@@ -1,0 +1,5 @@
+/* Optional rounded media treatment. Remove this stylesheet link to restore square corners. */
+.hero-media-main{border-radius:6px;isolation:isolate}
+.hero-video-frame{border-radius:inherit}
+.work-card-visual{border-radius:6px;isolation:isolate}
+.card-hover-preview{border-radius:inherit;overflow:hidden}
