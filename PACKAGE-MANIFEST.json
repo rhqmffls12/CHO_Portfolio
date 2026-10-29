@@ -346,8 +346,8 @@
   },
   {
     "path": "next-concept/app.js",
-    "bytes": 35606,
-    "sha256": "f4328719f3f365418c913603b95b80ef461db25a5ffc0dd5956a2cbdb30f206b"
+    "bytes": 36385,
+    "sha256": "6f03434ab0299e6fdfa3aa082617bf87b068f7fcfdb1415500fb118fe105872c"
   },
   {
     "path": "next-concept/assets/fonts/Pretendard-LICENSE.txt",
@@ -935,9 +935,64 @@
     "sha256": "7b44bf64c618b8572e0f7055028f7fc1be60cbf863824bc215f8c543832f4255"
   },
   {
+    "path": "next-concept/card-colors.css",
+    "bytes": 2031,
+    "sha256": "7c8621505ca24e91b137a64e9a5bc1f1d01ca3c5ecb51d212d08102196add823"
+  },
+  {
+    "path": "next-concept/card-details-toggle.css",
+    "bytes": 1603,
+    "sha256": "6268387a7db59e04bc7b1478f59b506a40bdb5d643d1c6622d400d4d4b96b187"
+  },
+  {
+    "path": "next-concept/card-details-toggle.js",
+    "bytes": 1494,
+    "sha256": "d1183c62f729cace4a765d0ddb33f74be94c6637c89023c3756ce602e2c58c39"
+  },
+  {
+    "path": "next-concept/card-focus.css",
+    "bytes": 1178,
+    "sha256": "9359f68e117e88d237a5165afdb3c7af563d30253567bc249271f3331177e1bb"
+  },
+  {
+    "path": "next-concept/card-reveal.css",
+    "bytes": 975,
+    "sha256": "4932083a81d95bf174f61821e2c8e7feeb06bc439ddda36b796a5a224bc4bf84"
+  },
+  {
+    "path": "next-concept/card-reveal.js",
+    "bytes": 3961,
+    "sha256": "460eac126d86a3eaadc450e1d4459df5975cb654ac21147ef13c0b052e713022"
+  },
+  {
     "path": "next-concept/catalog.js",
-    "bytes": 37394,
-    "sha256": "31217831e4c9f7981bf989736792840620f7798f3231fbe5d119ff8a9b134009"
+    "bytes": 37548,
+    "sha256": "580a56bc1f538171e66f339dad131106f81b4930c4619a8306de48232d4da161"
+  },
+  {
+    "path": "next-concept/collection-hover.css",
+    "bytes": 5193,
+    "sha256": "06a0681d3a1f188e51166226ee072152a9d765c0502bf851aec53d4b15f99f15"
+  },
+  {
+    "path": "next-concept/collection-layout.js",
+    "bytes": 3697,
+    "sha256": "ae9ed613161a276883e68439e6c317268efc521ed71b4f5dda8affba90557f7e"
+  },
+  {
+    "path": "next-concept/compact-scroll.js",
+    "bytes": 4434,
+    "sha256": "9a2b0f468baad6161534a5ee1b65cfa83ef2bfdd7abbc14fce30fa8ee345176d"
+  },
+  {
+    "path": "next-concept/featured-layout.css",
+    "bytes": 426,
+    "sha256": "f0dcef391c57f0d551a2405d6108680faafc5faa7cf775c988416be8423fcb9d"
+  },
+  {
+    "path": "next-concept/fullscreen-hero-preview.css",
+    "bytes": 4252,
+    "sha256": "88e0bf2aa0e6feb81f18a1eb52c276964122b676b54e9d1170feadc6d558f3d1"
   },
   {
     "path": "next-concept/hover-preview.js",
@@ -950,9 +1005,14 @@
     "sha256": "2509cc3e07e24c3a50e430db0a7e834a9a274a5e9393287983952894238dd4e5"
   },
   {
+    "path": "next-concept/independent-card-layout.js",
+    "bytes": 6448,
+    "sha256": "8a110abf6ab7026da32735ea62b823bd2577df5c4e51e4be50c09c71fdcc2866"
+  },
+  {
     "path": "next-concept/index.html",
-    "bytes": 13011,
-    "sha256": "acc802cdd970ad16914dc4f273c339216f3e5e942a41095ee68695f17ca1f9f7"
+    "bytes": 15235,
+    "sha256": "a694221f358738c84bfbc5be1269f1e4209dba17c03aafa8385323dc2f726f24"
   },
   {
     "path": "next-concept/profile.js",
@@ -960,9 +1020,14 @@
     "sha256": "e18ea288175d033334d1bf7bf27237af2f862fb7b6e7d30fe711092ae8fc070e"
   },
   {
+    "path": "next-concept/project-columns-preview.css",
+    "bytes": 1260,
+    "sha256": "099afb985affb2946adaedd13226a78a6731b76ce5bd1c437dacf77e8c19026b"
+  },
+  {
     "path": "next-concept/README.md",
-    "bytes": 19873,
-    "sha256": "18e7abcb17fcbf77ad52ee48fbcf3d68179e026871b1898dfb1d6be8d545ffdc"
+    "bytes": 55717,
+    "sha256": "ea52c29bf25f9149e329f66ac7cda0d6eccfc20a7a9303ddc65539d73b2d6d65"
   },
   {
     "path": "next-concept/rounded-preview.css",
@@ -976,13 +1041,13 @@
   },
   {
     "path": "next-concept/styles.css",
-    "bytes": 32092,
-    "sha256": "d8a372e1422ef483e2f91a938ec98a2ca3837d802ee070872ba3097333f9e37c"
+    "bytes": 32871,
+    "sha256": "fcc9b2603193695c63daaab9213c1f342e24400951adf83b337b77d8c6401e45"
   },
   {
     "path": "README.md",
-    "bytes": 4896,
-    "sha256": "7087327572b878d374eb4775aaea0904c9094ddd15d26dac32804b04fd48edf5"
+    "bytes": 5907,
+    "sha256": "ab890dc95b2c37086ea3a69ab42dd05b3a879c884f8e673a4ab93b4a1cda9873"
   },
   {
     "path": "run-local.cmd",

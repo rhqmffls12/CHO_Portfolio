@@ -1,0 +1,11 @@
+/* Emphasize the active card through contrast, without zooming or blurring artwork. */
+@media(hover:hover) and (pointer:fine){
+  .project-collections .work-card-visual{filter:brightness(1) saturate(1);transition:filter 220ms var(--ease)}
+  .project-collections .thumbnail-compact-title{opacity:1;transition:opacity 220ms var(--ease)}
+  .project-collections .work-card{transition:box-shadow 220ms var(--ease)}
+  .project-collections:has(.work-card:hover,.work-card :focus-visible) .work-card:not(:hover):not(:has(:focus-visible)) .work-card-visual{filter:brightness(.75) saturate(.7)}
+  .project-collections:has(.work-card:hover,.work-card :focus-visible) .work-card:not(:hover):not(:has(:focus-visible)) .thumbnail-compact-title{opacity:.55}
+  .project-collections .work-card:is(:hover,:has(:focus-visible)){z-index:2;box-shadow:0 2px 6px rgba(23,27,24,.12)}
+}
+@media(prefers-reduced-motion:reduce){.project-collections .work-card-visual,.project-collections .thumbnail-compact-title,.project-collections .work-card{transition:none!important}}
+@media print{.project-collections .work-card-visual{filter:none!important}.project-collections .work-card{box-shadow:none!important}}

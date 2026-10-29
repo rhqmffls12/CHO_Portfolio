@@ -1,0 +1,20 @@
+/* Small discipline accents, preserving the existing grid and artwork colors. */
+.work-card[data-card-discipline="production"]{--card-accent:#dda988;--card-accent-ink:#956444;--card-accent-outline:rgba(187,134,101,.42)}
+.work-card[data-card-discipline="tech"]{--card-accent:#9caf65;--card-accent-ink:#61762e;--card-accent-outline:rgba(113,139,44,.38)}
+.work-card[data-card-discipline]{position:relative;border-radius:6px;outline:none;background:var(--paper)}
+.work-card[data-card-discipline]::after{position:absolute;z-index:5;inset:0;box-sizing:border-box;border:1px solid var(--card-accent-outline);border-radius:inherit;content:"";opacity:0;pointer-events:none;transition:opacity 180ms var(--ease)}
+.project-collections .work-card .work-card-info{padding:14px 12px 12px}
+.work-card[data-card-discipline]:is(:hover,:focus-within,.is-card-expanded-held) .work-card-visual{border-radius:6px 6px 0 0}
+.work-card[data-card-discipline] .work-card-visual::before{position:absolute;z-index:2;bottom:0;left:0;right:0;height:2px;content:"";background:var(--card-accent);pointer-events:none}
+.work-card[data-card-discipline] .card-discipline-label{color:var(--card-accent-ink)}
+.work-card[data-card-discipline] .thumbnail-compact-title{color:#fff}
+.work-card[data-card-discipline] .featured-badge{color:var(--card-accent)}
+.work-card[data-card-discipline] h3 button:hover{color:var(--card-accent-ink)}
+.work-card[data-card-discipline]:is(:focus-within,.is-card-expanded-held)::after{opacity:1}
+@media(hover:hover){.work-card[data-card-discipline]:hover::after{opacity:1}}
+@media(hover:hover){.work-card[data-card-discipline]:has(.work-card-visual:hover) h3 button{color:var(--card-accent-ink)}}
+.work-card[data-card-discipline]:has(.work-card-visual:focus-visible) h3 button{color:var(--card-accent-ink)}
+@media(hover:hover) and (pointer:fine){
+  .project-collections .work-card{transition:box-shadow 220ms var(--ease)}
+  .project-collections .work-card:is(:hover,:has(:focus-visible)){z-index:2;box-shadow:0 2px 6px rgba(23,27,24,.12)}
+}

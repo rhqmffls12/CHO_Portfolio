@@ -1,0 +1,5 @@
+/* Featured work gets two equal large cards; other project grids retain their layout. */
+.work-section .featured-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.work-section .featured-grid .work-card:first-child{grid-column:auto;display:block}
+.work-section .featured-grid .work-card:first-child .work-card-info{padding-top:14px}
+@media(max-width:600px){.work-section .featured-grid{grid-template-columns:minmax(0,1fr)}}

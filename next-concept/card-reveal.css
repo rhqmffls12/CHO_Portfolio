@@ -1,0 +1,10 @@
+/* Closed drawers leave no blank space; later thumbnail rows follow the expansion. */
+.project-grid.info-drawer-grid{row-gap:22px;overflow-anchor:none;align-items:start}
+.card-info-drawer{display:flow-root;min-width:0}
+.work-card.has-scroll-info .card-info-drawer{height:var(--card-drawer-height,0px);overflow:hidden;overflow:clip}
+.work-card.has-scroll-info .work-card-info{transform:translateY(var(--card-info-shift,-18px))}
+.work-card.has-scroll-info .card-info-drawer:focus-within{height:auto;overflow:visible}
+.work-card.has-scroll-info .work-card-info:focus-within{transform:none}
+.work-section:has(.info-drawer-grid){overflow-anchor:none}
+@media(prefers-reduced-motion:reduce){.work-card.has-scroll-info .card-info-drawer{height:auto;overflow:visible}.work-card.has-scroll-info .work-card-info{transform:none}}
+@media print{.work-card.has-scroll-info .card-info-drawer{height:auto;overflow:visible}.work-card.has-scroll-info .work-card-info{transform:none}}

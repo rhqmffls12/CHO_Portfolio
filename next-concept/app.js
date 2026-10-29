@@ -1,7 +1,10 @@
-import { catalog } from "./catalog.js?v=archive-thumbnails-20261027";
+import { catalog } from "./catalog.js?v=moodboard-fourth-thumbnail-20261028";
 import { profile } from "./profile.js?v=slack-contact-20261027";
 import { imageManifest } from "./image-manifest.js?v=archive-thumbnails-20261027";
 import { initHoverPreviews } from "./hover-preview.js?v=instant-hover-20261027";
+import { initCompactScroll } from "./compact-scroll.js?v=card-details-toggle-20261028";
+import { initIndependentCardLayout } from "./independent-card-layout.js?v=balanced-diagonal-spacing-20261028";
+import { initCardDetailsToggle } from "./card-details-toggle.js?v=segmented-card-view-20261028";
 
 const escapeHTML = (value = "") => String(value).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" })[c]);
 const toRootPath = (path = "") => path.startsWith("./") ? `../${path.slice(2)}` : path;
@@ -37,18 +40,21 @@ function imageMarkup(path, alt = "", mode = "card", eager = false) {
 }
 function cardMarkup(entry) {
   const index = work.indexOf(entry);
+  const discipline = entry.kind === "tool" || entry.groups.some(group => group === "tool" || group === "pipeline") ? "tech" : "production";
   const poster = entry.thumbnail || entry.poster;
   const logos = (entry.toolLogos || []).map(({name,src}) => `<img src="${escapeHTML(toRootPath(name.toLowerCase().includes("unreal") ? "./assets/tools/unreal-engine-black.png" : src))}" alt="${escapeHTML(name)}" title="${escapeHTML(name)}" loading="lazy" width="24" height="24" />`).join("");
-  return `<article class="work-card" data-work-card data-work-id="${entry.id}">
+  return `<article class="work-card" data-work-card data-work-id="${entry.id}" data-card-discipline="${discipline}">
     <button class="work-card-visual${poster ? "" : " is-text-poster"}" type="button" data-open-work="${entry.id}" aria-label="View ${escapeHTML(entry.title)}">
       ${imageMarkup(poster)}${!poster ? `<span class="visual-placeholder">${escapeHTML(entry.thumbnailLabel || entry.title)}</span>` : ""}
-      <span class="visual-label">${escapeHTML(groupLabel(entry.groups))}</span><span class="visual-open" aria-hidden="true">↗</span>
+      <span class="visual-open" aria-hidden="true">↗</span>
+      <span class="thumbnail-compact-title" aria-hidden="true">${escapeHTML(entry.title)}</span>
+      <span class="thumbnail-category-label">${escapeHTML(groupLabel(entry.groups))}</span>
       ${entry.featuredOrder !== null ? `<span class="featured-badge">FEATURED / 0${entry.featuredOrder+1}</span>` : ""}
     </button>
-    <div class="work-card-info"><p class="work-card-meta"><span>${escapeHTML(entry.year)}</span><span>${entry.archive ? "EARLIER WORK" : entry.kind === "tool" ? "TECHNICAL ART" : "PRODUCTION ART"}</span><span class="card-index">${String(index+1).padStart(2,"0")}</span></p>
+    <div class="card-info-panel"><div class="card-info-clip"><div class="work-card-info"><p class="work-card-meta"><span>${escapeHTML(entry.year)}</span><span class="card-discipline-label">${escapeHTML(groupLabel(entry.groups))}</span><span class="card-index">${String(index+1).padStart(2,"0")}</span></p>
     <h3><button id="work-${entry.id}" type="button" data-open-work="${entry.id}">${escapeHTML(entry.title)}</button></h3>
     <p class="work-card-description">${escapeHTML(entry.description || "")}</p>
-    <div class="work-card-footer"><div class="card-tool-logos" aria-label="Project software">${logos}</div><div class="card-actions">${entry.releaseUrl ? `<a class="release-link" href="${escapeHTML(entry.releaseUrl)}" target="_blank" rel="noopener noreferrer">RELEASE ↗</a>` : ""}</div></div></div></article>`;
+    <div class="work-card-footer"><div class="card-tool-logos" aria-label="Project software">${logos}</div><div class="card-actions">${entry.releaseUrl ? `<a class="release-link" href="${escapeHTML(entry.releaseUrl)}" target="_blank" rel="noopener noreferrer">RELEASE ↗</a>` : ""}</div></div></div></div></div></article>`;
 }
 function renderWork() {
   for (const [name, predicate] of Object.entries({featured:e => e.featuredOrder !== null, current:e => e.featuredOrder === null && !e.archive, archive:e => e.archive})) {
@@ -65,7 +71,10 @@ function renderWork() {
     button.addEventListener("click", () => setFilter(group));
   });
   document.querySelector(".main-nav a[href='#work'] span").textContent = String(work.length).padStart(2,"0");
+  initIndependentCardLayout();
   stopCardPreview = initHoverPreviews({entries:work, toRootPath, dialog, reduceMotion});
+  initCompactScroll(reduceMotion);
+  initCardDetailsToggle();
 }
 function setFilter(filter) {
   stopCardPreview();
@@ -83,6 +92,7 @@ function setFilter(filter) {
   });
   document.querySelector("[data-visible-count]").textContent = String(count).padStart(2,"0");
   document.querySelectorAll("[data-work-group]").forEach(group => { group.hidden = !group.querySelector("[data-work-card]:not([hidden])"); });
+  document.dispatchEvent(new Event("portfolio:filterchange"));
 }
 function mediaStage(entry) {
   const poster = entry.poster || entry.thumbnail || entry.media?.images?.[0];
@@ -545,7 +555,7 @@ function renderProfile() {
   const responsibilities = (entry) => `<p class="career-description">${escapeHTML(entry.description)}</p><ul class="career-tags" aria-label="Responsibilities">${(entry.tags || []).map((tag) => `<li>${escapeHTML(tag)}</li>`).join("")}</ul>`;
   careerList.innerHTML = profile.career.map((entry) => {
     if (entry.roles?.length) {
-      return `<li class="career-entry career-entry--group reveal"><p class="career-period">${escapeHTML(entry.period)}</p><h4>${escapeHTML(entry.studio)}</h4><p class="career-group-label">ROLE PROGRESSION</p><ol class="career-roles" aria-label="Roles at ${escapeHTML(entry.studio)}">${entry.roles.map((role) => `<li class="career-role"><p class="career-period">${escapeHTML(role.period)}</p><h5>${escapeHTML(role.role)}</h5>${responsibilities(role)}</li>`).join("")}</ol></li>`;
+      return `<li class="career-entry career-entry--group reveal"><p class="career-period">${escapeHTML(entry.period)}</p><h4 class="career-studio">${escapeHTML(entry.studio)}</h4><ol class="career-roles" aria-label="Roles at ${escapeHTML(entry.studio)}">${entry.roles.map((role) => `<li class="career-role"><p class="career-period">${escapeHTML(role.period)}</p><h5>${escapeHTML(role.role)}</h5>${responsibilities(role)}</li>`).join("")}</ol></li>`;
     }
     return `<li class="career-entry reveal"><p class="career-period">${escapeHTML(entry.period)}</p><h4>${escapeHTML(entry.role)}</h4><p class="career-studio">${escapeHTML(entry.studio)}</p>${responsibilities(entry)}</li>`;
   }).join("");

@@ -610,7 +610,8 @@ export const catalog = [
     "kind": "tool",
     "contribution": "로컬 AI 워크플로 설계 · 3D 생성·텍스처링 배치 자동화",
     "featuredOrder": null,
-    "archive": false
+    "archive": false,
+    "thumbnail": "./assets/technical/local-ai-3d/3D_AI_Asset_tool_render06.png"
   },
   {
     "title": "Local AI Moodboard Image Tool",
@@ -681,7 +682,8 @@ export const catalog = [
     "kind": "tool",
     "contribution": "Maya 프리비즈 연계 · 로컬 AI 이미지 생성 워크플로 구성",
     "featuredOrder": null,
-    "archive": false
+    "archive": false,
+    "thumbnail": "./assets/technical/ai-moodboard/ai_moodboard04.png"
   },
   {
     "title": "ML Deform Simulation Procedural Workflow",

@@ -18,9 +18,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./styles.css?v=contact-icons-20261027" />
+    <link rel="stylesheet" href="./styles.css?v=art-engineered-heading-20261028" />
     <link rel="stylesheet" href="./rounded-preview.css?v=subtle-rounded-media-20261027" />
-    <script type="module" src="./app.js?v=archive-thumbnails-20261027"></script>
+    <link rel="stylesheet" href="./fullscreen-hero-preview.css?v=hero-white-specs-20261028" />
+    <link rel="stylesheet" href="./card-colors.css?v=white-title-category-corner-20261028" />
+    <link rel="stylesheet" href="./collection-hover.css?v=hide-open-thumbnail-category-20261028" />
+    <link rel="stylesheet" href="./card-details-toggle.css?v=segmented-card-view-20261028" />
+    <script type="module" src="./app.js?v=career-no-progression-label-20261028"></script>
   </head>
   <body>
     <a class="skip-link" href="#work">프로젝트로 바로 이동</a>
@@ -42,7 +46,6 @@
           <h1 id="hero-title" class="hero-title--vision"><span class="hero-title-line" data-title-scale=".82"><span class="hero-title-word">From</span> <strong class="hero-title-word">artistic</strong></span> <span class="hero-title-line"><span class="hero-title-word">vision</span> <span class="hero-title-word">to</span></span> <span class="hero-title-line is-accent"><strong class="hero-title-word">technical</strong></span> <span class="hero-title-line is-accent"><span class="hero-title-word">execution.</span></span></h1>
           <div class="hero-bottomline">
           <p>다양한 아트 제작과 개발 경험으로 제작의 흐름을 이해합니다.<br />월드, 렌더링, 캐릭터부터 워크플로와 파이프라인 설계까지.</p>
-            <a class="text-link" href="#work">EXPLORE SELECTED WORK <span aria-hidden="true">↓</span></a>
           </div>
           <div class="hero-specs" aria-label="Portfolio expertise">
             <div><span>ART PRODUCTION</span><strong>Worlds · Render · Rig<br />CFX · FX</strong></div>
@@ -67,6 +70,7 @@
             </div>
           </div>
         </div>
+        <a class="hero-scroll-cue" href="#work" aria-label="프로젝트 살펴보기" title="프로젝트 살펴보기"><svg viewBox="0 0 64 64" fill="none" aria-hidden="true" focusable="false"><path d="M32 7v48M13 36l19 19 19-19" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" /></svg></a>
       </section>
 
       <section class="signal-strip" aria-label="Portfolio disciplines">
@@ -75,7 +79,7 @@
 
       <section class="work-section section-shell" id="work" aria-labelledby="work-title">
         <div class="section-heading">
-          <div><p class="eyebrow section-kicker">SELECTED WORK <span>2015 — 2026</span></p><h2 id="work-title">Art, systems,<br /><span>in production.</span></h2></div>
+          <div><p class="eyebrow section-kicker">SELECTED WORK <span>2015 — 2026</span></p><h2 id="work-title"><strong class="work-title-art">Art,</strong> engineered.<br /><span class="work-title-production">For production.</span></h2></div>
           <p class="section-intro">Unreal Engine 기반의 시네마틱 제작을 통해 고품질 실시간 비주얼과 제작 워크플로에 대한 경험을 쌓았습니다. 프로젝트를 살펴보며 아트 제작부터 툴 개발과 파이프라인 설계까지, 비주얼의 목표를 기술로 구현하는 테크니컬 아티스트의 접근 방식과 결과를 함께 확인할 수 있습니다.</p>
         </div>
         <div class="work-toolbar">
@@ -86,11 +90,13 @@
             <button class="filter-chip" type="button" data-filter="cfx-fx" aria-pressed="false">CFX / FX <span data-filter-count="cfx-fx">00</span></button>
             <button class="filter-chip" type="button" data-filter="tool-pipeline" aria-pressed="false">TOOL / PIPELINE <span data-filter-count="tool-pipeline">00</span></button>
           </div>
-          <span class="results-count" aria-live="polite"><b data-visible-count>00</b> PROJECTS</span>
+          <div class="work-view-controls"><span class="results-count" aria-live="polite"><b data-visible-count>00</b> PROJECTS</span><div class="card-details-controls" data-card-details-controls data-expanded="false" role="group" aria-label="프로젝트 카드 정보 보기" hidden><span class="card-details-indicator" aria-hidden="true"></span><button class="card-details-option" type="button" data-details-mode="collapsed" aria-pressed="true" aria-controls="project-collections" aria-label="모든 카드 접기" title="접기 · 마우스를 올린 카드만 정보 표시"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="3" y="3" width="5" height="5" rx=".8" stroke="currentColor" stroke-width="1.2"/><rect x="12" y="3" width="5" height="5" rx=".8" stroke="currentColor" stroke-width="1.2"/><rect x="3" y="12" width="5" height="5" rx=".8" stroke="currentColor" stroke-width="1.2"/><rect x="12" y="12" width="5" height="5" rx=".8" stroke="currentColor" stroke-width="1.2"/></svg><span>COLLAPSE</span></button><button class="card-details-option" type="button" data-details-mode="expanded" aria-pressed="false" aria-controls="project-collections" aria-label="모든 카드 펼치기" title="펼치기 · 모든 카드 정보 표시"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="3" y="3" width="14" height="7" rx=".8" stroke="currentColor" stroke-width="1.2"/><path d="M3 13.5h14M3 17h10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg><span>EXPAND</span></button></div></div>
         </div>
+        <div class="project-collections" id="project-collections">
         <div class="work-collection" data-work-group="featured"><header class="collection-heading"><h3>Featured projects</h3><p>워크플로 개발 · 렌더링 기술 · 프로덕션 아트</p></header><div class="project-grid featured-grid" data-work-grid="featured"></div></div>
         <div class="work-collection" data-work-group="current"><header class="collection-heading"><h3>Selected projects</h3><p>각 프로젝트의 담당 범위와 구현 과정을 확인하세요.</p></header><div class="project-grid" id="project-grid" data-work-grid="current"></div></div>
         <div class="work-collection archive-collection" data-work-group="archive"><header class="collection-heading"><h3>Earlier work</h3><p>2015–2021 · Rigging, tools &amp; production</p></header><div class="project-grid" data-work-grid="archive"></div></div>
+        </div>
       </section>
 
       <section class="capabilities-section" id="capabilities" aria-labelledby="capabilities-title">

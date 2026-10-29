@@ -1,0 +1,50 @@
+/* Full-width hero trial: remove this stylesheet link to restore the split layout. */
+.hero{position:relative;isolation:isolate;display:flex;align-items:center;max-width:none;min-height:calc(100svh - 80px);margin:0;padding:48px clamp(22px,5vw,90px) 148px;overflow:hidden;background:#101713;color:#f4f5f1}
+.hero .hero-media{position:absolute;inset:0;z-index:0;min-width:0;width:100%;height:100%}
+.hero .hero-media-main{width:100%;height:100%;aspect-ratio:auto;border-radius:0;box-shadow:none}
+.hero .hero-video-frame{border-radius:0}
+.hero .hero-video-frame::after{position:absolute;inset:0;z-index:1;pointer-events:none;content:"";background:linear-gradient(90deg,rgba(8,13,10,.87) 0%,rgba(8,13,10,.66) 33%,rgba(8,13,10,0) 70%)}
+.hero .hero-copy{position:relative;z-index:2;flex:0 1 640px;width:48%;max-width:48%;min-width:0}
+.hero .hero-copy>.eyebrow{color:#d1d6cc;font-size:10px}
+.hero h1.hero-title--vision{color:#f4f5f1;margin-top:28px}
+.hero h1.hero-title--vision>span:first-child strong.hero-title-word{color:#dda988}
+.hero h1.hero-title--vision>span.is-accent{color:#bdd084}
+.hero .hero-bottomline{margin-top:26px;gap:14px}
+.hero .hero-bottomline p{color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.3)}
+.hero .hero-scroll-cue{position:absolute;z-index:3;left:clamp(22px,5vw,90px);bottom:36px;display:grid;place-items:center;width:64px;height:76px;color:#fff;border:0;background:none}
+.hero-scroll-cue svg{display:block;width:56px;height:56px;overflow:visible;filter:drop-shadow(0 2px 5px rgba(0,0,0,.35));transform-origin:50% 20%;animation:hero-scroll-tension 3.6s infinite}
+.hero .hero-scroll-cue:focus-visible{outline:2px solid #fff;outline-offset:5px}
+@keyframes hero-scroll-tension{0%,15%,100%{transform:translateY(-5px) scaleY(1);animation-timing-function:cubic-bezier(.45,0,.2,1)}55%{transform:translateY(10px) scaleY(1.07);animation-timing-function:cubic-bezier(.2,.8,.2,1)}82%{transform:translateY(-7px) scaleY(.98);animation-timing-function:ease-out}}
+.hero .hero-specs{margin-top:28px;padding-top:16px;border-top-color:rgba(220,231,211,.25)}
+.hero .hero-specs span{color:#aeb9a4}
+.hero .hero-specs strong{color:#fff}
+.hero .reel-overlay-panel{left:auto;right:calc(clamp(22px,3vw,48px) + 54px);bottom:48px;width:36%;max-width:520px;text-align:right}
+.hero .reel-overlay-heading{display:none}
+.hero .reel-overlay-panel h2{font-size:clamp(14px,1.4vw,21px);margin-bottom:10px;color:#fff}
+.hero .reel-overlay-detail{display:flex;justify-content:flex-end;align-items:baseline;gap:7px}
+.hero .reel-overlay-detail>span{flex:0 0 auto}
+.hero .reel-overlay-detail p{min-width:0}
+.hero .reel-overlay-detail>span{font:9px var(--mono);color:#efc6ad}
+.hero .reel-overlay-detail p{font:400 11px/1.6 var(--body);color:#fff}
+.hero .hero-video-toggle{right:clamp(22px,3vw,48px);bottom:48px}
+.hero .hero-video-timeline{height:2px}
+.hero .reel-error{inset:12px 22px auto auto;max-width:38%}
+.hero a:focus-visible,.hero button:focus-visible{outline-color:#bddc6b}
+@media(min-width:1600px){.hero .hero-copy{max-width:640px}}
+@media(max-width:1100px){.hero .hero-copy{flex-basis:58%;width:58%;max-width:58%}.hero .reel-overlay-panel{left:auto;right:calc(clamp(22px,3vw,48px) + 54px);width:42%;bottom:36px}.hero .reel-overlay-panel h2{font-size:15.4px}.hero .hero-video-toggle{bottom:36px}}
+@media(max-width:760px){
+  .hero{min-height:calc(100svh - 102px);padding:44px 7vw 190px;align-items:flex-start}
+  .hero .hero-copy{flex-basis:100%;width:100%;max-width:520px}
+  .hero .hero-copy>.eyebrow{font-size:9px;max-width:90%}
+  .hero .hero-specs{margin-top:24px}
+  .hero .hero-specs strong{font-size:11px}
+  .hero .hero-video-frame::after{background:linear-gradient(90deg,rgba(8,13,10,.8),rgba(8,13,10,0) 70%)}
+  .hero .reel-overlay-panel{left:calc(7vw + 72px);right:76px;bottom:32px;width:auto;max-width:none}
+  .hero .reel-overlay-panel h2{font-size:15.4px;margin-bottom:6px}
+  .hero .reel-overlay-details{display:grid}
+  .hero .hero-video-toggle{right:22px;bottom:32px}
+  .hero .reel-error{max-width:90%}
+  .hero .hero-scroll-cue{left:7vw;bottom:22px;width:56px;height:64px}
+  .hero-scroll-cue svg{width:48px;height:48px}
+}
+@media(prefers-reduced-motion:reduce){.hero-scroll-cue svg{animation:none;transform:none}}

@@ -1,0 +1,11 @@
+/* Two disciplines, with one card per row in each discipline: two columns overall. */
+.work-section .featured-grid,.work-section .archive-collection .project-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.work-section .featured-grid .work-card:first-child{grid-column:auto;display:block}
+.work-section .featured-grid .work-card:first-child .work-card-info{padding-top:14px}
+.selected-project-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:22px}
+.selected-project-lane{min-width:0}
+.project-lane-title{margin:0 0 20px;padding-bottom:12px;border-bottom:1px solid var(--line);color:#6b8035;font:500 11px/1.6 var(--mono);letter-spacing:.045em}
+.selected-project-lane .project-grid{grid-template-columns:minmax(0,1fr);gap:38px 22px}
+.selected-project-columns.is-single-lane{grid-template-columns:minmax(0,1fr)}
+.selected-project-columns.is-single-lane .project-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:600px){.selected-project-columns{grid-template-columns:minmax(0,1fr);gap:38px}.work-section .featured-grid,.work-section .archive-collection .project-grid,.selected-project-columns.is-single-lane .project-grid{grid-template-columns:minmax(0,1fr)}.project-lane-title{margin-bottom:18px}}

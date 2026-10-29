@@ -1,0 +1,13 @@
+.work-view-controls{display:flex;align-items:center;flex-wrap:wrap;gap:16px;margin-left:auto}
+.card-details-controls{position:relative;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px;padding:3px;border:1px solid var(--line);border-radius:6px;background:transparent;isolation:isolate}
+.card-details-indicator{position:absolute;z-index:-1;top:3px;bottom:3px;left:3px;width:calc(50% - 4px);border-radius:3px;background:#252c26;box-shadow:0 1px 2px rgba(23,27,24,.08);pointer-events:none;transition:transform 180ms cubic-bezier(.2,.8,.2,1)}
+.card-details-controls[data-expanded="true"] .card-details-indicator{transform:translateX(calc(100% + 2px))}
+.card-details-option{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-width:98px;min-height:44px;padding:8px 10px;border:0;border-radius:3px;background:transparent;color:var(--muted);font:10px/1.4 var(--mono);letter-spacing:.025em;transition:color 180ms ease}
+.card-details-option svg{display:block;flex:0 0 auto;width:17px;height:17px}
+.card-details-option:hover{color:var(--ink)}
+.card-details-option[aria-pressed="true"],.card-details-option[aria-pressed="true"]:hover{color:#f4f5f1}
+.card-details-option[aria-pressed="true"] svg{color:#bdd084}
+.card-details-option:focus-visible{outline:2px solid var(--olive);outline-offset:3px}
+.project-collections.show-all-card-info .work-card[data-card-discipline]::after{opacity:1}
+@media(hover:none),(pointer:coarse){.card-details-controls{display:none}}
+@media(prefers-reduced-motion:reduce){.card-details-indicator,.card-details-option{transition:none}}
