@@ -46,19 +46,20 @@ export function initCompactScroll(reduceMotion) {
     if (!frame && !document.hidden) frame = requestAnimationFrame(check);
   }
   function sync() {
-    region.classList.toggle("has-compact-cascade", enabled());
-    if (!enabled()) {
-      for (const card of [...pending, ...active.keys()]) finish(card);
-    }
+    region.classList.toggle("has-compact-cascade", compact());
     observer?.disconnect();
-    if (enabled() && !triggered) {
+    if (!compact()) {
+      for (const card of cards) finish(card);
+      return;
+    }
+    if (!triggered) {
       observer = new IntersectionObserver(schedule, {rootMargin:`0px 0px -${Math.round(window.innerHeight * .28)}px 0px`, threshold:0});
       observer.observe(region);
     }
     schedule();
   }
   function resetAboveProjects() {
-    if (!enabled() || !triggered) return;
+    if (!compact() || !triggered) return;
     // Reset only when returning above the entire collection, never between rows.
     for (const card of cards) finish(card);
     triggered = false;
@@ -73,7 +74,7 @@ export function initCompactScroll(reduceMotion) {
     if (!entry.isIntersecting && entry.boundingClientRect.top >= window.innerHeight - 1) resetAboveProjects();
   }, {threshold:0});
   resetObserver.observe(region);
-  for (const card of cards) card.classList.add("compact-enter-pending");
+  if (compact()) for (const card of cards) card.classList.add("compact-enter-pending");
   cards.forEach(card => card.addEventListener("pointerenter", () => finish(card)));
   region.addEventListener("pointerleave", schedule);
   region.addEventListener("focusout", schedule);
@@ -95,8 +96,8 @@ export function initCompactScroll(reduceMotion) {
     if (region.classList.contains("show-all-card-info")) {
       for (const card of [...pending, ...active.keys()]) finish(card);
       triggered = true;
-      observer?.disconnect();
-    } else schedule();
+    }
+    sync();
   });
   reduceMotion.addEventListener("change", sync);
   sync();

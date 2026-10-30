@@ -57,7 +57,7 @@ export const catalog = [
         "src": "./assets/tools/maya.png"
       }
     ],
-    "thumbnail": "./assets/thumbnails/subzero.png?v=20261019b",
+    "thumbnail": "./assets/thumbnails/subzero.png?v=20261030",
     "description": "시네마틱에 맞춰 환경을 구성하고, 얼어붙은 블루존 머티리얼과 월드가 점진적으로 얼어가는 프리즈 효과를 제작했습니다. 환경의 변화가 서사와 함께 읽히도록 머티리얼 연출과 렌더링을 다듬었습니다.",
     "video": "./media/subzero.mp4",
     "releaseUrl": "https://www.youtube.com/watch?v=eFRcy0Bcqtc",
@@ -196,7 +196,7 @@ export const catalog = [
   {
     "number": "06",
     "discipline": "cinematic",
-    "title": "Battleground Intro & Collabo Showreel",
+    "title": "Battleground Showreel",
     "category": "CINEMATIC · PRODUCTION PIPELINE",
     "year": "2021–2025",
     "role": "Technical Art · Rigging · Environment Art · CFX · Rendering",
@@ -611,7 +611,7 @@ export const catalog = [
     "contribution": "로컬 AI 워크플로 설계 · 3D 생성·텍스처링 배치 자동화",
     "featuredOrder": null,
     "archive": false,
-    "thumbnail": "./assets/technical/local-ai-3d/3D_AI_Asset_tool_render06.png"
+    "thumbnail": "./assets/technical/local-ai-3d/3D_AI_Asset_tool_render_th.png"
   },
   {
     "title": "Local AI Moodboard Image Tool",
@@ -770,6 +770,7 @@ export const catalog = [
       }
     ],
     "poster": "./assets/technical/houdini-batch/houdini_simulation_batch_setup.png",
+    "thumbnail": "./assets/technical/houdini-batch/houdini_batch_thumbnail.png",
     "media": {
       "type": "youtube",
       "id": "p1Gi89BS0Rk",
@@ -869,6 +870,7 @@ export const catalog = [
       }
     ],
     "poster": "./assets/technical/cinematic-asset-picker/workflow-overview.svg?v=2021-2026",
+    "thumbnail": "./assets/technical/cinematic-asset-picker/workflow-thumbnail.png",
     "media": {
       "type": "youtube",
       "id": "zBuRQKSIXgI",

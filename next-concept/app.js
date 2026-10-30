@@ -1,9 +1,9 @@
-import { catalog } from "./catalog.js?v=moodboard-fourth-thumbnail-20261028";
+import { catalog } from "./catalog.js?v=workflow-thumbnail-20261030";
 import { profile } from "./profile.js?v=slack-contact-20261027";
-import { imageManifest } from "./image-manifest.js?v=archive-thumbnails-20261027";
+import { imageManifest } from "./image-manifest.js?v=cinematic-shading-revision2-20261030";
 import { initHoverPreviews } from "./hover-preview.js?v=instant-hover-20261027";
-import { initCompactScroll } from "./compact-scroll.js?v=card-details-toggle-20261028";
-import { initIndependentCardLayout } from "./independent-card-layout.js?v=balanced-diagonal-spacing-20261028";
+import { initCompactScroll } from "./compact-scroll.js?v=expand-scroll-reset-fix-20261030";
+import { initIndependentCardLayout } from "./independent-card-layout.js?v=expand-footer-row-alignment-20261030";
 import { initCardDetailsToggle } from "./card-details-toggle.js?v=segmented-card-view-20261028";
 
 const escapeHTML = (value = "") => String(value).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" })[c]);
@@ -47,6 +47,7 @@ function cardMarkup(entry) {
     <button class="work-card-visual${poster ? "" : " is-text-poster"}" type="button" data-open-work="${entry.id}" aria-label="View ${escapeHTML(entry.title)}">
       ${imageMarkup(poster)}${!poster ? `<span class="visual-placeholder">${escapeHTML(entry.thumbnailLabel || entry.title)}</span>` : ""}
       <span class="visual-open" aria-hidden="true">↗</span>
+      <span class="thumbnail-compact-year" aria-hidden="true">${escapeHTML(entry.year)}</span>
       <span class="thumbnail-compact-title" aria-hidden="true">${escapeHTML(entry.title)}</span>
       <span class="thumbnail-category-label">${escapeHTML(groupLabel(entry.groups))}</span>
       ${entry.featuredOrder !== null ? `<span class="featured-badge">FEATURED / 0${entry.featuredOrder+1}</span>` : ""}
@@ -347,6 +348,8 @@ function renderFloatingToolkit(container, tools) {
   if (!tools.length) return;
   container.innerHTML = `<div class="toolkit-field" role="group" aria-label="Production software"><canvas class="toolkit-dots" aria-hidden="true"></canvas>${tools.map((tool) => `<button class="tool-orb" type="button" data-priority="${tool.priority || 1}" data-enlarged="${Boolean(tool.enlarged)}" aria-pressed="false" aria-label="${escapeHTML(tool.name)} · Usage ${tool.priority || 1}/4"><img src="${escapeHTML(tool.icon)}" alt="" width="48" height="48" loading="lazy" draggable="false" /></button>`).join("")}</div><div class="toolkit-hover-detail" aria-live="polite" aria-atomic="true"></div><button class="toolkit-touch-control" type="button" aria-pressed="false">아이콘 멈추기</button>`;
   const field = container.querySelector(".toolkit-field");
+  const usageHint = container.parentElement.querySelector(".toolkit-usage-hint");
+  if (usageHint) container.querySelector(".toolkit-hover-detail").after(usageHint);
   const bodies = [...field.querySelectorAll(".tool-orb")].map((element, index) => {
     const angle = index * Math.PI * 2 / tools.length - Math.PI / 2;
     const heading = angle + .7 + (index % 3) * .8;
@@ -402,12 +405,57 @@ function renderFloatingToolkit(container, tools) {
   });
   const canvas = field.querySelector(".toolkit-dots");
   const context = canvas.getContext("2d");
+  // Cloud-soft brain profile: indentations filled 50% toward the convex envelope, no stem.
+  // The same outline masks Cartesian dots and reflects the floating icons.
+  const cloudAnchors = [
+    [-0.9430,0.1200],[-0.9635,-0.1000],[-0.8610,-0.3000],[-0.7420,-0.3728],
+    [-0.6047,-0.5600],[-0.3895,-0.6500],[-0.2239,-0.6461],[-0.0410,-0.7500],
+    [0.1947,-0.7300],[0.3832,-0.6234],[0.5433,-0.6100],[0.7380,-0.4600],
+    [0.8187,-0.2971],[0.9430,-0.1700],[0.9737,0.0400],[0.8712,0.2500],
+    [0.6970,0.3600],[0.4952,0.3831],[0.3443,0.3703],[0.1754,0.4240],
+    [0.0717,0.4800],[-0.0533,0.4616],[-0.1844,0.4285],[-0.3280,0.4900],
+    [-0.5433,0.4800],[-0.7075,0.3802],[-0.8405,0.3000]
+  ];
+  // Taller profile inside a narrower panel; retain the shallow, stem-free base.
+  cloudAnchors.forEach((point) => { point[1] = point[1] * 1.38 + .15; });
+  const cloudContour = [];
+  cloudAnchors.forEach((point, index) => {
+    const count = cloudAnchors.length;
+    const p0 = cloudAnchors[(index + count - 1) % count];
+    const p1 = point, p2 = cloudAnchors[(index + 1) % count];
+    const p3 = cloudAnchors[(index + 2) % count];
+    for (let step = 0; step < 6; step++) {
+      const t = step / 6, t2 = t * t, t3 = t2 * t;
+      cloudContour.push([0, 1].map((axis) => .5 * (
+        2 * p1[axis] + (-p0[axis] + p2[axis]) * t +
+        (2 * p0[axis] - 5 * p1[axis] + 4 * p2[axis] - p3[axis]) * t2 +
+        (-p0[axis] + 3 * p1[axis] - 3 * p2[axis] + p3[axis]) * t3
+      )));
+    }
+  });
+  const profileDistance = (x, y) => {
+    let inside = false, nearest = Infinity, inwardX = 0, inwardY = 0;
+    for (let i = 0, j = cloudContour.length - 1; i < cloudContour.length; j = i++) {
+      const [ax, ay] = cloudContour[j], [bx, by] = cloudContour[i];
+      if ((ay > y) !== (by > y) && x < (bx - ax) * (y - ay) / (by - ay) + ax) inside = !inside;
+      const dx = bx - ax, dy = by - ay, length2 = dx * dx + dy * dy;
+      const t = Math.max(0, Math.min(1, ((x - ax) * dx + (y - ay) * dy) / length2));
+      const distance = Math.hypot(x - ax - dx * t, y - ay - dy * t);
+      if (distance < nearest) {
+        nearest = distance;
+        const length = Math.sqrt(length2);
+        inwardX = -dy / length; inwardY = dx / length;
+      }
+    }
+    return { distance: inside ? nearest : -nearest, nx: inwardX, ny: inwardY };
+  };
   const pointer = { x: 0, y: 0, active: false };
   let dots = [];
   let diameter = 0;
+  let fieldHeight = 0;
   const drawDots = (snap = false) => {
     if (!context || !diameter) return;
-    context.clearRect(0, 0, diameter, diameter);
+    context.clearRect(0, 0, diameter, fieldHeight);
     const influence = diameter * .23;
     dots.forEach((dot) => {
       const proximity = pointer.active ? Math.max(0, 1 - Math.hypot(dot.x - pointer.x, dot.y - pointer.y) / influence) : 0;
@@ -436,42 +484,43 @@ function renderFloatingToolkit(container, tools) {
   let frame = 0;
   let previousTime = 0;
   const paint = () => bodies.forEach(({ element, x, y }) => {
-    element.style.transform = `translate3d(${x * diameter / 2}px, ${y * diameter / 2}px, 0) translate(-50%, -50%)`;
+    element.style.transform = `translate3d(${x * diameter / 2}px, ${y * fieldHeight / 2}px, 0) translate(-50%, -50%)`;
   });
   const constrain = (body) => {
-    const distance = Math.hypot(body.x, body.y);
-    if (distance <= body.boundary) return;
-    const nx = body.x / distance;
-    const ny = body.y / distance;
-    body.x = nx * body.boundary;
-    body.y = ny * body.boundary;
-    // Reflect the outward velocity at the circle's normal, preserving speed.
-    const outward = body.vx * nx + body.vy * ny;
-    if (outward > 0) {
-      body.vx -= 2 * outward * nx;
-      body.vy -= 2 * outward * ny;
+    for (let attempt = 0; attempt < 8; attempt++) {
+      const { distance, nx, ny } = profileDistance(body.x, body.y);
+      if (distance >= body.boundary) return;
+      const correction = body.boundary - distance + .002;
+      body.x += nx * correction;
+      body.y += ny * correction;
+      const outward = body.vx * nx + body.vy * ny;
+      if (outward < 0) {
+        body.vx -= 2 * outward * nx;
+        body.vy -= 2 * outward * ny;
+      }
     }
   };
   const resize = () => {
     diameter = field.clientWidth;
+    fieldHeight = field.clientHeight;
     if (!diameter) return;
     const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = Math.round(diameter * pixelRatio);
-    canvas.height = Math.round(diameter * pixelRatio);
+    canvas.height = Math.round(fieldHeight * pixelRatio);
     context?.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
     dots = [];
     const center = diameter / 2;
-    const outerRadius = center - 8;
+    const centerY = fieldHeight / 2;
     const steps = Math.max(14, Math.round(diameter / 16));
     const spacing = diameter / steps;
-    // Keep a Cartesian grid; soften only its circular silhouette.
-    for (let row = 0; row <= steps; row++) {
+    // Keep the Cartesian grid; only its clipping silhouette changes.
+    for (let row = 0; row <= Math.floor(fieldHeight / spacing); row++) {
       for (let column = 0; column <= steps; column++) {
         const x = column * spacing;
         const y = row * spacing;
-        const distance = Math.hypot(x - center, y - center);
-        if (distance > outerRadius) continue;
-        const edge = Math.min(1, (outerRadius - distance) / (spacing * 1.3));
+        const { distance } = profileDistance((x - center) / center, (y - centerY) / centerY);
+        if (distance <= 0) continue;
+        const edge = Math.min(1, distance * Math.min(center, centerY) / (spacing * 1.3));
         const baseRadius = .45 + 1.15 * edge;
         dots.push({ x, y, baseRadius, radius: baseRadius });
       }
@@ -480,7 +529,7 @@ function renderFloatingToolkit(container, tools) {
     bodies.forEach((body) => {
       const iconSize = body.element.getBoundingClientRect().width;
       body.collisionRadius = (iconSize + 10) / diameter;
-      body.boundary = Math.max(.1, 1 - (iconSize * Math.SQRT2 + 12) / diameter);
+      body.boundary = (iconSize * Math.SQRT2 + 12) / Math.min(diameter, fieldHeight);
       constrain(body);
     });
     paint();

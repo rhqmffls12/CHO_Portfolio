@@ -1,6 +1,6 @@
 # 포트폴리오 이동 · GitHub 업로드 패키지
 
-2026-10-28 현재 `next-concept` 디자인의 독립 실행 복사본입니다.
+2026-10-30 현재 `next-concept` 디자인의 독립 실행 복사본입니다.
 원본 사이트를 변경하거나 GitHub에 업로드한 상태가 아닙니다.
 
 ## 다른 PC에서 확인
@@ -22,7 +22,7 @@ GitHub Free에서는 공개(Public) 저장소로 구성합니다.
 1. GitHub에서 새 저장소를 만듭니다. 예: `portfolio`.
 2. **ZIP 자체가 아닌, 압축 해제한 폴더 내부의 파일과 폴더**를 저장소 최상단에 업로드합니다.
    저장소 바로 아래 `index.html`, `next-concept/`, `assets/`, `media/`가 있어야 합니다.
-   상위 `portfolio-github-transfer-20261028` 폴더를 한 겹 더 넣지 마세요.
+   상위 `portfolio-github-transfer-20261030` 폴더를 한 겹 더 넣지 마세요.
 3. 웹 업로드는 `Add file → Upload files`로 진행합니다. 파일 수 제한에 걸리면 폴더별로 나누어 올리세요.
    GitHub Desktop을 쓰면 이 폴더의 내용을 새 저장소에 복사한 후 Commit / Publish하는 방식으로 전체를 올릴 수 있습니다.
 4. 저장소 `Settings → Pages`에서 Source를 `Deploy from a branch`로 선택합니다.
@@ -78,11 +78,11 @@ GitHub용 미리보기 MP4를 새로 압축한 패키지는 아닙니다. 기존
 - Selected Work 기간: 2015–2026
 - Earlier Work 썸네일: 2015_rig.png / 2015_tool.png / 2015_project.png
 - 화면을 채우는 메인 영상과 현재 텍스트 UI
-- 6 px 썸네일 라운드와 16 px 제목, 올리브·살구색 카테고리
+- 6 px 썸네일 라운드와 15 px 제목, 올리브·살구색 카테고리
 - 개별 카드 펼침과 주변 카드 이동, 최대 펼침 높이를 확보한 레이아웃
 - COLLAPSE / EXPAND 전체 보기 컨트롤
 - 프로젝트 영역 전체 등장과 위로 올라갔다 내려올 때 재등장
-- Local AI 3D Generator 마지막 이미지 / Moodboard 네 번째 이미지 썸네일
+- Local AI 3D Generator 전용 수정 썸네일 / Moodboard 네 번째 이미지 썸네일
 - “Art, engineered. / For production.” 문구와 새 타이포그래피
 - 상세 화면 최대 1760 px 너비
 - 경력 스튜디오 이름의 글꼴·색상 통일 및 ROLE PROGRESSION 제거
@@ -90,3 +90,17 @@ GitHub용 미리보기 MP4를 새로 압축한 패키지는 아닙니다. 기존
 
 기존 패키지의 문구를 이어 쓰는 개발 이력은 `next-concept/README.md`에 남아 있습니다.
 이 ZIP에는 위 최신 변경 사항까지 포함했습니다.
+
+## 2026-10-30 추가 반영
+
+- 구름과 뇌를 조합한 점 배경, 동일 폭의 Career / Tools 패널, Usage 안내 순서
+- CinematicShading 01–04 최신 수정 이미지와 Moodboard 01–05 수정 이미지
+- Subzero / Local AI 3D Generator / ML Deform / Houdini Batch 새 썸네일
+- Cinematic Workflow Toolkit 전용 썸네일 (1674 × 1080 PNG + 편집용 SVG)
+- Battleground Showreel 제목 변경
+- 썸네일 년도 9px / 제목 15px / 카테고리 10px, 촘촘한 간격
+- 썸네일 어두운 그라데이션 범위 하단 35%, EXPAND에서는 제거
+- EXPAND 제목 길이별 설명 공간 조정, 하단 높이와 행 정렬 통일
+- EXPAND 상태에서 메인 화면으로 올라갔다 내려올 때 카드 숨김 문제 수정
+- 마지막 문구: Craft the visual. / Build the systems behind it.
+

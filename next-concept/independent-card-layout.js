@@ -24,6 +24,26 @@ export function initIndependentCardLayout() {
       const cssWidth = `${group.width.toFixed(3)}px`;
       for (const card of group.cards) if (card.style.width !== cssWidth) card.style.width = cssWidth;
     }
+    // EXPAND keeps the one-title-line / two-description-line height budget.
+    for (const card of visible) {
+      const description = card.querySelector(".work-card-description");
+      if (!allOpen) {
+        for (const property of ["--expanded-description-height", "--expanded-description-gap", "--expanded-description-lines"])
+          description.style.removeProperty(property);
+        continue;
+      }
+      const title = card.querySelector("h3");
+      const titleLine = parseFloat(getComputedStyle(title).lineHeight);
+      const descriptionLine = parseFloat(getComputedStyle(description).lineHeight);
+      const extraTitle = Math.max(0, title.getBoundingClientRect().height - titleLine);
+      let budget = Math.max(0, descriptionLine * 2 - extraTitle);
+      // Borrow paragraph spacing if needed to retain one complete text line.
+      const recovered = budget > 0 && budget < descriptionLine ? Math.min(12, descriptionLine - budget) : 0;
+      budget += recovered;
+      description.style.setProperty("--expanded-description-height", `${budget.toFixed(3)}px`);
+      description.style.setProperty("--expanded-description-gap", `${(12 - recovered).toFixed(3)}px`);
+      description.style.setProperty("--expanded-description-lines", String(Math.max(1, Math.floor((budget + .1) / descriptionLine))));
+    }
     const metrics = new Map(visible.map(card => {
       const visual = card.querySelector(".work-card-visual").offsetHeight;
       return [card, {visual, info:card.querySelector(".work-card-info").offsetHeight,
@@ -67,6 +87,9 @@ export function initIndependentCardLayout() {
             maxOpen = Math.max(maxOpen,progress);
             bottoms[column] += height + gap + (expandedGap-gap) * progress;
           }
+          // EXPAND is a row grid, not independent masonry columns: prevent
+          // footer rounding / wrapping differences from accumulating downward.
+          if (allOpen) bottoms.fill(Math.max(...bottoms));
           if (finePointer.matches && !allOpen) for (let column = 0; column < count && row + column < group.cards.length; column++) {
             const source = group.cards[row + column];
             const progress = Math.min(1,getExpansion(source) / Math.max(1,metrics.get(source).info));

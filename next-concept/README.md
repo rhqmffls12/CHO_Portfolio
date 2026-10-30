@@ -351,3 +351,104 @@ Thumbnail overlays are now left-aligned in two lines: the 16 px white project ti
 Career organization hierarchy is normalized: Animation / VFX Studio now uses the same career-studio style as KRAFTON · Cinematic Production (Pretendard, 14 px, weight 400, color #c2cbbd). The grouped organization retains its semantic h4 while its role titles and grouped career structure remain intact. No package was rebuilt.
 
 The ROLE PROGRESSION label is removed from the grouped Animation / VFX Studio career entry. Company and role grouping remain unchanged. No package was rebuilt.
+
+
+## Abstract brain toolkit profile (2026-10-28)
+
+The Tools & Expertise dot field now follows a softly lobed brain side silhouette instead of a circle. Cartesian dot spacing, muted olive colors, pointer brightness/size response, usage tiers, hover/focus pause and reduced-motion behavior are retained. A shared smoothed contour masks the dots and provides inward normals for icon reflections, with clearance based on each icon size. No anatomical outlines or internal folds are drawn. The square responsive field remains unchanged. This is a local design trial; the previously delivered ZIP has not been rebuilt. Browser appearance has not been visually verified.
+
+
+## Illustrated cumulus toolkit profile (2026-10-28)
+
+Supersedes the brain silhouette trial: the dot mask now forms a wide illustrated cumulus cloud, with large rounded upper lobes, smaller side lobes and a gently rounded base. The same contour controls icon reflection and size clearance. Cartesian dots, colors, pointer interaction, icon usage sizes/speeds and motion accessibility remain unchanged. No realistic cloud texture or outline is used. Existing ZIP is unchanged.
+
+
+## Cloud / brain hybrid toolkit silhouette (2026-10-28)
+
+Replaces the cumulus-only trial with a cloud-soft brain side profile. Broad rounded upper lobes and a gently asymmetric lower contour suggest the brain without anatomical folds. The descending stem is removed entirely; only a shallow lower scallop remains. Dot masking and icon reflection still share the same contour. Existing interaction, grid, palette and usage tiers remain unchanged. Previous ZIP is not updated.
+
+
+Toolkit cloud-brain field enlarged 20% on desktop: width 120%, maximum 672px (previously 560px), centered in its existing column. Icon size bounds also increased 20%, retaining container-relative proportions and usage hierarchy. On single-column screens the field stays within available width, with maximum 624px (previously 520px), to avoid horizontal scrolling. ZIP unchanged.
+
+
+Toolkit icons reduced to 80% of the preceding size across all usage tiers, including container-relative sizing. The enlarged cloud-brain background stays unchanged. Collision clearance continues to derive from actual button size; minimum 44px interaction targets remain available. This gives icons more room while retaining tier hierarchy. ZIP unchanged.
+
+
+Cloud-brain silhouette softened: recessed anchor points filled halfway (50%) toward the convex envelope and horizontal shape widened by 2.5%, capped inside the canvas. Smooth interpolation retains broad cloud lobes with shallower indentations. Shared dot mask and icon boundary both use the revised contour. Field and icon sizes unchanged. ZIP unchanged.
+
+
+## Balanced career and toolkit columns (2026-10-28)
+
+Career and toolkit panels now use equal minmax(0,1fr) columns within a centered 1120px maximum, retaining the single-column breakpoint. Toolkit width returns to 100% of its panel (560px cap). Its stem-free cloud-brain contour is vertically extended, with a rectangular canvas and matching icon coordinates/collision clearance; Cartesian dots stay evenly spaced. The usage-frequency hint moves immediately after the field, before the hover inspector, eliminating the previous empty inspector gap above the hint. Previously supplied ZIP is unchanged.
+
+
+Toolkit footer order adjusted: dot field → selected tool / Usage inspector → usage-frequency hint. Inspector retains reserved height when inactive so the hint stays stable while hovering different tools. This supersedes the previous hint-before-inspector placement. ZIP unchanged.
+
+
+## CinematicShading image replacement (2026-10-30)
+
+Replaced cinematicshading01–04.png with the four revised files supplied from the portfolio source folder. Regenerated only these images at small/card/detail WebP sizes (480/960/2000px maximum), with dated filenames and refreshed module cache keys. Existing order, first-image poster and video are retained. Previously delivered ZIP is unchanged.
+
+
+## Moodboard image replacement (2026-10-30)
+
+Updated ai_moodboard01–05.png from the supplied revised source files and regenerated their 480/960/2000px maximum WebP derivatives with dated filenames. Refreshed module cache keys. Existing image order, sixth gallery image, fourth-image thumbnail, third-image poster and video are retained. Previously delivered ZIP is unchanged.
+
+
+Erangel Subzero Lore Film thumbnail replaced from the supplied portfolio/subzero.png (2026-10-30). Regenerated small/card/detail WebP sizes with dated filenames and refreshed asset/module cache versions. Video remains unchanged. Previous ZIP not rebuilt.
+
+
+Compact project thumbnails now include the project year above the title (10px DM Mono, muted white), followed by the existing title and discipline category. Year follows the same visibility rule as the compact title: hidden when card details are open, where year is already shown in metadata. No card dimensions changed. ZIP unchanged. (2026-10-30)
+
+
+Battleground Intro & Collabo Showreel renamed to Battleground Showreel in the project catalog, updating cards and detail views. Cache versions refreshed. ZIP unchanged. (2026-10-30)
+
+
+Local AI 3D Generator thumbnail switched from gallery image 06 to the revised 3D_AI_Asset_tool_render_th.png supplied by the owner. Original copied and 480/960/2000px maximum WebP derivatives regenerated with dated filenames; catalog and module cache versions updated. Gallery sequence unchanged. The existing poster references the same refreshed thumbnail source. ZIP unchanged. (2026-10-30)
+
+
+ML Deform Simulation Procedural Workflow thumbnail/poster replaced from the supplied ml_deform/ browser-independent source PNG. Copied to existing assets/technical/ml-deform/ML_deform_Th.png and regenerated small/card/detail WebP derivatives, with refreshed cache versions. Gallery and video unchanged. ZIP unchanged. (2026-10-30)
+
+
+Procedural Batch CFX Simulation Workflow thumbnail updated from the provided houdnini_simul source PNG. Added dedicated houdini_batch_thumbnail.png and optimized 480/960/2000px WebP sizes. Catalog uses the new card thumbnail, preserving the two existing gallery images and video. Cache versions refreshed. ZIP unchanged. (2026-10-30)
+
+
+## Dedicated Cinematic Workflow Toolkit thumbnail (2026-10-30)
+
+Added workflow-thumbnail.png (1674x1080) and an editable, self-contained SVG source. Large three-line title, Unreal Engine logo focal point and Maya → Unreal → Render stage cards replace the dense six-stage diagram only on the project thumbnail. Dark green/olive palette and a bottom overlay safe area match the site. Generated 480/960/2000px maximum WebP variants and refreshed module caches. Existing overview poster, detail gallery, YouTube and project text remain unchanged. Previous ZIP is not rebuilt. Design informed by ui-ux-pro-max hierarchy/contrast guidance.
+
+
+Working Principle closing copy updated (2026-10-30): “Craft the visual. / Build the systems behind it.” Supporting Korean copy connects art production experience, visual goals, technical systems and shared tools/pipelines. Existing styling and contact links retained. ZIP unchanged.
+
+
+## Equal EXPAND card height (2026-10-30)
+
+EXPAND uses a fixed text budget equivalent to a one-line title plus two description lines. Wrapped titles (maximum two lines) borrow their additional height from the description. Paragraph spacing can shrink slightly to retain a whole description line, and overflow is truncated. Budget recalculates on layout, font readiness and resize; returning to COLLAPSE clears overrides. Individual hover behavior remains unchanged. Cache versions refreshed. ZIP unchanged. JavaScript syntax checked; browser appearance not verified.
+
+
+## EXPAND footer and row alignment correction (2026-10-30)
+
+Additional height mismatch came from RELEASE links (28px minimum) versus logo-only footers (19px), accumulating through independent columns. EXPAND now reserves a consistent 32px border-box footer including padding/border and prevents footer group wrapping. The layout planner synchronizes column cursors to the maximum after each EXPAND row, removing cumulative drift and keeping next-row thumbnail starts aligned. COLLAPSE hover offsets remain unchanged. Existing title/description budget retained; module caches refreshed. JavaScript syntax checked. ZIP unchanged.
+
+
+EXPAND disables the thumbnail black gradient scrim for every project card, regardless of hover. COLLAPSE keeps its existing gradient/hover behavior. CSS cache version refreshed. ZIP unchanged. (2026-10-30)
+
+
+Compact thumbnail overlay typography reduced one step: year 10→9px, title 16→15px, category 9→8px. Fonts, weights, colors and positioning retained. CSS cache refreshed; ZIP unchanged. (2026-10-30)
+
+
+Compact overlay vertical spacing tightened: year bottom offset 51→42px and title 27→23px; category remains 10px from the bottom. At current type sizes this leaves approximately 2px between line boxes. Existing fonts and sizes retained. CSS cache refreshed; ZIP unchanged. (2026-10-30)
+
+
+Thumbnail category increased from 8px to 10px. Title/year moved up 3px to preserve roughly 2px between line boxes. Year remains 9px and title 15px. CSS cache refreshed; ZIP unchanged. (2026-10-30)
+
+
+## EXPAND return-scroll visibility fix (2026-10-30)
+
+Root cause: returning above the collection re-added compact-enter-pending in EXPAND, while the entrance check intentionally skipped EXPAND, leaving cards hidden. Reset/observer scheduling and has-compact-cascade now require compact mode. Noncompact sync clears every card state and timer. CSS pending/running effects also explicitly exclude show-all-card-info. Mode changes resynchronize observers. Verified with a Node DOM/IntersectionObserver fixture: three EXPAND upward/downward cycles stay visible, COLLAPSE replay still runs, and expanding mid-cascade clears all pending/running states. Browser rendering not automated. ZIP unchanged.
+
+
+Thumbnail dark gradient now begins at 65% height (bottom 35% only, previously bottom 45%). Bottom opacity remains 50%. Existing hover and EXPAND removal rules retained. CSS cache refreshed; ZIP unchanged. (2026-10-30)
+
+
+CinematicShading images 01–04 replaced again with latest supplied revisions (2026-10-30). Regenerated 480/960/2000px maximum WebP variants using content-hashed filenames to avoid stale browser caches across repeated same-day updates. Gallery order, first-image poster, project video and other content retained. Module cache versions refreshed. ZIP unchanged.

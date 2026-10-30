@@ -16,28 +16,28 @@
   },
   {
     "path": "assets/technical/ai-moodboard/ai_moodboard01.png",
-    "bytes": 3685949,
-    "sha256": "aa9c1781cedf5a87de306045c77d0e37e5814bfb9b1df70a0178cc1164355b6d"
+    "bytes": 3696168,
+    "sha256": "f9054bb7f421143d1cdfc27c0cce50626a1a5e820afeceb11b5e771b81941f7e"
   },
   {
     "path": "assets/technical/ai-moodboard/ai_moodboard02.png",
-    "bytes": 1307795,
-    "sha256": "2e18a72799ad6255dc3fcd9dc6bfb0497ef50860c5dc3352ec45aee3b04cf505"
+    "bytes": 1242186,
+    "sha256": "11dc42b246c9b01009470314e51e6dedbd3f2ff4a4053db3aea4a3e55bbe3e17"
   },
   {
     "path": "assets/technical/ai-moodboard/ai_moodboard03.png",
-    "bytes": 1572586,
-    "sha256": "b2ae8439f1bbdec79146f9ad0c2a918568b74a8f16d238d7e09a6951fb720346"
+    "bytes": 1399171,
+    "sha256": "6e05d650a15156101fc7069d4a7316d1eaf058c89694fc8615445b67fe90c94b"
   },
   {
     "path": "assets/technical/ai-moodboard/ai_moodboard04.png",
-    "bytes": 1392511,
-    "sha256": "779eadc25abd5a0a1458446f65a69feaf0772bce150fa1e401c476096ee9d622"
+    "bytes": 1329717,
+    "sha256": "41436bf30e53b0380742c260f84b405e32b4847cf166a3fed7ed9cd17b4d7f8c"
   },
   {
     "path": "assets/technical/ai-moodboard/ai_moodboard05.png",
-    "bytes": 1831718,
-    "sha256": "b0fa8695b1fe4c6b0ee72a91a5e2c388d78997e3b01c22246650a3871976aef6"
+    "bytes": 1781042,
+    "sha256": "8661847df9659466c0e11d4a343312824523b9b3dee4e4967cd4bb6a3311a143"
   },
   {
     "path": "assets/technical/ai-moodboard/ai_moodboard06.png",
@@ -90,24 +90,39 @@
     "sha256": "3279f342cdb00d338b5ea8e2cbef72298791043c7c2510ec64aa292285bfff22"
   },
   {
+    "path": "assets/technical/cinematic-asset-picker/workflow-thumbnail.png",
+    "bytes": 167538,
+    "sha256": "1853f2bb7950a6b0297a93aa0fe14bfad9626a854818c467aa13d6244acca125"
+  },
+  {
+    "path": "assets/technical/cinematic-asset-picker/workflow-thumbnail.svg",
+    "bytes": 201461,
+    "sha256": "3eb60f2a8b2be4fb9180aa3df0fc9b32228e87ad78c811040b511012d1d5a12f"
+  },
+  {
     "path": "assets/technical/cinematic-shading/cinematicshading01.png",
-    "bytes": 2674048,
-    "sha256": "cd19cc71fe5e1a3ac6f0d7d7727c58484184fd61428799648e0e239f29d4e259"
+    "bytes": 2608288,
+    "sha256": "7b7c7cf15099eea0d15420c60956f210f14a4733c2455dee6e704860def3c991"
   },
   {
     "path": "assets/technical/cinematic-shading/cinematicshading02.png",
-    "bytes": 2753833,
-    "sha256": "df24dfe506dbaddd0905d2c7a177fbf842a2feb43e09d24eebea2f99cdb0af18"
+    "bytes": 2670743,
+    "sha256": "4b47976dc9695e3b6cc8ff8aaca5f25749f517d48165e257403e1056871e7ddd"
   },
   {
     "path": "assets/technical/cinematic-shading/cinematicshading03.png",
-    "bytes": 2269512,
-    "sha256": "394db5cb1d623b200561cede9eac7f48a98a69fc3ef4ba09c12c2df843b2e831"
+    "bytes": 2219106,
+    "sha256": "e69683fa663074a199259a2d11eb03557fdb7400e5d3ebdcd3fa5a30889a145b"
   },
   {
     "path": "assets/technical/cinematic-shading/cinematicshading04.png",
-    "bytes": 1572254,
-    "sha256": "0bdfc38f610349b79130249715bca259d480e7017b19f446ac072fa6827eebe3"
+    "bytes": 1536266,
+    "sha256": "d0996a5c96a6ac0fd0e9e1dc782cc37768ddac29c010a4568b085d1403730766"
+  },
+  {
+    "path": "assets/technical/houdini-batch/houdini_batch_thumbnail.png",
+    "bytes": 531630,
+    "sha256": "f41f31710397ba83665b726c5773863ef05dcb4f240f7c9662da46894b93d162"
   },
   {
     "path": "assets/technical/houdini-batch/houdini_simulation_batch_setup.png",
@@ -151,8 +166,8 @@
   },
   {
     "path": "assets/technical/local-ai-3d/3D_AI_Asset_tool_render_th.png",
-    "bytes": 1836035,
-    "sha256": "dd8870e17cb9820a39971d410cdc4fea28d579ad4cb0a3f2b0ff63fb7f45ed1b"
+    "bytes": 2023776,
+    "sha256": "e2753ee83227a890b0c9cd093a4bf2d857848c914b2bf6d254008a8b0ddeb036"
   },
   {
     "path": "assets/technical/ml-deform/ML_deform01.png",
@@ -166,8 +181,8 @@
   },
   {
     "path": "assets/technical/ml-deform/ML_deform_Th.png",
-    "bytes": 3636662,
-    "sha256": "a8c3cb7e42ddf4b243e556bde8a7c4f27f72eb859aa1ead4507c26a613454813"
+    "bytes": 2050851,
+    "sha256": "cd6abe9a79b4377afb946eea2c87c94493122ed37586ddc6484bd2437611a061"
   },
   {
     "path": "assets/technical-direction.png",
@@ -221,8 +236,8 @@
   },
   {
     "path": "assets/thumbnails/subzero.png",
-    "bytes": 5260456,
-    "sha256": "3868c2c3a631490db91f06bfe2a893dcbc4c7236e7215ebab6d6073c08d75229"
+    "bytes": 1717055,
+    "sha256": "69f808d302cce1cee24411aa8a6e2f2d6e22520589791670d4537faf8bf26e88"
   },
   {
     "path": "assets/thumbnails/virtual-human-ana.png",
@@ -346,8 +361,8 @@
   },
   {
     "path": "next-concept/app.js",
-    "bytes": 36385,
-    "sha256": "6f03434ab0299e6fdfa3aa082617bf87b068f7fcfdb1415500fb118fe105872c"
+    "bytes": 39166,
+    "sha256": "811850c8e077a2669ae46361410b7fa15a5eec51b5b0e50c90dd4373d972cf6b"
   },
   {
     "path": "next-concept/assets/fonts/Pretendard-LICENSE.txt",
@@ -360,9 +375,19 @@
     "sha256": "9599f12fd42fc0bce1cd50b47a0c022e108d7aa64dd0d1bb0ed44f3282d900b4"
   },
   {
+    "path": "next-concept/assets/optimized/assets--technical--ai-moodboard--ai_moodboard01-card-20261030.webp",
+    "bytes": 128306,
+    "sha256": "8a5bdbf2e24bb368ec69b6c6af655a6d09499405b231a608a512a789010d99b5"
+  },
+  {
     "path": "next-concept/assets/optimized/assets--technical--ai-moodboard--ai_moodboard01-card.webp",
     "bytes": 126638,
     "sha256": "7a7b076e368f4abd0a273d4a26049f2444c222a583c0b43d6a4437b5d65ed84a"
+  },
+  {
+    "path": "next-concept/assets/optimized/assets--technical--ai-moodboard--ai_moodboard01-detail-20261030.webp",
+    "bytes": 614312,
+    "sha256": "100ec23ad18535fe646fcd69bc13b3f81955d72bceca5cf02733438da476f51d"
   },
   {
     "path": "next-concept/assets/optimized/assets--technical--ai-moodboard--ai_moodboard01-detail.webp",
@@ -370,9 +395,19 @@
     "sha256": "9948abebd2234fa1199c626588d8bebce33ed2e04344c5435ae0180746d94dae"
   },
   {
+    "path": "next-concept/assets/optimized/assets--technical--ai-moodboard--ai_moodboard01-small-20261030.webp",
+    "bytes": 28276,
+    "sha256": "0da507713a7070702eedf74b8313e48f47ed2039ab6e5d97585a78f92dca4c49"
+  },
+  {
     "path": "next-concept/assets/optimized/assets--technical--ai-moodboard--ai_moodboard01-small.webp",
     "bytes": 27248,
     "sha256": "8ffab6fa4c9d34ded520aee09e6060b58cbad31b908e6bed619fce2fcaa5596e"
+  },
+  {
+    "path": "next-concept/assets/optimized/assets--technical--ai-moodboard--ai_moodboard02-card-20261030.webp",
+    "bytes": 19226,
+    "sha256": "2832482ee3bd1b8b3c76a16340b431917f1db9578e6ea192bbc1f27f1b4e4ba2"
   },
   {
     "path": "next-concept/assets/optimized/assets--technical--ai-moodboard--ai_moodboard02-card.webp",
@@ -380,9 +415,19 @@
     "sha256": "728da8d5f3de306bb989ef62caf041506b4ac8e28fee9216bfa198d8ebbef138"
   },
   {
+    "path": "next-concept/assets/optimized/assets--technical--ai-moodboard--ai_moodboard02-detail-20261030.webp",
+    "bytes": 91624,
+    "sha256": "9d3938a6359eba106c2f1d9b75f1e1a97c39de9facc3bb183c3d1107dbaaf021"
+  },
+  {
     "path": "next-concept/assets/optimized/assets--technical--ai-moodboard--ai_moodboard02-detail.webp",
     "bytes": 87450,
     "sha256": "82f8c87420279dcfb948ffbb3ea27a228486d605d1b723fdaa5c23e35f3c6066"
+  },
+  {
+    "path": "next-concept/assets/optimized/assets--technical--ai-moodboard--ai_moodboard02-small-20261030.webp",
+    "bytes": 5258,
+    "sha256": "71313acf0083fb41346cada3ee1504510c1445109f4ee6428f199f0f9b47b428"
   },
   {
     "path": "next-concept/assets/optimized/assets--technical--ai-moodboard--ai_moodboard02-small.webp",
@@ -390,9 +435,19 @@
     "sha256": "488b121d72b654c807c9b4315532cf5d215192119867b577452c2af62f3f7e8f"
   },
   {
+    "path": "next-concept/assets/optimized/assets--technical--ai-moodboard--ai_moodboard03-card-20261030.webp",
+    "bytes": 26666,
+    "sha256": "3b966778ec4bd22d5703b2a3aa7ca4b8a2404807892901f80d54a7474e1b540b"
+  },
+  {
     "path": "next-concept/assets/optimized/assets--technical--ai-moodboard--ai_moodboard03-card.webp",
     "bytes": 28116,
     "sha256": "1c28437373dea3204cb47f6c8389d50d41fe2308a086d5da90152ebdf16e12e2"
+  },
+  {
+    "path": "next-concept/assets/optimized/assets--technical--ai-moodboard--ai_moodboard03-detail-20261030.webp",
+    "bytes": 126000,
+    "sha256": "f277eb7fc4174b72b08d42056e9214e16fcea2bd4ac030d2a85a974e3879fab7"
   },
   {
     "path": "next-concept/assets/optimized/assets--technical--ai-moodboard--ai_moodboard03-detail.webp",
@@ -400,9 +455,19 @@
     "sha256": "caeaab4ff7379b26b5b6bc9e8cd70c2a0351154dced71095bcb8a0c78d878430"
   },
   {
+    "path": "next-concept/assets/optimized/assets--technical--ai-moodboard--ai_moodboard03-small-20261030.webp",
+    "bytes": 7446,
+    "sha256": "bc5bfed0a596f9beff0643540c7d544767e91e0b9f3fe6e3e40922b61641c269"
+  },
+  {
     "path": "next-concept/assets/optimized/assets--technical--ai-moodboard--ai_moodboard03-small.webp",
     "bytes": 7300,
     "sha256": "32f329b2451decc4fcd0257f073591a5f387fbb51c594ac69d180fbc30a619fd"
+  },
+  {
+    "path": "next-concept/assets/optimized/assets--technical--ai-moodboard--ai_moodboard04-card-20261030.webp",
+    "bytes": 24748,
+    "sha256": "3d73e64e23f009b538eddd702df0a8bcf9fba99799b95f63a8fb7cbdce192733"
   },
   {
     "path": "next-concept/assets/optimized/assets--technical--ai-moodboard--ai_moodboard04-card.webp",
@@ -410,9 +475,19 @@
     "sha256": "2650b52df355823aac8710da25a3c518355201fb68089f334cc858dbe980369f"
   },
   {
+    "path": "next-concept/assets/optimized/assets--technical--ai-moodboard--ai_moodboard04-detail-20261030.webp",
+    "bytes": 94194,
+    "sha256": "237ef9d968a59786a26cfd177dfdb191e39d7d043a7f03f94b3eaab5b3e15d7d"
+  },
+  {
     "path": "next-concept/assets/optimized/assets--technical--ai-moodboard--ai_moodboard04-detail.webp",
     "bytes": 95114,
     "sha256": "386dba009d183bfeb9ea1be5a9fd00abe5a76985993ab40d385dbd4d5790cb2c"
+  },
+  {
+    "path": "next-concept/assets/optimized/assets--technical--ai-moodboard--ai_moodboard04-small-20261030.webp",
+    "bytes": 8020,
+    "sha256": "7790c7bfc2673e5097d40cb2beff13168619090813358f07083ab2f7b2e9a78d"
   },
   {
     "path": "next-concept/assets/optimized/assets--technical--ai-moodboard--ai_moodboard04-small.webp",
@@ -420,14 +495,29 @@
     "sha256": "f31b8402256a9f312ea280a66d74c5efdc9cb35780ae244026d6a6e7a7ef96c7"
   },
   {
+    "path": "next-concept/assets/optimized/assets--technical--ai-moodboard--ai_moodboard05-card-20261030.webp",
+    "bytes": 57178,
+    "sha256": "d3533d534f50f2c28cff22bca7e4eeaf7fe8713c3c39c885f67f3f9e69c6bd9c"
+  },
+  {
     "path": "next-concept/assets/optimized/assets--technical--ai-moodboard--ai_moodboard05-card.webp",
     "bytes": 56602,
     "sha256": "e683d4a01778eb9f43e69970c2f8ccd8a97da92b68264bdf221075c3725287ec"
   },
   {
+    "path": "next-concept/assets/optimized/assets--technical--ai-moodboard--ai_moodboard05-detail-20261030.webp",
+    "bytes": 196122,
+    "sha256": "b5f9ea032d02090c9977154ce94588d8895d1b267fa8ccce0db66a6c4bdc99ae"
+  },
+  {
     "path": "next-concept/assets/optimized/assets--technical--ai-moodboard--ai_moodboard05-detail.webp",
     "bytes": 197790,
     "sha256": "52ad0fdbb552b3350ce2eb93c17b44a3db0c8539a4471bd691c6b7456ffed23c"
+  },
+  {
+    "path": "next-concept/assets/optimized/assets--technical--ai-moodboard--ai_moodboard05-small-20261030.webp",
+    "bytes": 18170,
+    "sha256": "a9750af131a98ac6eb2ef89d7d874da7246b20dec574486c2473241c7331fc00"
   },
   {
     "path": "next-concept/assets/optimized/assets--technical--ai-moodboard--ai_moodboard05-small.webp",
@@ -525,9 +615,29 @@
     "sha256": "36454d0c6266fae67d156a7130f0317918956fbf17f6d31392b846900c6e2372"
   },
   {
+    "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading01-card-20261030.webp",
+    "bytes": 68186,
+    "sha256": "4420c316de067f10d8b9d4258cf4e9e794536804a488beae28b291b83c796cab"
+  },
+  {
+    "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading01-card-7b7c7cf150.webp",
+    "bytes": 68446,
+    "sha256": "d6be8674d76736d06d8140d30249200ba3701b8bf6e8dfa439758fd5a39550f2"
+  },
+  {
     "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading01-card.webp",
     "bytes": 67984,
     "sha256": "3c0616f5e2cb1bc2d74f5dcce6b39c9e48f9afddf9dc00c0be6c1771ef1edf14"
+  },
+  {
+    "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading01-detail-20261030.webp",
+    "bytes": 284510,
+    "sha256": "0979f4331c9b7ba41ddb20002269e16256e0c588bb8a39cab313f40b01269170"
+  },
+  {
+    "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading01-detail-7b7c7cf150.webp",
+    "bytes": 286740,
+    "sha256": "3f4da7456e5db0747ad696935da84e201479520bb3ed3d6bc4c24574fc88ec85"
   },
   {
     "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading01-detail.webp",
@@ -535,9 +645,29 @@
     "sha256": "f7d5dd217accf0b68daaa3ceddcd4e0d6a256ea873cfe98acf92f80fc86850ef"
   },
   {
+    "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading01-small-20261030.webp",
+    "bytes": 17094,
+    "sha256": "7b40e84f4718b708e10f2813ccf65b766f6670b26f4d6f21153ec44d3580d9ab"
+  },
+  {
+    "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading01-small-7b7c7cf150.webp",
+    "bytes": 17452,
+    "sha256": "d5e99720be97931096e1e8a81e801569e7a744ad77533d43ffaf993e2569bc3e"
+  },
+  {
     "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading01-small.webp",
     "bytes": 16740,
     "sha256": "e8dd829bf18aec4527f95efc6cecd5d2418f7522978ba9020be5702d838cceb2"
+  },
+  {
+    "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading02-card-20261030.webp",
+    "bytes": 70008,
+    "sha256": "0c972f4569df46b8f0fdadfdb0608a66536d0423b57ffedd88060d1c48ba09d3"
+  },
+  {
+    "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading02-card-4b47976dc9.webp",
+    "bytes": 69518,
+    "sha256": "4a5f3a4e433e3a2a4ab7dfa48a9b7662c2ed377e3bdbce242778a99e724339bf"
   },
   {
     "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading02-card.webp",
@@ -545,9 +675,29 @@
     "sha256": "9198ff9c12dbbf7be52818a4f7908b7ad6fc7124917b17e9c3b05b10ff8969c4"
   },
   {
+    "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading02-detail-20261030.webp",
+    "bytes": 277416,
+    "sha256": "794842e3b8db7d6581722b13ac59130b5174f9acf25ddacdee206c9e961bd61a"
+  },
+  {
+    "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading02-detail-4b47976dc9.webp",
+    "bytes": 279222,
+    "sha256": "5f24769385664005b3af84ce50050a94cd924083bf34d4cd61241ff7acd2db5b"
+  },
+  {
     "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading02-detail.webp",
     "bytes": 279632,
     "sha256": "aa5c90f0dc9a877922b4363149fc6acf3a0305c98407f8f82c95c60039ef92b0"
+  },
+  {
+    "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading02-small-20261030.webp",
+    "bytes": 17634,
+    "sha256": "c8db3f78f3f725230fcdeae76ba825468cfb369787f27355259db154272cf724"
+  },
+  {
+    "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading02-small-4b47976dc9.webp",
+    "bytes": 17562,
+    "sha256": "fbbfd5800ac3df8bcfe7847fd968bff8dd6fa1099299c02535a7fbe7320ebbf5"
   },
   {
     "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading02-small.webp",
@@ -555,9 +705,29 @@
     "sha256": "62a2962fe86161d60d9dd1e056f05dac4b8a39160b00db8fc4564852f119a2b3"
   },
   {
+    "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading03-card-20261030.webp",
+    "bytes": 48244,
+    "sha256": "59ad142c191bb27105271a8c2c0be5e62458d127fc92fb39c7ba70091e4cd243"
+  },
+  {
+    "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading03-card-e69683fa66.webp",
+    "bytes": 47744,
+    "sha256": "a75f7c763a9bb33286feda420893fc52f2ed76e70482b7ddc282e73de6dd8117"
+  },
+  {
     "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading03-card.webp",
     "bytes": 46570,
     "sha256": "e98b88c1e8decfd90d2dbe4226d9615166ba3b5138abdf2218e2886cdf2d1726"
+  },
+  {
+    "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading03-detail-20261030.webp",
+    "bytes": 200450,
+    "sha256": "f6144b856fbe75e6fecf329a8b3c09e2a4efef31a8610508e1015aedc3c08234"
+  },
+  {
+    "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading03-detail-e69683fa66.webp",
+    "bytes": 200400,
+    "sha256": "9aa530b9904e2d4ef36e66358e850cc3839df609941c3a694875773ce40ca0f9"
   },
   {
     "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading03-detail.webp",
@@ -565,9 +735,29 @@
     "sha256": "864b4738a57f2f2af3715d5afd8f516b69ffc4f3106189b912bcfb34ab0c2013"
   },
   {
+    "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading03-small-20261030.webp",
+    "bytes": 12768,
+    "sha256": "0936a45a950a7ba41afb05c5551d9eaf613bb4d0282acf943b12e390ba2a2ae0"
+  },
+  {
+    "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading03-small-e69683fa66.webp",
+    "bytes": 13046,
+    "sha256": "7e07fef32b9f1dc8ec2321499c33df7318659135ed5a9e6e1fd0266997ab396d"
+  },
+  {
     "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading03-small.webp",
     "bytes": 12428,
     "sha256": "1c38682278f3e44ed31e5fd2ce23ab36725ad71c4b8e286c3c8ce9f64966a331"
+  },
+  {
+    "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading04-card-20261030.webp",
+    "bytes": 23756,
+    "sha256": "aaf69de0a01a89f4ebc32129b60b207dcc6255e43f85e730272e20ec2938189f"
+  },
+  {
+    "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading04-card-d0996a5c96.webp",
+    "bytes": 23590,
+    "sha256": "468e88b4caa662fd56554457eef8176afa486c97f85316fb3ca5f4af8fed1e83"
   },
   {
     "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading04-card.webp",
@@ -575,14 +765,49 @@
     "sha256": "70c21ce816931a2bc98f0caf483307d2ea84d17a8dd7e5b40b2ad49d3a2ead36"
   },
   {
+    "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading04-detail-20261030.webp",
+    "bytes": 78784,
+    "sha256": "8c5c952b140ba4dce5d33958463c7efcc8c688f0475637e6392680996a60110d"
+  },
+  {
+    "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading04-detail-d0996a5c96.webp",
+    "bytes": 78574,
+    "sha256": "47e23fb2b757be6bc5a4a46dfcb0a9a5917b67c52b5631eb94cc849faf8b98c5"
+  },
+  {
     "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading04-detail.webp",
     "bytes": 71936,
     "sha256": "4b61e023bc111d954de58af68655f8c4c2410877970db03665b2cc2c25b9b5a6"
   },
   {
+    "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading04-small-20261030.webp",
+    "bytes": 8600,
+    "sha256": "ef2275cdc52dd4ad50c47c93a30d2098157b37ff115038d71abbe9754a7f8336"
+  },
+  {
+    "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading04-small-d0996a5c96.webp",
+    "bytes": 8698,
+    "sha256": "6559fee25ce9daee09f32ef82b2a3c2b6860b6db7c78fb21f5e3743f08ae9b4e"
+  },
+  {
     "path": "next-concept/assets/optimized/assets--technical--cinematic-shading--cinematicshading04-small.webp",
     "bytes": 7860,
     "sha256": "a6a9d1721a18f760e75487abcf50c15cd79042d72d9becfccda30a4570f6643e"
+  },
+  {
+    "path": "next-concept/assets/optimized/assets--technical--houdini-batch--houdini_batch_thumbnail-card-20261030.webp",
+    "bytes": 61460,
+    "sha256": "ea1d50c7b5b738c7b6268ecdbd1baca4a7dc41cf9e95601f84642ffb697dc876"
+  },
+  {
+    "path": "next-concept/assets/optimized/assets--technical--houdini-batch--houdini_batch_thumbnail-detail-20261030.webp",
+    "bytes": 146082,
+    "sha256": "d0484e72b3449eaaf7f5e3b0ed74af158d910a41a4ea54f4a8ceb9ba4407c060"
+  },
+  {
+    "path": "next-concept/assets/optimized/assets--technical--houdini-batch--houdini_batch_thumbnail-small-20261030.webp",
+    "bytes": 22378,
+    "sha256": "24f2e3d0372cbd62ffbeed3e5c236761bfc6c0ab0d5a7498d54c51085350e1e4"
   },
   {
     "path": "next-concept/assets/optimized/assets--technical--houdini-batch--houdini_simulation_batch_setup-card.webp",
@@ -705,14 +930,29 @@
     "sha256": "72c6f5c1483158bb3910153e7ac73ffd32acf6dc7aed5a1bef74114add1d6ef8"
   },
   {
+    "path": "next-concept/assets/optimized/assets--technical--local-ai-3d--3D_AI_Asset_tool_render_th-card-20261030.webp",
+    "bytes": 58912,
+    "sha256": "5e00abe8a07ec2632db6403ed2e4a6caba1df8ed736a3b2e1d0cf34d3b346c3b"
+  },
+  {
     "path": "next-concept/assets/optimized/assets--technical--local-ai-3d--3D_AI_Asset_tool_render_th-card.webp",
     "bytes": 38082,
     "sha256": "4622498920a2bd34c6b907ab29c27607d1643b14c7592e771b3025592e58e8db"
   },
   {
+    "path": "next-concept/assets/optimized/assets--technical--local-ai-3d--3D_AI_Asset_tool_render_th-detail-20261030.webp",
+    "bytes": 179058,
+    "sha256": "7dcd1a2538218815aa4040431c90b6dc7812a4ade099a4c14b1d50403c7efe60"
+  },
+  {
     "path": "next-concept/assets/optimized/assets--technical--local-ai-3d--3D_AI_Asset_tool_render_th-detail.webp",
     "bytes": 142694,
     "sha256": "e2d212674c0e67698ab44a40d5468684808d9798b1ac64afbbf3326439f8b0d4"
+  },
+  {
+    "path": "next-concept/assets/optimized/assets--technical--local-ai-3d--3D_AI_Asset_tool_render_th-small-20261030.webp",
+    "bytes": 16530,
+    "sha256": "c7b9e1ecfcf9d7d9d4f95caa21500242128f0be9b541a2eac637389dd5b6c8dc"
   },
   {
     "path": "next-concept/assets/optimized/assets--technical--local-ai-3d--3D_AI_Asset_tool_render_th-small.webp",
@@ -750,14 +990,29 @@
     "sha256": "3df356118b8626b71624b4f80d26814d3a9325cd41d7ad93e31436481df69c77"
   },
   {
+    "path": "next-concept/assets/optimized/assets--technical--ml-deform--ML_deform_Th-card-20261030.webp",
+    "bytes": 111316,
+    "sha256": "a133185f47804032b19deac803a40fb93b505985e2b87af159821568cc247aca"
+  },
+  {
     "path": "next-concept/assets/optimized/assets--technical--ml-deform--ML_deform_Th-card.webp",
     "bytes": 31232,
     "sha256": "994f3e6a6af209a73b957871a6d1553983e126a70b3f3e947d64b6a3c08dd62a"
   },
   {
+    "path": "next-concept/assets/optimized/assets--technical--ml-deform--ML_deform_Th-detail-20261030.webp",
+    "bytes": 339598,
+    "sha256": "9304fde06de689aa47ffc58dc622d716792ddd8174e4e2acbdbde370900fb167"
+  },
+  {
     "path": "next-concept/assets/optimized/assets--technical--ml-deform--ML_deform_Th-detail.webp",
     "bytes": 99034,
     "sha256": "20e8cb34503c36272dbe823bc558b2d25a49c10941f100acee6e21927de1579a"
+  },
+  {
+    "path": "next-concept/assets/optimized/assets--technical--ml-deform--ML_deform_Th-small-20261030.webp",
+    "bytes": 29204,
+    "sha256": "f264d251c4314a96c505792592ffa602cc2b62df3c30e729d7759e3b30fd0936"
   },
   {
     "path": "next-concept/assets/optimized/assets--technical--ml-deform--ML_deform_Th-small.webp",
@@ -900,14 +1155,29 @@
     "sha256": "c400d912d342d9bb32cb40311026922888e1cd59679bb9fdaffe0a966c7c810b"
   },
   {
+    "path": "next-concept/assets/optimized/assets--thumbnails--subzero-card-20261030.webp",
+    "bytes": 64082,
+    "sha256": "d5a4f37c0b8129f16bf22b18d6f3e38130984f94f38606ef7bf313091e7ded54"
+  },
+  {
     "path": "next-concept/assets/optimized/assets--thumbnails--subzero-card.webp",
     "bytes": 46664,
     "sha256": "a41fcf808364238a0d7db7f2bde019e5a9882c0af60ee44afe1ee82caaff90cf"
   },
   {
+    "path": "next-concept/assets/optimized/assets--thumbnails--subzero-detail-20261030.webp",
+    "bytes": 164994,
+    "sha256": "cdce0568d240e3987b3c69a1a9ecdeb8b57d191e376ab9f61562d233c63f827c"
+  },
+  {
     "path": "next-concept/assets/optimized/assets--thumbnails--subzero-detail.webp",
     "bytes": 164174,
     "sha256": "5705f0dc3034e789e92d8118c267b40361e2130fdaf00553bc7166575f0feebc"
+  },
+  {
+    "path": "next-concept/assets/optimized/assets--thumbnails--subzero-small-20261030.webp",
+    "bytes": 20348,
+    "sha256": "8317b00015ebb5743b302ccff4d08492479fad844c810771abb0c85e1ac42915"
   },
   {
     "path": "next-concept/assets/optimized/assets--thumbnails--subzero-small.webp",
@@ -928,6 +1198,21 @@
     "path": "next-concept/assets/optimized/assets--thumbnails--virtual-human-ana-small.webp",
     "bytes": 10162,
     "sha256": "53426abe7e38457fa9b1bbdfac211461c87d306c086fc09b71f63af8dac6b182"
+  },
+  {
+    "path": "next-concept/assets/optimized/workflow-thumbnail-card-20261030.webp",
+    "bytes": 24128,
+    "sha256": "60d727e80dd92fbdfa46b1722eae4268f3329b35a72fc32a1794fa7d951cfb6e"
+  },
+  {
+    "path": "next-concept/assets/optimized/workflow-thumbnail-detail-20261030.webp",
+    "bytes": 50602,
+    "sha256": "f9d4cedd3fe40e051ed3b05df336bea10f409cb608442850c824390e1f19ece0"
+  },
+  {
+    "path": "next-concept/assets/optimized/workflow-thumbnail-small-20261030.webp",
+    "bytes": 10016,
+    "sha256": "1cae91dda80accaa44219c6a09ee5669fe4c3b4b522259bb9393c3e5631cef21"
   },
   {
     "path": "next-concept/assets/social-preview.jpg",
@@ -966,13 +1251,13 @@
   },
   {
     "path": "next-concept/catalog.js",
-    "bytes": 37548,
-    "sha256": "580a56bc1f538171e66f339dad131106f81b4930c4619a8306de48232d4da161"
+    "bytes": 37700,
+    "sha256": "1b05c80f3ae404d99daa006d0427e80728181bb96206272c2363d97a34815753"
   },
   {
     "path": "next-concept/collection-hover.css",
-    "bytes": 5193,
-    "sha256": "06a0681d3a1f188e51166226ee072152a9d765c0502bf851aec53d4b15f99f15"
+    "bytes": 6231,
+    "sha256": "3fdda849189e3f099ee4dd6700099750f66d7c0bd1a57a3f3ba5fd546d003235"
   },
   {
     "path": "next-concept/collection-layout.js",
@@ -981,8 +1266,8 @@
   },
   {
     "path": "next-concept/compact-scroll.js",
-    "bytes": 4434,
-    "sha256": "9a2b0f468baad6161534a5ee1b65cfa83ef2bfdd7abbc14fce30fa8ee345176d"
+    "bytes": 4391,
+    "sha256": "a981c050e4803ef6e610bb9bcf72ec0505d9580d2d623aa7500ac660ade327df"
   },
   {
     "path": "next-concept/featured-layout.css",
@@ -1001,18 +1286,18 @@
   },
   {
     "path": "next-concept/image-manifest.js",
-    "bytes": 14952,
-    "sha256": "2509cc3e07e24c3a50e430db0a7e834a9a274a5e9393287983952894238dd4e5"
+    "bytes": 16089,
+    "sha256": "cb414d0211f3ed120954b2847ae57217ecfd34527c2cd666e1dbc4af3b44030b"
   },
   {
     "path": "next-concept/independent-card-layout.js",
-    "bytes": 6448,
-    "sha256": "8a110abf6ab7026da32735ea62b823bd2577df5c4e51e4be50c09c71fdcc2866"
+    "bytes": 8009,
+    "sha256": "6e310baaab17ffe0901c02044d235712b2e35356e1f3978d8713b85e13e9c646"
   },
   {
     "path": "next-concept/index.html",
-    "bytes": 15235,
-    "sha256": "a694221f358738c84bfbc5be1269f1e4209dba17c03aafa8385323dc2f726f24"
+    "bytes": 15257,
+    "sha256": "5c51da1b8fb9c41d805ce7bf9a63fa5c0068a612c1d3407c17dc56b6540615c2"
   },
   {
     "path": "next-concept/profile.js",
@@ -1026,8 +1311,8 @@
   },
   {
     "path": "next-concept/README.md",
-    "bytes": 55717,
-    "sha256": "ea52c29bf25f9149e329f66ac7cda0d6eccfc20a7a9303ddc65539d73b2d6d65"
+    "bytes": 66369,
+    "sha256": "092c1ec991e3a530ce453634323f883be07c88d854c430ba9fcacaa3e480e844"
   },
   {
     "path": "next-concept/rounded-preview.css",
@@ -1041,13 +1326,13 @@
   },
   {
     "path": "next-concept/styles.css",
-    "bytes": 32871,
-    "sha256": "fcc9b2603193695c63daaab9213c1f342e24400951adf83b337b77d8c6401e45"
+    "bytes": 33062,
+    "sha256": "f123b9117f9317214803f841b1a672998ac4e3416db383a478dd4c28bb318479"
   },
   {
     "path": "README.md",
-    "bytes": 5907,
-    "sha256": "ab890dc95b2c37086ea3a69ab42dd05b3a879c884f8e673a4ab93b4a1cda9873"
+    "bytes": 6742,
+    "sha256": "b2d07e0c6e92dc480fa1d8ac3a1c9a37ec0794474f620d2296aac6392cec66fc"
   },
   {
     "path": "run-local.cmd",
