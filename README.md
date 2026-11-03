@@ -1,6 +1,6 @@
 # 포트폴리오 이동 · GitHub 업로드 패키지
 
-2026-10-30 현재 `next-concept` 디자인의 독립 실행 복사본입니다.
+2026-11-03 현재 `next-concept` 디자인의 독립 실행 복사본입니다.
 원본 사이트를 변경하거나 GitHub에 업로드한 상태가 아닙니다.
 
 ## 다른 PC에서 확인
@@ -22,7 +22,7 @@ GitHub Free에서는 공개(Public) 저장소로 구성합니다.
 1. GitHub에서 새 저장소를 만듭니다. 예: `portfolio`.
 2. **ZIP 자체가 아닌, 압축 해제한 폴더 내부의 파일과 폴더**를 저장소 최상단에 업로드합니다.
    저장소 바로 아래 `index.html`, `next-concept/`, `assets/`, `media/`가 있어야 합니다.
-   상위 `portfolio-github-transfer-20261030` 폴더를 한 겹 더 넣지 마세요.
+   상위 `portfolio-github-transfer-20261103` 폴더를 한 겹 더 넣지 마세요.
 3. 웹 업로드는 `Add file → Upload files`로 진행합니다. 파일 수 제한에 걸리면 폴더별로 나누어 올리세요.
    GitHub Desktop을 쓰면 이 폴더의 내용을 새 저장소에 복사한 후 Commit / Publish하는 방식으로 전체를 올릴 수 있습니다.
 4. 저장소 `Settings → Pages`에서 Source를 `Deploy from a branch`로 선택합니다.
@@ -38,7 +38,7 @@ GitHub Free에서는 공개(Public) 저장소로 구성합니다.
 ## 포함한 현재 상태
 
 - 현재 프로젝트 데이터, 상세 설명, 카테고리, 경력, 툴 Usage 인터랙션
-- 원본 이미지, 웹용 WebP, 로고, Pretendard 폰트와 라이선스
+- 원본 이미지, 웹용 WebP, 로고, Pretendard / Chewy 폰트와 라이선스
 - 현재 메인 영상 / 프로젝트에서 사용하는 로컬 영상 7개
 - Toolkit YouTube: https://youtu.be/zBuRQKSIXgI
 - Production Breakdown YouTube: https://youtu.be/R-7Lavq2Sdk
@@ -104,3 +104,16 @@ GitHub용 미리보기 MP4를 새로 압축한 패키지는 아닙니다. 기존
 - EXPAND 상태에서 메인 화면으로 올라갔다 내려올 때 카드 숨김 문제 수정
 - 마지막 문구: Craft the visual. / Build the systems behind it.
 
+
+## 2026-11-03 추가 반영
+
+- 최신 프로젝트 제목 / 설명 / 모바일 썸네일 개선
+- 투명 WebGL 병아리와 커서 나비, 스크롤 위치 연동, 클릭 점프와 빠른 추격
+- 클릭 시 나비 주변 작은 꽃가루 효과, 메인 배경 영상 영역 클릭 반응
+- SHOWREEL / PROJECTS / EXPERTISE / CONNECT 글자 발자국
+- 귀여운 Chewy 글꼴, 기존 대비 2배 글자 출현 빈도, 배경별 색상
+- Three.js 런타임과 Chewy 글꼴은 로컬 포함: 병아리 효과에 외부 CDN 불필요
+- 병아리 켜기/끄기, 모바일 및 동작 줄이기 환경 기본 비활성, 상세 보기 중 일시 정지
+
+실행이나 업로드를 위해 Node.js, npm 또는 별도 빌드는 필요하지 않습니다.
+병아리 효과에는 WebGL을 지원하는 브라우저가 필요하며, 지원하지 않아도 포트폴리오는 이용할 수 있습니다.

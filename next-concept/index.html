@@ -22,11 +22,18 @@
     <link rel="stylesheet" href="./rounded-preview.css?v=subtle-rounded-media-20261027" />
     <link rel="stylesheet" href="./fullscreen-hero-preview.css?v=hero-white-specs-20261028" />
     <link rel="stylesheet" href="./card-colors.css?v=white-title-category-corner-20261028" />
-    <link rel="stylesheet" href="./collection-hover.css?v=expand-scroll-reset-fix-20261030" />
+    <link rel="stylesheet" href="./collection-hover.css?v=mobile-no-thumbnail-overlays-20261102" />
     <link rel="stylesheet" href="./card-details-toggle.css?v=segmented-card-view-20261028" />
-    <script type="module" src="./app.js?v=cinematic-shading-revision2-20261030"></script>
+    <link rel="stylesheet" href="./sumi-chick.css?v=transparent-companion-20261103" />
+    <script type="module" src="./app.js?v=workflow-quality-intro-20261102"></script>
+    <script type="module" src="./sumi-chick.js?v=chewy-trail-20261103"></script>
   </head>
   <body>
+    <canvas class="sumi-chick-canvas" id="sumi-chick-canvas" data-sumi-canvas aria-hidden="true" hidden></canvas>
+    <button class="sumi-chick-control" type="button" data-sumi-control aria-label="병아리 켜기" aria-pressed="false" aria-controls="sumi-chick-canvas" title="병아리 켜기">
+      <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M9 12c0-4 3-7 7-7s7 3 7 7v2c3 1 4 4 2 7-2 4-6 6-11 5-6-1-9-5-8-10l3 1v-5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="m23 12 5 2-5 2M12 26v3m7-3v3M10 18c1 3 4 4 6 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="19" cy="11" r="1.3" fill="currentColor"/></svg>
+    </button>
+    <span class="sr-only" data-sumi-status role="status"></span>
     <a class="skip-link" href="#work">프로젝트로 바로 이동</a>
     <p class="sr-only" data-page-status role="status"></p>
     <header class="site-header">
@@ -61,7 +68,7 @@
                 <div class="reel-overlay-heading"><strong data-reel-year>2026</strong><i></i><span data-reel-category>CINEMATIC · TRAILER</span></div>
                 <h2 data-reel-title>PUBG : Dednet Trailer</h2>
                 <div class="reel-overlay-details">
-                  <div class="reel-overlay-detail"><span>MY ROLE</span><p data-reel-role>Environment Art · Rendering · FX · Technical Art</p></div>
+                  <div class="reel-overlay-detail"><span>MY ROLE</span><p data-reel-role>Environment Art · Rendering · Technical Art</p></div>
                 </div>
               </div>
               <button class="hero-video-toggle" type="button" data-reel-play aria-label="Pause video and autoplay" aria-pressed="true" title="Pause">Ⅱ</button>

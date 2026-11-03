@@ -452,3 +452,211 @@ Thumbnail dark gradient now begins at 65% height (bottom 35% only, previously bo
 
 
 CinematicShading images 01–04 replaced again with latest supplied revisions (2026-10-30). Regenerated 480/960/2000px maximum WebP variants using content-hashed filenames to avoid stale browser caches across repeated same-day updates. Gallery order, first-image poster, project video and other content retained. Module cache versions refreshed. ZIP unchanged.
+
+
+## CinematicShading version-independent presentation (2026-11-02)
+
+Removed UE 5.8 and Substrate wording from project summary, implementation description and integration bullet; category now reads UNREAL ENGINE · SHADING. Copy describes direct lighting, Profile SSS, ambient response and cinematic look controls without implying a particular engine version or shading framework. Technical capabilities remain unchanged; this wording does not assert support for every engine version. Cache keys refreshed. Existing ZIP unchanged.
+
+
+## Mobile thumbnail overlays removed (2026-11-02)
+
+Touch/no-hover layouts now hide the thumbnail category label and remove the black gradient pseudo-element. Category metadata beneath each thumbnail stays visible. Desktop COLLAPSE/EXPAND, featured badges and open-project arrows are retained. CSS cache version refreshed. Existing ZIP unchanged.
+
+
+Cinematic Workflow Toolkit result wording changed from “기존 수작업 대비 100배 이상” to “기존 수작업 대비 수십 배” per owner request (2026-11-02). Catalog/module cache keys refreshed. Existing ZIP unchanged.
+
+
+Added owner-supplied timing context to Cinematic Workflow Toolkit result: per-shot manual work approximately five minutes versus tool-assisted approximately ten seconds, excluding import/export duration. Presented in parentheses after the speed improvement statement. These approximate figures are supplied by the owner; no new benchmark was run. Cache versions refreshed; ZIP unchanged. (2026-11-02)
+
+
+Production Breakdown technical section heading renamed from Rig & Tech to Rig & Material. Section items retained; cache keys refreshed. ZIP unchanged. (2026-11-02)
+
+
+Featured project titles changed to KRAFTON Cinematic Workflow Toolkit and KRAFTON Production Breakdown, replacing the year prefix only. Year metadata remains 2021–2026. Catalog/cache versions refreshed. ZIP unchanged. (2026-11-02)
+
+
+Dednet FX attribution removed (2026-11-02): role/contribution, summary, objective and result now describe environment development and rendering only; blood FX/modeling wording removed. Existing groups were already worlds/render. Updated initial hero role fallback as well. Other projects and media remain unchanged; ZIP unchanged.
+
+
+KRAFTON Cinematic Workflow Toolkit introduction now frames ongoing 2021–2026 development around high-quality Unreal Engine cinematic production, replacing the production-demand wording. Remaining description unchanged; caches refreshed; ZIP unchanged. (2026-11-02)
+
+## Transparent Sumi Chick companion (2026-11-03)
+
+Adapted the owner's `Q:/Codex/threejs/sumi-chick.html` into the existing portfolio as a page-wide transparent WebGL layer. The source HTML remains unchanged. This addition does not change project data, layouts, typography, thumbnails or the tool cloud.
+
+- `sumi-chick-scene.js` retains the chick geometry and 26 fur shells, procedural behaviour and leg IK, butterfly cursor tracking, idle motion, soft contact shadow, footprints, dissolving ink and blank-space click response.
+- Removed paper, mountain, circular brushstroke, plum blossom scenery and autonomous edge smoke. Interaction ink is composited separately with transparency. Fur now writes source-over alpha instead of preserving the standalone page's opaque destination alpha.
+- `sumi-chick.js` loads the scene on idle, observes pointer events passively, and suspends rendering when hidden, during project/image dialogs, or when switched off. The canvas is `pointer-events:none`; the page cursor, links, cards and scrolling retain their existing behaviour. Click ink is omitted on interactive controls so normal navigation does not start the effect.
+- A small chick button at the upper right toggles the companion; on narrow screens the control sits at the lower right. Desktop fine-pointer devices start enabled. Touch devices and reduced-motion users start disabled and can explicitly enable it.
+- `assets/vendor/three-r186/` contains the original Three.js 0.186.0 version and MIT license, served locally. The minified core file uses the `three.core.js` filename expected by the bundled module. No CDN or original Q: path is needed at runtime. Added runtime assets total approximately 0.83 MiB before HTTP compression; no external models or textures are needed.
+- Drawing-buffer pixels are capped at 2.4 million on desktop / 1.1 million on coarse-pointer devices; feedback simulation is half-resolution with a maximum 960px long side. Mobile rendering is limited to 30fps. These are workload limits, not a guarantee of frame rate on every device.
+
+Verification: JavaScript syntax; headless Chromium/WebGL2 shader compilation and transparent pixel readback; pointer-follow movement measured from visible chick pixels; 17 cards still present; canvas does not capture hit testing; toggle, project open/close suspension, resize and reduced-motion behavior; touch defaults to disabled without loading the scene and renders when explicitly enabled. No GUI automation or screenshots. GPU/device visual performance should still be judged on the actual viewing device. Existing ZIP unchanged.
+
+### Document-attached scrolling / constant character size (2026-11-03)
+
+The companion's canvas remains fixed only as a transparent rendering surface. The chick, its contact shadow and footprints now occupy document-relative ground coordinates. `sumi-chick-camera.js` uses a 30-degree orthographic camera calibrated to the previous view scale. Camera and target translate together along the ground in proportion to `window.scrollY`, so stationary world points move up exactly one CSS pixel per scrolled pixel without depth-dependent size changes. Resizing preserves world units per CSS pixel; initialization at a scrolled/deep-linked location starts the chick in that viewport.
+
+The butterfly remains associated with the viewport cursor. Its target is raycast again after scrolling, including when the pointer has not moved, and the chick follows toward the new visible ground area with its existing gait. It is not teleported or clamped back into the viewport. Therefore a rapid long scroll can temporarily move the chick offscreen while it catches up. The ink feedback buffer is reprojected by the same scroll delta; pixels outside the previous buffer are cleared instead of edge-clamped. Click ink stores its document Y coordinate until rendered.
+
+Checks: 15 camera projection scenarios across desktop/mobile dimensions, reversed scroll and deep-link offsets verify 1:1 scroll displacement, constant projected size and correct raycast targets. Headless WebGL checks confirm actual upward motion, cursor reacquisition after scrolling, transparency, resize, modal suspension, touch opt-in and reduced-motion behavior without shader/runtime errors. Existing layout, source HTML and ZIP remain unchanged.
+
+### Randomized chase rhythm and offscreen recovery (2026-11-03)
+
+`sumi-chick-chase.js` replaces the mandatory run/pause cycle with randomized pause opportunities and durations. A time-integrated probability keeps the rhythm independent of frame rate. As butterfly distance increases, pauses become less frequent and shorter, existing pauses can end early, and the chick's running speed increases.
+
+The scene checks the chick's projected position against the viewport. While offscreen, it immediately cancels pauses, settling and hops, increases movement and turning speed, and follows the butterfly back without teleporting. Recovery continues slightly inside the viewport (84% of each half-extent) to avoid oscillating at the boundary. Acceleration eases out after re-entry, and arrival braking prevents overshoot. Gait frequency and body tilt are capped separately from travel speed so fast recovery does not produce excessive leg motion or leaning.
+
+Verification: seeded rhythm simulations confirm irregular intervals, fewer pauses at greater distances, matching pause counts at 30/60fps, and no pauses during recovery. Headless WebGL integration verifies an actual 1400px scroll recovery with no intermediate pauses and subsequent deceleration, plus pointer following, transparency, modal/toggle suspension, resize, touch opt-in and reduced-motion defaults. JavaScript syntax checked. Module cache versions refreshed; original standalone HTML and existing ZIP unchanged.
+
+### Calmer pursuit with visible hesitations (2026-11-03)
+
+Retuned after owner feedback that pursuit was too fast and pauses were barely noticeable. Normal speed limits now range from 1.65 to 3.15 world units/second (approximately 31–58% of the preceding in-view maximum). Offscreen recovery is capped at that previous in-view maximum, 5.4, instead of the earlier distance-driven cap of 40. Normal acceleration is gentler; recovery still cancels pauses and smoothly returns to ordinary speed after re-entry.
+
+In-view pauses now last approximately 0.27–0.9 seconds, sampled irregularly, with a nonzero pause frequency even at maximum distance. Distance reduces their frequency and duration without cancelling them. Stronger braking during a pause makes the brief stop visible instead of coasting through it. Seeded cadence checks cover near/middle/far pursuit and 30/60fps; WebGL checks cover normal cursor-follow pauses and capped, pause-free recovery after scrolling. Cache versions refreshed; standalone source and ZIP unchanged.
+
+### Reference-inspired butterfly wing colors (2026-11-03)
+
+Repainted the two existing procedural 512px CanvasTextures using the owner's reference: cyan/turquoise fields, cobalt-blue wing roots, dark margins and veins, and wine-red forewing tips. Removed the previous ochre wash, pale spots and hindwing eyespot. The existing tail is painted dark. Textures retain sRGB tagging and are drawn once without external image downloads.
+
+Only `wingTexture()` painting changed. Wing silhouette paths, plane geometry, UVs, body, antennae, scale, wing-flap animation and cursor/chick movement remain identical. Headless WebGL verification confirms the color regions, transparency and no shader/runtime errors; exported texture previews were visually inspected. Source comparison verifies unchanged geometry, silhouettes and movement code. Cache versions refreshed; standalone source and ZIP unchanged.
+
+Blue/cyan wing gradient stops received a further 14% relative HSL saturation increase (2026-11-03), preserving hue and lightness within 8-bit rounding. Red tips, dark veins/margins and all geometry/motion retain their preceding values. Cache versions refreshed.
+
+### Idle cursor butterfly flight (2026-11-03)
+
+After seven seconds without pointer activity, the butterfly follows smooth, randomized waypoints inside a 100 CSS-pixel radius around the cursor. Waypoint radii are 48–96px, leaving a little margin for the wing center. Each leg takes 1.7–3.1 seconds; interpolation stays inside the disk and target coordinates are constrained to the viewport. The idle offset is applied in screen coordinates before raycasting, preserving the radius through scroll and different viewport scales. Pointer movement clears wandering immediately and resumes ordinary cursor tracking with the existing eased follow.
+
+Wandering uses active wing beats. The chick's start/stop following distances are reduced only during idle flight so it continues chasing these smaller movements. Normal chase speed and hesitation settings remain intact. Headless WebGL verification confirms the seven-second threshold, bounded/random movement, chick pursuit, radius after scrolling, pointer-move recovery and no runtime errors. JavaScript syntax checked; cache keys refreshed. Standalone source and ZIP unchanged.
+
+Idle flight radius increased from 100px to 300px (2026-11-03). Random waypoint radii scale from 48–96px to 144–288px, retaining the existing seven-second delay, flight timing and viewport bounds. Cache keys refreshed.
+
+Idle flight retuned to match the outside-cursor motion (2026-11-03): replaced waypoint arrivals/departures with continuous superimposed sine curves using the outside flight's .31/.83/.23 frequencies and the same 2.2 damping response. A 2.4-second smooth entry blends into the flight without an initial jump. Component amplitudes mathematically bound the path below the 300px radius. Seven-second activation, viewport constraints, immediate pointer-move exit and chick pursuit remain active. Syntax and headless WebGL idle-flight checks cover timing, radius, pursuit, scrolling and cursor reacquisition. Cache keys refreshed.
+
+### Butterfly steering and pursuit spacing correction (2026-11-03)
+
+Diagnosed the reported tail-first turns: below 0.4 world units/second, butterfly yaw previously ignored travel direction and drifted independently. Yaw now follows actual X/Z velocity down to a small numerical tolerance, takes the shortest angular path with frame-rate-independent damping, and holds its direction when stationary. The model's antennae face local +Z. A restrained bank follows turn rate without changing the model or wing textures.
+
+Idle flight now uses coupled ellipse phases with a subtle secondary drift, increasing pace and avoiding near-stationary reversals caused by independent X/Y oscillations. Entry takes 1.8 seconds. The path remains within the cursor's 300px disk, with viewport constraints and the seven-second idle trigger retained. Idle chick pursuit now starts at 1.35 world units and stops at 0.85 instead of 0.28/0.16. Forward travel reduces during turns and stops when facing away from the goal. Existing normal/recovery speed caps and randomized hesitations remain active.
+
+Verification: 60-second deterministic simulations through the actual scene functions in headless Chromium reproduce 184 backward-facing frames and a median 22px pursuit gap before the fix. The revised center case has no backward-facing frames, a median flight speed of 127px/s, and a median pursuit gap of 158px; an edge-cursor case also has no backward-facing frames. These figures describe the 1280×800 test viewport, not fixed speed/gap guarantees. Headless idle-flight integration checks activation, radius, scrolling, chick movement and cursor reacquisition. Cache keys refreshed; original standalone HTML and existing ZIP unchanged.
+
+### Random continuous butterfly steering (2026-11-03)
+
+Replaced the one-direction ellipse with `sumi-butterfly-flight.js`. Idle flight now continuously advances while choosing a new random turn rate and cruising speed every 1.1–2.6 seconds. Angular velocity and speed ease toward their targets; there are no waypoint stops. Gradual inward steering near the radius and viewport edges keeps the flight local, with a 294px safety envelope inside the requested 300px radius. A small steering response away from the chick helps preserve pursuit spacing when a random turn brings them close.
+
+The seven-second trigger, immediate return to cursor tracking, velocity-aligned heading and existing chick behavior remain active. A 60-second scene-function simulation verifies both clockwise and counterclockwise travel, no backward-facing motion, bounded radius, sustained flight speed and pursuit separation. Live headless idle-flight checks also cover activation, scrolling and cursor reacquisition. No model or texture edits; cache keys refreshed.
+
+### Subtle portfolio-colored interaction traces (2026-11-03)
+
+Replaced black/gray smoke composition with very faint peach (#DDA988 family) and muted olive traces. All existing emission sources use the new composition: dissolving footprints, chick landings, butterfly travel and blank-space clicks. Curl and upward drift are reduced substantially; density falls to 10–16% after one second of normal simulation instead of lingering as a plume. Emission amounts and radii are reduced, including the click radius from .05 to .014 normalized units. Footprints now use muted olive-gray at up to .22 alpha instead of .6 black ink, fading into the faint trace.
+
+Normal source-over composition keeps the effect restrained on both light and dark site sections. GPU pixel checks measure about 2.7% alpha for a fresh click and a maximum of 7.5% even at saturated feedback density; an empty buffer remains fully transparent. Headless WebGL checks confirm warm/light colors and no shader/runtime errors. Character models, flight/chase behavior and site interaction remain unchanged. Cache keys refreshed; existing ZIP unchanged.
+
+Footprint visibility increased (2026-11-03): raised the footprint opacity multiplier from .22 to .42 so the tracks read more clearly. Olive-gray color, dissolve timing and the faint movement/click/dissolve traces retain their preceding settings. Cache keys refreshed.
+
+Footprint opacity multiplier increased again from .42 to .70 at the owner's request (2026-11-03). Dissolve behavior and other effect strengths are retained. Cache keys refreshed.
+
+Chick wing colors matched to its body (2026-11-03): wing fur now uses the same base RGB (.98, .78, .34) and tip RGB (1, .95, .72) as body fur. Existing wing fur length, density, geometry and animation remain unchanged; butterfly colors are unaffected. Cache keys refreshed.
+
+Footprint color changed to the portfolio olive #718B2C (2026-11-03), retaining the .70 opacity multiplier and existing dissolve timing. Color stays olive while fading; faint interaction traces keep their preceding settings. Cache keys refreshed.
+
+### Occasional section-aware text footprints (2026-11-03)
+
+Added `sumi-text-tracks.js`. Most footfalls retain the existing olive footprint. A randomized threshold of 15–25 visible footfalls, with a minimum 6.5-second interval, permits one footfall to become a short text stamp instead. Only one text stamp is visible at a time: a 0.1-second reveal, three-second hold (including reveal), and 1.2-second fade. Offscreen and edge-clipped candidates remain ordinary footprints; the next suitable footfall can carry the text.
+
+- Hero: `2021–2026 SHOWREEL`
+- Project collection: `ART · TECH · PIPELINE`
+- Career / expertise: `EXPERIENCE & EXPERTISE`
+- Closing: alternates `CRAFT THE VISUAL.` and `BUILD THE SYSTEMS.`
+
+Section selection uses the planted foot's projected position against current section bounds, including after filter/EXPAND/responsive layout changes. Hero and career stamps use cream `#FFF4E2` with a narrow dark edge; light sections use dark olive `#3F4D24` with a light edge. A project-thumbnail hit also selects cream so text remains legible over images/video. These text colors do not change ordinary olive footprints or the existing faint effects.
+
+CanvasTextures use the local Pretendard font at 600 weight, 16 CSS pixels on desktop / 14 on narrow screens. A screen-facing sprite stays at its world/document position with a small heading-dependent tilt limited to ±10 degrees; it cannot turn upside down or flatten into the ground perspective. Its CSS-pixel size stays constant on scroll/resize. The texture cache is bounded by the fixed phrase/theme/size combinations, resources are disposed with the companion, and no DOM overlay or pointer target is added. Existing companion suspension, opt-in and reduced-motion settings apply.
+
+Verification: JavaScript syntax and headless Chromium/WebGL rendering. Checked all four section phrases/themes, thumbnail contrast variant, footfall replacement/cooldown, full fade, ±10-degree rotation, clipped-edge rejection, 100px scroll moving the stamp exactly 100px with constant size, resizing, narrow-screen sizing, cleanup and the unchanged 17-card collection. Inspected generated text textures and confirmed no shader/runtime errors. No GUI automation or site screenshots; no packaging changes.
+
+### Character-by-character footprint correction (2026-11-03)
+
+Replaced the whole-phrase caption behavior above with individual character footprints, following the owner's clarified reference. After an occasional normal-footprint interval (15–25 visible footfalls and at least 6.5 seconds), a phrase is written progressively: one character replaces the footprint at each randomly chosen one- or two-step interval. Spaces and intervening steps retain normal footprints. Finishing a phrase returns to the normal-footprint interval; crossing into a different section while writing starts that section's phrase on the next eligible step.
+
+Every character stays at its own planted foot position, with no word layout, collision avoidance or automatic separation. Retracing the same ground intentionally overlaps the letters. Each character independently holds for three seconds and fades over 1.2 seconds, using the existing cream/dark-olive contrast variants, 16px desktop / 14px narrow-screen Pretendard, and viewport-facing tilt limited to ±10 degrees. No whole sentence is rendered in a single stamp. A fixed 64-sprite pool bounds live objects; textures are shared by character/theme/size and disposed with the companion.
+
+Verification: deterministic headless Chromium/WebGL checks through the actual footfall function cover both one-step and two-step cadence, sequential characters, exact-position overlaps, spaces preserving normal prints, section changes, independent expiry, return to ordinary footprints, alternating closing phrases, scrolling, mobile size, GPU rendering and resource cleanup. No shader/runtime errors; 17 project cards remain present. Cache keys refreshed; ZIP unchanged.
+
+### Ground-aligned letter tracks / full direction rotation (2026-11-03)
+
+Corrected the camera-facing letter sprites after owner feedback. Letters now use shared horizontal XZ plane geometry at the same Y=.002 ground height as footprints, with depth testing enabled and depth writes disabled. The former depth-disabled transparent sprites could overpaint the chick's opaque fur regardless of their render order; ground letters are now occluded by the chick and other foreground geometry.
+
+Each footfall computes one footprint heading, including its existing toe-in and small yaw variation. The letter's reading axis (+X in its texture) aligns with that heading (+Z in the footprint texture). This replaces the ±10-degree screen tilt limit: rightward travel reads upright, reversing travel rotates the glyph 180 degrees, and each letter follows local turns along the trail. Letters remain fixed after planting and scroll with the page.
+
+The alternating lateral foot offset is removed for text only, placing glyphs midway between the two foot lanes at the planted step's forward/backward coordinate. Visible capital height is .225 world units: .14 between the two feet plus the .085 footprint extent, spanning the full two-foot trail. Texture resolution is independent of displayed size, and the glyph plane scales by measured capital height rather than CSS font size. Ordinary footprints retain their positions, dimensions and olive color.
+
+Letter rendering now reuses the actual footprint noise/erosion shader and its 2.4-second hold / 2-second fade, retaining the contrasting cream and dark-olive glyph textures. One/two-step sequencing, occasional runs, overlapping characters and the bounded 64-stamp pool remain active. The shared plane, per-slot materials and cached glyph textures are disposed with the companion.
+
+Verification: syntax and headless WebGL checks cover ground-plane vertices, reading-axis alignment, right/left 180-degree reversal and up/down orientation, two-foot sizing, one/two-step cadence, overlap, independent footprint-timed expiry, 100px document scrolling, mobile sizing, cleanup and no shader/runtime errors. A GPU occlusion check confirms that opaque foreground geometry completely hides a letter beneath it. Cache keys refreshed; ZIP unchanged.
+
+Letter footprint size reduced by 20% in both dimensions (2026-11-03): capital height now .18 world units, using .8 of the preceding two-foot-trail size. Removed the canvas text stroke and shadow/halo, leaving solid cream/dark-olive glyphs. Ground orientation, depth testing, step cadence and erosion behavior retained. Cache keys refreshed; ZIP unchanged.
+
+### Smaller letters and shared footprint colors (2026-11-03)
+
+Reduced letter footprints by another 20% from the preceding size: capital height is now .144 world units (.64 of the original two-foot-trail size). Letters remain fill-only, without outlines.
+
+Ordinary footprints now share the text's surface-color resolver at their planted screen position: cream `#FFF4E2` on the hero, career section and project media; dark olive `#3F4D24` on light sections. Each footprint stores its own ink color in an instanced attribute, so crossing a section boundary does not recolor older tracks. The ordinary footprint opacity multiplier stays at .70, with the existing appearance and erosion fade unchanged. Both glyphs and ordinary prints use matching color-space handling.
+
+Verification: headless Chromium/WebGL checks passed for the further size reduction, ground orientation, depth occlusion, step cadence, scrolling and cleanup. Tested the actual stamped colors in all four page sections and on a project thumbnail; GPU readback confirmed both palette colors and 70% opacity (within 8-bit rounding). No shader/runtime errors. Cache keys refreshed; ZIP unchanged.
+
+### Readable letter spacing and opacity fade (2026-11-03)
+
+Replaced the one-/two-footfall letter interval with distance sampling along the planted, centered foot trail. Letter advances use the actual Pretendard glyph widths, plus modest tracking (24% of capital height, varied by ±6%). Word spaces add an empty 55%-of-height gap. Long steps interpolate intermediate letter positions; short steps wait until enough distance is available. Adjacent rotated glyph bounds reserve at least 14% of capital height as clearance on bends. In-place foot taps no longer pile multiple letters at the same point. Heading follows the chick's travel direction without alternating toe-in jitter; ground orientation, reversal, depth occlusion and .144-unit capital height remain.
+
+Once a sentence starts, every footfall is consumed by that sentence, including waiting steps and word spaces. Normal footprints resume after completion and a small clearance beyond the final letter. Crossing a page section preserves the current sentence until complete, while each new glyph still resolves its local cream/dark-olive ink. New sentences retain the occasional 15–25-footfall / 6.5-second trigger. Offscreen jumps are not filled with a burst; an unfinished run with no new glyphs for eight seconds is released so abandoned text cannot remain indefinitely.
+
+Text now uses a dedicated texture-and-opacity shader, with no erosion, UV distortion or emitted trace. Earlier letters remain intact while the sentence is being written. After completion, the whole sentence holds for 2.4 seconds and fades smoothly over two seconds. Ordinary footprint size, color selection, 70% opacity and dissolution effects remain unchanged.
+
+Verification: headless Chromium tests cover seven paths (slow, fast, variable stride, reverse, broad curve, S curve and tight turn), measured adjacent clearance, speed-independent straight-line spacing, stationary taps, word gaps and sentence completion without mixed ordinary footprints. Actual scene footfall integration confirms ordinary tracks resume afterward; all four page phrases and light/dark palettes pass. GPU pixel comparison confirms the fading glyphs retain their mask and lose opacity uniformly, without fragments disappearing. Reviewed rendered letter-trail fixtures in `Q:\Codex\portfolio-exports\sumi-readable-trail-review.png`; no shader/runtime errors. Checks live outside the shipped site in `check-sumi-readable-trail.mjs`. Cache keys refreshed; ZIP unchanged.
+
+Text footprint opacity matched to ordinary footprints (2026-11-03): reduced the text multiplier from .98 to .70 across every page section. Shared cream/dark-olive ink, letter spacing, sentence hold and smooth opacity fade remain unchanged. Cache keys refreshed.
+
+Trail opacity revised again at the owner's request (2026-11-03): text restored to .98; ordinary footprints increased to .90. Both values apply across all sections with the existing adaptive colors. Letter spacing, sentence timing and each effect's fade behavior remain unchanged. Cache keys refreshed.
+
+### Chick surface darkening removed (2026-11-03)
+
+The chick did not use cast/receive shadow maps; the apparent self-shadow came from its custom fur shader's directional diffuse multiplier and root-darkening factor. Removed both darkening terms for body, head, wings and feathered legs. Root-to-tip pigment, strand coverage, soft positive sheen/rim highlights, geometry and motion remain. Beak and bare legs/toes now use unlit MeshBasicMaterial with their existing colors; the unused hemisphere/directional scene lights were removed. The light-direction uniform remains solely for the fur's positive sheen.
+
+The separate ground-contact shadow retains its texture, .40 opacity, shape, placement and animation. Headless GPU comparison confirmed root color no longer varies with surface orientation (red-channel range 77 before, 0 after), identical contact-shadow alpha output, and no shader/runtime errors. Reviewed three rendered angles before/after in `Q:\Codex\portfolio-exports\sumi-self-shading-review.png`. Cache keys refreshed; original standalone scene and ZIP unchanged.
+
+Footstep text shortened for readability (2026-11-03): hero `SHOWREEL`, projects `PROJECTS`, career/tools `EXPERTISE`, closing `CONNECT`. Each section now uses one short word, including a single closing word instead of alternating sentences. Text opacity remains .98 and footprints .90; distance-based spacing and opacity fade continue. Cache keys refreshed.
+
+### Click hop followed by uninterrupted catch-up (2026-11-03)
+
+A companion-eligible page click now requests one hop and latches a fast pursuit. After landing, the chick follows the butterfly's current position with the faster recovery speed/turn response and no random curiosity pauses. The existing 5.4 speed ceiling and arrival deceleration apply. Pursuit ends after landing within .25 units beyond the ordinary stopping distance (.80 normally, 1.10 during idle wandering); ordinary slower following and hesitation rhythm then resume. Clicking while already airborne keeps the current hop. Sleeping chicks wake and perform the requested hop; links, buttons and other excluded controls retain the existing input filtering.
+
+Verification: deterministic headless scene checks cover a click during a hesitation, while sleeping, facing away and already near the butterfly. Every case retains the .48-second hop, has no pursuit pauses and releases near the target; normal pursuit afterward regains its slower limit and random pauses. The seeded rhythm/recovery checks also pass. No runtime errors. Cache keys refreshed.
+
+### Hero background click reaction (2026-11-03)
+
+The generic video input exclusion prevented chick click reactions across the right-hand hero background. Allow the control-free `.hero .hero-video` as a decorative page surface. Links, buttons, other interactive ancestors, videos with native controls and all other videos remain excluded. The passive listener does not intercept page actions. Bootstrap and scene cache keys refreshed.
+
+Verification: headless Chromium DOM hit testing at three right-hand hero positions targets the actual background video; bubbling pointer events trigger the hop/pursuit state at all three. The hero pause button, a controlled video, a controlled hero video and a linked video remain excluded. Existing hop, uninterrupted catch-up and return-to-normal behavior checks pass with no runtime errors.
+
+### Butterfly pollen click feedback (2026-11-03)
+
+Replaced the click's broad feedback-buffer splat with a small pollen burst emitted from the butterfly's actual world position. Twenty-eight soft round grains in gold, peach, pale olive and cream spread in two wingbeat pulses 75 ms apart, decelerate into a slight flutter/drift and fade over .72–1.10 seconds. Grains are 2.2–4.4 CSS pixels before fading, with roughly 18–41 px radial spread. The butterfly briefly accelerates its wingbeat for .28 seconds while the existing chick hop and uninterrupted catch-up begin. Background-video eligibility and control exclusions remain unchanged.
+
+`sumi-butterfly-pollen.js` uses one Points draw call and a fixed 120-grain pool, with no external assets or per-click GPU resources. Repeated clicks recycle the pool; suspension clears it and disposal releases it. Explicit reduced-motion opt-in uses ten grains, half the spread, a .55-second fade and no wingbeat boost. Normal movement/landing traces and footprints remain unchanged. Bootstrap/scene cache keys refreshed.
+
+Verification: headless WebGL checks confirm actual butterfly-origin emission, 28 live grains, bounded capacity under 30 rapid bursts, expiry, suspension cleanup and same-frame chick hop/pursuit. Reviewed native-size shader renders against dark/light backgrounds in `Q:\Codex\portfolio-exports\sumi-pollen-review.png`. Hero hit-target/control exclusions and prior catch-up/normal-pause regression checks pass without runtime or shader errors.
+
+Text footprint frequency increased (2026-11-03): apply a 1.5 frequency multiplier to both run-start gates. The random ordinary-footfall wait changes from 15–25 to approximately 10–17 steps, and the minimum wait from 6.5 to approximately 4.33 seconds. Completed-word timing, glyph spacing/size, colors, opacity and fade remain unchanged; actual frequency still depends on walking and word completion. Module/bootstrap cache keys refreshed.
+
+Text footprint frequency revised to 2× the original baseline (2026-11-03), replacing the 1.5× setting: minimum wait is now 3.25 seconds and the rounded random footfall wait is 8–13 steps. Letter spacing, word completion and visual styling remain unchanged. Module/bootstrap cache keys refreshed.
+
+### Playful chick trail lettering (2026-11-03)
+
+Text footprints now use Chewy Regular (400), with soft, irregular rounded letterforms suited to the chick. Only the WebGL trail uses this font; portfolio typography remains unchanged. The unmodified 41,248-byte font is bundled at `assets/fonts/Chewy-Regular.ttf`, with its Apache 2.0 license in `assets/fonts/Chewy-LICENSE.txt`. Source: https://github.com/google/fonts/tree/main/apache/chewy .
+
+The companion lazily loads a dedicated `Sumi Trail Chewy` FontFace and waits before measuring or caching glyph textures; no remote font request or system installation is needed. Font failure falls back to local cursive. Existing capital height (.144 world units), fill-only rendering, directional rotation, adaptive colors, opacity, distance-based clearance and 2× appearance frequency remain. Module/bootstrap cache keys refreshed.
+
+Verification: headless Chromium confirms the bundled font loads with distinct font metrics and completes SHOWREEL on forward, reverse and curved paths without ordinary footprints mixed into the word. Measured minimum adjacent clearance stays above .02016 units and capital height stays .144. Reviewed four word specimens and actual projected letter meshes in `Q:\Codex\portfolio-exports\sumi-chewy-review.png`; no runtime errors.

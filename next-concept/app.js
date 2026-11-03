@@ -1,4 +1,4 @@
-import { catalog } from "./catalog.js?v=workflow-thumbnail-20261030";
+import { catalog } from "./catalog.js?v=workflow-quality-intro-20261102";
 import { profile } from "./profile.js?v=slack-contact-20261027";
 import { imageManifest } from "./image-manifest.js?v=cinematic-shading-revision2-20261030";
 import { initHoverPreviews } from "./hover-preview.js?v=instant-hover-20261027";

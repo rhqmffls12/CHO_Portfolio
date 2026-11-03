@@ -6,7 +6,7 @@ export const catalog = [
     "title": "PUBG: Dednet Trailer",
     "category": "CINEMATIC · TRAILER",
     "year": "2026",
-    "role": "Environment Art · Rendering · FX · Technical Art",
+    "role": "Environment Art · Rendering · Technical Art",
     "tools": "UNREAL ENGINE 5 · SUBSTANCE PAINTER · MAYA",
     "toolLogos": [
       {
@@ -23,7 +23,7 @@ export const catalog = [
       }
     ],
     "thumbnail": "./assets/thumbnails/dednet.png",
-    "description": "시네마틱 연출과 샷 흐름에 맞춰 환경을 디벨롭하고, 블러드 FX가 장면 안에서 선명하게 읽히도록 관련 모델링과 표현을 다듬었습니다. 환경 제작부터 FX와 렌더링까지 연결해 컷의 완성도를 높였습니다.",
+    "description": "시네마틱 연출과 샷 흐름에 맞춰 환경을 디벨롭하고, 환경 제작과 렌더링을 연결해 컷의 완성도를 높였습니다.",
     "video": "./media/dednet.mp4",
     "releaseUrl": "https://www.youtube.com/watch?v=ED_kgsr8MkU",
     "poster": "",
@@ -32,10 +32,10 @@ export const catalog = [
       "worlds",
       "render"
     ],
-    "objective": "샷의 연출과 액션 흐름에 맞는 환경과 FX 표현을 제작합니다.",
-    "result": "환경 디벨롭, 블러드 FX 관련 모델링·표현, 렌더링을 연결한 시네마틱 컷입니다.",
+    "objective": "샷의 연출과 액션 흐름에 맞는 환경을 제작하고 렌더링을 구성합니다.",
+    "result": "환경 디벨롭과 렌더링을 연결해 샷의 연출 의도를 구현한 시네마틱 컷입니다.",
     "kind": "project",
-    "contribution": "Environment Art · Rendering · FX · Technical Art",
+    "contribution": "Environment Art · Rendering · Technical Art",
     "featuredOrder": null,
     "archive": false
   },
@@ -281,7 +281,7 @@ export const catalog = [
   {
     "number": "08",
     "discipline": "cinematic",
-    "title": "2021–2026 Production Breakdown",
+    "title": "KRAFTON Production Breakdown",
     "category": "PRODUCTION · BREAKDOWN",
     "year": "2021–2026",
     "role": "Environment Art · Rigging · Technical Art · CFX · FX · Rendering",
@@ -332,7 +332,7 @@ export const catalog = [
         ]
       },
       {
-        "heading": "Rig & Tech",
+        "heading": "Rig & Material",
         "items": [
           "프로젝트 전용 머티리얼 제작",
           "MetaHuman 커스텀 리그와 인하우스 리그",
@@ -466,7 +466,7 @@ export const catalog = [
   },
   {
     "title": "CinematicShading for Unreal Engine",
-    "category": "UNREAL ENGINE 5 · SHADING",
+    "category": "UNREAL ENGINE · SHADING",
     "year": "2026",
     "toolLogos": [
       {
@@ -474,8 +474,8 @@ export const catalog = [
         "src": "./assets/tools/unreal-engine.png"
       }
     ],
-    "description": "UE 5.8 Substrate 직접광 셰이딩을 확장하고 Profile SSS와 환경광 응답을 보정하는 시네마틱 렌더링 플러그인입니다.",
-    "technicalDescription": "기존 Substrate 렌더링 경로에 시네마틱 디퓨즈 응답과 프로파일 기반 SSS 보정을 통합했습니다. 주요 셰이딩 파라미터는 런타임에 제어하고, 엔진 버전에 맞는 셰이더 오버레이와 Slate Control Center로 적용·진단할 수 있도록 구성했습니다.",
+    "description": "Unreal Engine의 직접광 셰이딩을 확장하고, Profile SSS와 환경광 응답을 조절해 시네마틱 룩을 구현하는 렌더링 플러그인입니다.",
+    "technicalDescription": "Unreal Engine의 렌더링 경로에 시네마틱 디퓨즈 응답과 프로파일 기반 SSS 보정을 통합했습니다. 주요 셰이딩 파라미터는 런타임에 제어하고, 엔진 버전에 맞는 셰이더 오버레이와 Slate Control Center로 적용·진단할 수 있도록 구성했습니다.",
     "technicalSections": [
       {
         "heading": "룩을 만드는 셰이딩 기술",
@@ -492,7 +492,7 @@ export const catalog = [
         "heading": "엔진 통합 및 개발 기술",
         "items": [
           "C++ 플러그인과 HLSL 셰이더 확장",
-          "UE 5.8 Substrate Deferred 렌더링 경로 통합",
+          "Unreal Engine Deferred 렌더링 경로 통합",
           "SceneViewExtension 기반 화면 공간 진단 프리뷰",
           "비트 패킹 기반 View 파라미터 전달",
           "경계값·정밀도 안정화 및 HDR / PreExposure 대응",
@@ -794,7 +794,7 @@ export const catalog = [
     "archive": false
   },
   {
-    "title": "2021–2026 Cinematic Workflow Toolkit",
+    "title": "KRAFTON Cinematic Workflow Toolkit",
     "category": "TOOL · PIPELINE",
     "year": "2021–2026",
     "sortYear": 2026,
@@ -816,7 +816,7 @@ export const catalog = [
         "src": "./assets/tools/cpp.png"
       }
     ],
-    "description": "2021년부터 2026년까지 제작 현장의 요구에 맞춰 지속적으로 개선해 온 시네마틱 파이프라인 툴입니다. Maya의 카메라·애니메이션 익스포트부터 Unreal Engine의 에셋·시퀀스 구성과 렌더까지 연결하고, 모델링·애니메이션·리깅·FX·렌더링 파트의 소스를 공통된 기준으로 관리해 협업 과정의 충돌과 반복 작업을 줄입니다.",
+    "description": "2021년부터 2026년까지 Unreal Engine 기반의 고품질 시네마틱 제작을 위해 지속적으로 개선해 온 시네마틱 파이프라인 툴입니다. Maya의 카메라·애니메이션 익스포트부터 Unreal Engine의 에셋·시퀀스 구성과 렌더까지 연결하고, 모델링·애니메이션·리깅·FX·렌더링 파트의 소스를 공통된 기준으로 관리해 협업 과정의 충돌과 반복 작업을 줄입니다.",
     "technicalDescription": "ShotGrid의 샷 정보와 Maya에서 익스포트한 카메라·애니메이션 소스를 Unreal Engine의 에셋·LevelSequence 구성에 연결했습니다. 각 샷에 필요한 Level과 렌더 설정을 저장·재사용하고, 여러 샷을 Movie Render Queue 작업으로 일괄 구성하도록 구현했습니다. SVN 기반 버전 관리와 에디터 내 소스 접근을 통합해, 각 파트가 공통된 소스 관리 기준과 제작 흐름을 따르도록 구성했습니다. 2021~2026년 동안 실제 제작 피드백을 반영해 기능을 지속적으로 개선하고 확장했습니다.",
     "technicalSections": [
       {
@@ -892,7 +892,7 @@ export const catalog = [
     "role": "DCC–Unreal 워크플로 설계 · Editor 플러그인 개발 · ShotGrid·SVN 연동 · 파트 간 소스 관리 기준 정립",
     "stack": "Maya · Unreal Engine · C++ · Slate · Python · ShotGrid · SVN",
     "objective": "모델링·애니메이션·리깅·FX·렌더링으로 이어지는 각 파트의 작업 소스를 일관된 기준으로 관리하고, 제작 팀원 간 에셋 소스 충돌과 설정 누락을 최소화하는 워크플로를 구축합니다. DCC에서 Unreal Engine까지 이어지는 반복 작업을 자동화해 아티스트가 제작에 집중할 수 있는 환경을 만드는 것이 목표입니다.",
-    "result": "수작업으로 진행하던 반복적인 소스 처리와 샷 셋업을 자동화해, 자동화 대상 작업의 처리 속도를 기존 수작업 대비 100배 이상 개선했습니다. 또한 파트별 소스 관리와 샷 구성을 표준화해 팀원 간 에셋 소스 충돌과 설정 누락을 줄이고, 모델링부터 렌더링까지 일관된 제작 흐름을 유지하도록 했습니다.",
+    "result": "수작업으로 진행하던 반복적인 소스 처리와 샷 셋업을 자동화해, 자동화 대상 작업의 처리 속도를 기존 수작업 대비 수십 배 개선했습니다(샷당 임포트·익스포트 시간 제외, 수작업 약 5분 → 툴 사용 시 약 10초). 또한 파트별 소스 관리와 샷 구성을 표준화해 팀원 간 에셋 소스 충돌과 설정 누락을 줄이고, 모델링부터 렌더링까지 일관된 제작 흐름을 유지하도록 했습니다.",
     "relevance": "DCC–엔진 에셋 연계 · 아티스트용 Editor 도구 개발 · 팀 단위 소스·버전 관리 · 아트 파이프라인 표준화",
     "kind": "tool",
     "contribution": "DCC–Unreal 워크플로 설계 · Editor 플러그인 개발 · ShotGrid·SVN 연동 · 파트 간 소스 관리 기준 정립",

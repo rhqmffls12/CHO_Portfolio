@@ -43,3 +43,9 @@
 @media(prefers-reduced-motion:reduce),print{.project-collections .compact-enter-pending,.project-collections .compact-enter-running{opacity:1!important;transform:none!important;animation:none!important}}
 @media print{.project-collections .card-info-panel{grid-template-rows:1fr!important;opacity:1!important;visibility:visible!important}.project-collections .work-card-info{transform:none!important}}
 @media print{.project-collections.has-independent-cards{display:grid!important;height:auto!important}.project-collections.has-independent-cards .work-card{position:static!important;width:auto!important;top:auto!important;left:auto!important}}
+
+/* Touch layouts show category metadata below the artwork, without a scrim. */
+@media(hover:none),(pointer:coarse){
+  .project-collections .work-card-visual::after{display:none}
+  .project-collections .thumbnail-category-label{display:none}
+}

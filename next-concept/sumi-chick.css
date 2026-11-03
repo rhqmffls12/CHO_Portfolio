@@ -1,0 +1,53 @@
+/* One transparent, non-intercepting layer; the portfolio controls remain the hit targets. */
+.sumi-chick-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 15;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: transparent;
+}
+.sumi-chick-canvas[hidden], .sumi-chick-control[hidden] { display: none; }
+.sumi-chick-control {
+  position: fixed;
+  top: calc(96px + env(safe-area-inset-top, 0px));
+  right: max(18px, env(safe-area-inset-right, 0px));
+  z-index: 21;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 8px;
+  border: 1px solid rgba(113, 139, 44, .3);
+  border-radius: 50%;
+  color: var(--ink, #171b18);
+  background: rgba(244, 245, 241, .92);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: color 160ms ease, border-color 160ms ease;
+}
+.sumi-chick-control:hover { color: #718b2c; border-color: #718b2c; }
+.sumi-chick-control:focus-visible { outline: 2px solid #718b2c; outline-offset: 4px; }
+.sumi-chick-control svg { display: block; width: 26px; height: 26px; }
+.sumi-chick-control::after {
+  content: '';
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  width: 6px;
+  height: 6px;
+  border: 2px solid #f4f5f1;
+  border-radius: 50%;
+  background: #718b2c;
+}
+.sumi-chick-control[data-state='off']::after,
+.sumi-chick-control[data-state='error']::after { background: #999d93; }
+.sumi-chick-control[data-state='loading']::after { background: #dda988; }
+@media (max-width: 600px) {
+  .sumi-chick-control { top: auto; bottom: max(18px, env(safe-area-inset-bottom, 0px)); right: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sumi-chick-control { transition: none; }
+}
