@@ -52,12 +52,12 @@ export function createButterflyPollen(scene, camera, { reducedMotion = false } =
   const right = new THREE.Vector3(), up = new THREE.Vector3();
   let cursor = 0;
 
-  function burst(origin, viewportHeight) {
+  function burst(origin, viewportHeight, strength = 1) {
     camera.updateMatrixWorld();
     right.setFromMatrixColumn(camera.matrixWorld, 0);
     up.setFromMatrixColumn(camera.matrixWorld, 1);
     const scale = (camera.top - camera.bottom) / (camera.zoom * Math.max(1, viewportHeight));
-    const count = reducedMotion ? 10 : 28;
+    const count = Math.max(6, Math.round((reducedMotion ? 10 : 28) * strength));
     for (let i = 0; i < count; i++) {
       const index = cursor++ % capacity;
       const p = particles[index];
@@ -68,7 +68,7 @@ export function createButterflyPollen(scene, camera, { reducedMotion = false } =
       p.age = i < count / 2 ? 0 : -.075;
       p.life = reducedMotion ? .55 : .72 + Math.random() * .38;
       p.angle = i / count * Math.PI * 2 + (Math.random() - .5) * .35;
-      p.radius = (18 + Math.random() * 23) * (reducedMotion ? .5 : 1);
+      p.radius = (18 + Math.random() * 23) * (reducedMotion ? .5 : 1) * strength;
       p.phase = Math.random() * Math.PI * 2;
       p.scale = scale;
       p.size = 2.2 + Math.random() * 2.2;

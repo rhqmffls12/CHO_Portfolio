@@ -1321,8 +1321,8 @@
   },
   {
     "path": "next-concept/index.html",
-    "bytes": 16219,
-    "sha256": "19d9c7630789d94b44f9012cc565fc048079f649c1010af2fd271846efc350ad"
+    "bytes": 16213,
+    "sha256": "663b821127921922e7dc3174d080f0132ee1203c2a375cd6dac7ac2ea0dfae86"
   },
   {
     "path": "next-concept/profile.js",
@@ -1336,8 +1336,8 @@
   },
   {
     "path": "next-concept/README.md",
-    "bytes": 101648,
-    "sha256": "4e1640306f58357a353b0ff659f0453aa146bea8b568b21f44614e8b960bc707"
+    "bytes": 158700,
+    "sha256": "11a94d92c0600be332a5f09a626809052520bee496297ab0a730cb2beaa2e9fa"
   },
   {
     "path": "next-concept/rounded-preview.css",
@@ -1361,8 +1361,8 @@
   },
   {
     "path": "next-concept/sumi-butterfly-pollen.js",
-    "bytes": 5098,
-    "sha256": "9fbe363a1e3fb811a3b7267dcd5fc31df8656865fd707a8635f45a1ba5efa36c"
+    "bytes": 5161,
+    "sha256": "433de035099067d4d1be6295a488ecc178d569208fbb20c105059cc8b2f5abf3"
   },
   {
     "path": "next-concept/sumi-chick-camera.js",
@@ -1376,28 +1376,68 @@
   },
   {
     "path": "next-concept/sumi-chick-scene.js",
-    "bytes": 61259,
-    "sha256": "47d49bb3b044a340f7898cfa2b19ab48536631b4a91bcde7f03b70be67e20b8a"
+    "bytes": 72773,
+    "sha256": "a228930c38f90dd8e601f1f6a2b1e6f13876736cafd39ac5cea59f8492f2b4e9"
   },
   {
     "path": "next-concept/sumi-chick.css",
-    "bytes": 1669,
-    "sha256": "660b039c28e99d0d1e420bfd4d80bdc1f2983b81b1a280827e3f116c4304cd36"
+    "bytes": 5974,
+    "sha256": "3b7cc339715c7afb14e6efd94da9374e62591cb6d70c158396a80cc75c0b9ee2"
   },
   {
     "path": "next-concept/sumi-chick.js",
-    "bytes": 3670,
-    "sha256": "3f3e2422b23bb5427471aac9a6b7c4999e449b361d2fbe5df1494128fded54f7"
+    "bytes": 4442,
+    "sha256": "40b6ef14b85bf3f6baef63eb63e36dd924c51659774fc0bbdaf9380592d95f6d"
+  },
+  {
+    "path": "next-concept/sumi-fire-mode.js",
+    "bytes": 9288,
+    "sha256": "da3c44a436d421851c0989e1f04bae7c2585cf18acf78490982b3a3ada56e416"
+  },
+  {
+    "path": "next-concept/sumi-flower-art.js",
+    "bytes": 13103,
+    "sha256": "c9b763be72c8b9b13423df8542187eba0a595a669332426643d1e25f8dbeee5c"
+  },
+  {
+    "path": "next-concept/sumi-flower-game.js",
+    "bytes": 29380,
+    "sha256": "83860f13d954f490db3727ef82d28c3e93f3ff56149cb6338bba1887c4c4afd7"
+  },
+  {
+    "path": "next-concept/sumi-ground-skills.js",
+    "bytes": 7144,
+    "sha256": "bbc4746de8c60b21da5f57fee1ccd9fd3269ec8bc4314810b87fb5d7f449c927"
+  },
+  {
+    "path": "next-concept/sumi-growth-debug.js",
+    "bytes": 2869,
+    "sha256": "0f51bc78d9dd5365bca6990734ea4de7ccf930ad4310323ec90a7b31661c5ea7"
+  },
+  {
+    "path": "next-concept/sumi-growth-stages.js",
+    "bytes": 774,
+    "sha256": "7b7efa1aa92f596bea6de4c3be8f85966ad7871976a4e6c61bdf6bdfe298ebfb"
+  },
+  {
+    "path": "next-concept/sumi-media-perch.js",
+    "bytes": 657,
+    "sha256": "b74a6b4ed699b13e8b2a6934eacbc173843d67a6cea9783147d869a588936116"
+  },
+  {
+    "path": "next-concept/sumi-seed-counter.js",
+    "bytes": 3330,
+    "sha256": "22faf7ac880a1b2bc69b8e0fc31231e81492956f6a65a2c4a2761602bd79620a"
   },
   {
     "path": "next-concept/sumi-text-tracks.js",
-    "bytes": 12735,
-    "sha256": "4cd1569942e4fc102f31ea16b79d6b722b9287181da28db455e9a721531296f1"
+    "bytes": 12807,
+    "sha256": "783d917f9010d1da4f460828078ab236935dde921f9c3dd5fafb1b1080e09bce"
   },
   {
     "path": "README.md",
-    "bytes": 7652,
-    "sha256": "dcbcd591ce20193d900b958f30cdd8c25c33b0fa5a02eaf1eee27cc6b9a634dd"
+    "bytes": 8779,
+    "sha256": "8145b0155a0849cc6f4c07944c775706aa7ebf4952e0fbc27b94f0b9b70cda0d"
   },
   {
     "path": "run-local.cmd",

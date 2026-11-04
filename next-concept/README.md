@@ -660,3 +660,333 @@ Text footprints now use Chewy Regular (400), with soft, irregular rounded letter
 The companion lazily loads a dedicated `Sumi Trail Chewy` FontFace and waits before measuring or caching glyph textures; no remote font request or system installation is needed. Font failure falls back to local cursive. Existing capital height (.144 world units), fill-only rendering, directional rotation, adaptive colors, opacity, distance-based clearance and 2× appearance frequency remain. Module/bootstrap cache keys refreshed.
 
 Verification: headless Chromium confirms the bundled font loads with distinct font metrics and completes SHOWREEL on forward, reverse and curved paths without ordinary footprints mixed into the word. Measured minimum adjacent clearance stays above .02016 units and capital height stays .144. Reviewed four word specimens and actual projected letter meshes in `Q:\Codex\portfolio-exports\sumi-chewy-review.png`; no runtime errors.
+
+### Creator-perspective trail phrases (2026-11-04)
+
+Replaced section keywords with the approved playful production copy: hero “Welcome behind the scenes.”; projects “Looks good. Works better.”; career/tools “Less clicking. More creating.”; closing “What shall we make next?”. Preserve sentence case, punctuation and word gaps. Chewy lettering, size, section colors and 2× trigger frequency remain. A phrase continues to consume footfalls until complete, then holds and fades as before. Module/bootstrap cache keys refreshed.
+
+Verification: browser fixtures using the actual text-track module completed all four phrases with word gaps, no ordinary footprints inside a phrase and full expiry after the hold/fade period. Syntax check passed. The previously exported 2026-11-03 ZIP is unchanged.
+
+### Quiet flower collection play (2026-11-04)
+
+Added `sumi-flower-game.js` to the existing companion scene. Up to three small cream/peach five-petal flowers appear in available page whitespace. Olive stems and a restrained gold seed match the portfolio palette. Art is generated locally with CanvasTexture; no download, image asset, external service, score HUD, popup or layout element is required.
+
+Move the butterfly over a flower for .28 seconds: the flower opens briefly, emits a smaller version of the existing pollen burst, and leaves a tiny glowing seed. Nearby seeds attract a short, slower chick detour (1.8-world-unit acquisition radius, 1.4 speed cap). The chick collects the seed with a brief peck and seed-to-beak fade, then resumes following. Three seeds grant a small peach flower on its head for 6.5 seconds and two in-place hops. Explicit clicks override collection/celebration movement and preserve the existing hop/catch-up behavior. No remote seed pursuit is introduced.
+
+Flowers use 43 CSS-pixel sprite bounds; seeds use 24. They are anchored to the page ground, move with scrolling and retain their apparent size. Placement avoids headings, body copy, cards, controls, hero copy, notes and the tools diagram with 22px clearance. Only reachable middle-screen whitespace is eligible, with 140px between flowers. There may be fewer flowers or none when space is limited. New content covering an item causes a .25-second retirement; resizing also retires old placements. Seeds expire after 24 seconds. A new round waits until the previous items are gone and at least 18 seconds after the last collection. Scrolling does not activate flowers.
+
+Uses six reusable world sprites, one head decoration and four shared procedural textures. Pollen reuses the bounded existing particle pool. Suspension hides the game and pauses its timers; disposal releases its resources. Existing companion toggle, dialog/hidden-page suspension, mobile default-off and reduced-motion default-off remain. With explicit reduced-motion opt-in, reward hops, flower wobble, seed bounce/rotation and crown pop are suppressed. No portfolio pointer target is intercepted.
+
+Verification: `Q:\Codex\portfolio-exports\check-sumi-flower-game.mjs` exercises actual scene following through three bloom/seed/collection cycles, reward reset/expiry, exactly two queued reward hops, cooldown, fixed sprite capacity, timer suspension, covered-item retirement and native-dialog suspension. A 120px page scroll produces exactly -120px flower movement with unchanged size. Placement checks pass at 1440×900 and 900×800; at 390×844 the tested hero has no safe flower placement. Native-size procedural art and offscreen rendered chick/flower decoration were visually reviewed on dark/light backgrounds. Existing click-pursuit and pollen checks pass without runtime/shader errors. These are headless desktop Chromium checks; physical mobile-device performance has not been measured. QA artifacts remain outside the shipped site in `portfolio-exports`. No new transfer ZIP was created.
+
+### Illustrated flowers, content anchors and growth stages (2026-11-04)
+
+Supersedes the original cream/peach rosettes and whitespace-only placement above. `sumi-flower-art.js` generates four distinct illustrated silhouettes (open poppy cup, tulip, oblique daisy and hanging bell) in six saturated palettes: yellow, coral, pink, blue, violet and turquoise. Rear/front petals and elliptical openings imply a slightly elevated oblique view rather than a face-on radial flower. Flat fills replace gradients. The same family is used for the head blossom. There are 24 flower/color combinations, with three world flowers present at most; new rounds vary the silhouettes and colors.
+
+Placement now prefers typography's upper edges and the four inset corners of project thumbnails, with small randomized offsets. It may overlap text/images as requested. World positions follow the selected DOM anchor when cards change layout; blooming/seed positions then remain grounded. Most of the visible page is eligible (30px side clearance, 15–90% vertical range); header, dialogs, form fields and companion control remain excluded. Random placement is a fallback when the preferred anchors cannot accommodate three separated items. The transparent companion canvas still does not intercept any portfolio input. This permits flowers on the narrow-screen layout when the companion is explicitly enabled; mobile remains default-off.
+
+Corrected layering: world flowers and seeds use the opaque render queue with custom source-over alpha blending, depth writes disabled and order -20, after the trace background but before the opaque fur. This is deliberate: a negative renderOrder on a transparent sprite alone does not place it behind opaque chick geometry. Head decoration remains in the transparent queue with order 4 and depth testing disabled, so only that decoration draws over the chick.
+
+Seed one produces a green sprout; seed two changes it to a colored bud; seed three opens a flower and triggers the existing two-hop celebration. Sprout and bud remain until the next collection, including across suspension. Each stage grows/fades in over .22–.4 seconds; the finished flower holds then fades at 5.5–6.5 seconds before the next cycle. Reduced-motion opt-in suppresses the scale pop and celebration hops. Seed palette/flower variant determine the later head decoration; no score UI was added.
+
+Verification: updated headless scene checks observe stages [1,2,3] during actual collection, persistence/suspension, final expiry, two queued hops, and recovery to ordinary following. Render callbacks verify all six ground sprites draw before the chick's fur and the crown draws after it. Project-section checks place all three flowers on actual thumbnail anchors. Scroll anchoring retains a -120px displacement for a 120px scroll with unchanged size; resize checks pass at 900×800 and 390×844. Native-size artboard reviews cover all 24 variants and three growth stages; an offscreen rendered chick verifies crown scale. Existing click-pursuit and pollen regression checks pass without runtime/shader errors. Bootstrap/module cache keys refreshed. No transfer package was regenerated.
+
+### Flowers as document elements (2026-11-04)
+
+Flowers now render as three non-interactive, aria-hidden 43px canvas elements in an absolute document layer at z-index 14, below the companion WebGL canvas at 15. They use the same illustrated artwork, attached to the chosen heading/thumbnail's layout coordinates. The WebGL flower sprites are not drawn; their existing values only drive the shared bloom animation. Camera projection is used solely for butterfly contact and the seed handoff. Seeds, chick and head-growth stages remain in WebGL.
+
+Removed random viewport fallback placement and flower retirement merely for scrolling offscreen, resizing or exceeding a lifetime. A flower remains at its chosen element until consumed (or its anchor is removed/hidden). Returning to the section restores the same placement; responsive reflow/card movement follows the same anchor. This keeps the existing three-flower round rather than generating a new set on every viewport. Suspension hides the DOM layer alongside the companion; disposal removes it. Canvas nodes do not change document flow or capture input.
+
+Verification: the headless integration check scrolls 1800px away for three simulated seconds and back, asserting the same flower, anchor and document coordinates, constant 43px dimensions and no duplicate WebGL flower. Existing three-stage collection, bloom-to-seed handoff, suspension, page anchoring and resize checks pass without runtime/shader errors. Cache keys refreshed; no ZIP generated.
+
+### Populate the whole document (2026-11-04)
+
+Removed the three-flower round gate, initial delay and 18-second global cooldown. Eligible headings and thumbnail corners across the entire document are planted immediately after the companion initializes, including below-fold sections. One flower per anchor element, 90px minimum separation and a bounded 48-slot pool keep the layout distributed. Current desktop fixture produces about 30 flowers spanning hero, work, capabilities and closing sections. The scanner checks for newly rendered anchors every .5 seconds; consumed/expired items have an individual 8-second regrowth delay. Other flowers do not wait for a collection round to finish.
+
+Offscreen DOM flowers do not require a camera-ground intersection to be planted. Their collision position resolves when visible; screen interaction uses the actual element anchor, preventing offscreen flowers from accidentally activating at a stale world coordinate. Document anchoring, three seed growth stages, non-intercepting input, suspension and existing visual styling remain.
+
+Verification: `portfolio-exports/check-sumi-full-garden.mjs` confirms initial planting in all four page areas, about 30 active flowers, collection stages [1,2,3], exactly two reward hops, bounded pool, suspension, scroll-away/return persistence and constant CSS size at desktop/narrow widths. No runtime/shader errors. Cache keys refreshed; no ZIP generated.
+
+### DOM seeds and per-seed happy response (2026-11-04)
+
+Seeds now render as 24px, non-interactive canvas elements in the same absolute document layer as flowers, below the chick. Both flower/seed render records are plain animation data; the garden group contains no WebGL meshes or sprites. Only the head decoration remains a Three.js sprite. Seed positions follow their source heading/thumbnail through document scrolling and layout changes. Camera-ground conversion remains for chick proximity/steering, and the projected beak position supplies the end of the .32-second DOM pickup animation. The seed shrinks and fades as it approaches the beak. Scroll/resize no longer retires a seed immediately; its normal 24-second lifetime remains.
+
+Every seed now queues an in-place happy hop after the pickup finishes, with the existing hop-driven wing flutter and a small body puff. The third seed replaces that single-hop queue with the two-hop blossom celebration. Explicit clicks retain priority and reduced-motion opt-in disables the added hops/puff. The sprout/bud/flower progression is unchanged.
+
+Verification: `portfolio-exports/check-sumi-dom-seeds.mjs` completes three actual collections and observes DOM seeds plus hop counts [1,1,2], stages [1,2,3], no garden WebGL objects, and unchanged document seed coordinates through a 220px scroll (approximately -220px viewport displacement, allowing slight rotation). Existing planting, suspension, flower persistence, resize and click-pursuit regression checks pass without runtime/shader errors. Cache keys refreshed; no ZIP generated.
+
+### Thumbnail horizontal-edge planting (2026-11-04)
+
+Replaced the four inset thumbnail corners with top/bottom edge anchors. Stem roots sit 1px above the top edge or 2px inside the bottom edge, so upward-growing flowers extend outside the top and inside the bottom. Horizontal placement is random across 8–92% of thumbnail width, retained once planted. Existing one-flower-per-thumbnail density, heading placement and collection behavior are unchanged. Headless DOM checks verify all 17 thumbnail flowers use the requested edges and x range, with actual document positions matching their anchor within .1px; the collection/scroll/resize suite passes. Cache keys refreshed.
+
+### Featured thumbnail flower emphasis (2026-11-04)
+
+The `cinematic-workflow-toolkit` and `production-breakdown` thumbnail IDs now receive a stable per-element random quota of 4–6 flowers. Slots split evenly across the upper/lower edges (an odd extra goes above); horizontal positions vary within separated bands. Each slot retains its anchor until consumed and regrows independently after the existing delay. Other thumbnails still receive one flower. Same-featured-card clearance is 36px; the document pool remains capped at 48.
+
+Verification: headless checks observe 5 and 6 flowers on the two featured thumbnails, both top and bottom edges, and exactly one on every other thumbnail. Collection stages, DOM seed pickup, hop counts [1,1,2], suspension, scroll persistence and responsive sizing pass without runtime/shader errors. Cache keys refreshed.
+
+### Hidden flowers in expanded card descriptions (2026-11-04)
+
+Each card footer receives a stable random quota of 0–2 hidden flowers, positioned in the lower information area's whitespace around the footer/divider. They appear only when the information panel is visible and sufficiently unfolded; they hide immediately with a collapsed/clipped panel. Closing a card freezes its hidden flower/seed state and disables collection targeting; reopening restores it instead of rerolling the count. EXPAND and layouts with already visible descriptions also reveal them. Existing thumbnail flower quotas remain unchanged. The reusable pool is now capped at 80 to cover both all-page flowers and up to 34 hidden card flowers.
+
+Verification: headless checks open all descriptions, assert per-card counts remain 0–2, then collapse/reopen and verify flowers/seeds hide and restore correctly. Featured counts, three growth stages, per-seed happy hops, DOM seeds, scroll anchoring and responsive checks continue to pass. Cache keys refreshed; no ZIP generated.
+
+### Immediate card-flower appearance (2026-11-04)
+
+Hidden description flowers now render at their normal .92 opacity as soon as the panel exposes them, bypassing the .65-second appearance fade. Visible-footer changes trigger layout scanning and planting in the same frame instead of waiting for the .5-second garden refill timer. Panel clipping, collapse hiding, stable quotas, collection and regrowth remain intact. Other document flowers retain their appearance fade.
+
+Verification: `check-sumi-dom-seeds.mjs` confirms full opacity on the first exposed-panel update, collapse/reopen behavior, growth stages, seed collection, document anchoring and responsive sizing. No runtime errors. Cache key: `instant-card-flowers-20261104`.
+
+### Smaller flowers and slower regrowth (2026-11-04)
+
+Document flowers, including thumbnail and hidden-description flowers, now use 34.4px canvases instead of 43px (20% smaller). Bloom scaling and the flower-head interaction center follow the new size. Seed size and head growth decorations are unchanged. The per-slot regrowth delay after collection/retirement increases from 8 to 16 seconds. Initial hidden-card flowers still appear immediately. Cache key: `smaller-slower-flowers-20261104`.
+
+Validation: DOM seed/garden regression checks cover reduced dimensions, collection, growth stages, scrolling, responsive sizing and immediate card-flower display.
+
+### Reduced ordinary project flowers (2026-11-04)
+
+Non-featured project cards now share a stable 0–2 flower quota across thumbnail and description: 15% receive none, 30% receive one, 55% receive two. This averages 1.4 flowers instead of the previous expected 2 (30% fewer). Nonempty cards place one on the thumbnail; two-flower cards reserve the second for the expanded description. The two KRAFTON featured projects retain their 4–6 thumbnail flowers and existing hidden-description quota. Other page sections, 16-second regrowth and 34.4px flower size remain unchanged.
+
+Validation: headless checks confirm ordinary-card totals stay within 0–2, featured thumbnails remain at 5 and 6 in the fixture, and collection, scrolling, responsive layout and immediate hidden-flower visibility pass. Cache key: `sparser-project-flowers-20261104`.
+
+### Twenty-stage garden growth and round-body cycles (2026-11-04)
+
+Replaces the previous three-seed reset/fading reward with a persistent, twenty-seed growth cycle. One seed advances one stage. The stages are: one small leaf; two small leaves; large/small leaves; the original two-leaf sprout; three leaves; four leaves; small bud; the original full bud; opening bloom; full flower; extra leaves; side bud; two flowers; three flowers; little bush; sapling; young tree; full tree; blossom tree; fruit tree. Artwork retains the original flat fills, rounded green leaves, cupped flower shapes, four species and six palettes. A cycle holds its flower family; the next cycle may vary it. The fruit tree remains until the next seed starts a fresh sprout, with no timer-based loss of progress.
+
+Every seed retains the happy hop. Stages 10 and 20 queue two celebration hops. At lifetime totals 20 and 40 the chick gradually becomes rounder; body evolution is capped at two upgrades while plant cycles continue. At the cap the body is approximately 40% wider, 24% deeper and 7% taller. Breast, wings, tail, neck position, hip/foot spread and ground shadow adjust together; the head itself is not inflated. Existing click pursuit remains authoritative. Reduced-motion opt-in skips celebration hops and growth pop/fade, and applies body proportions directly. Progress lives in the current page session; reloading starts over.
+
+Implementation reuses one 192×192 growth CanvasTexture and one head sprite. The texture is repainted only on collection, not per frame; existing geometry and fur instances are reused for body proportions. No new network assets, server dependencies or per-cycle resource accumulation. Current page flower sizes, counts, 16-second regrowth and immediate hidden-card appearance remain in place. Cache key: `growth-cycle-20261104`.
+
+Validation: `portfolio-exports/check-sumi-growth-cycle.mjs` advances 61 collections, checks all 20 distinct drawings, wraps 20→1, caps body tiers at [1,2,2] across three cycles, verifies per-seed/10th/20th hop queues, retained growth on suspend/resume, finite foot positions and ground contact, and reduced-motion behavior. Offscreen art plates review all stages and base/first/final body proportions. The isolated renders keep the same 46 draw calls and 7 active textures between body tiers 1 and 2; these are fixture observations, not a device FPS guarantee. Updated DOM-seed regression verifies actual butterfly/chick collection and three initial happy hops, responsive sizes, scrolling, project flower quotas and instant card flowers. Click-pursuit regression passes. No runtime or shader errors. No ZIP generated.
+
+### Local growth debug slider (2026-11-04)
+
+Adds a compact, collapsible GROWTH DEBUG panel at bottom right on localhost/127.0.0.1/IPv6 localhost. A native keyboard-accessible range input sets 0–60 total seeds immediately, including backward changes and reset to zero. Labels show total seeds, the 0–20 plant stage/name and body tier. At 20/40 the existing body upgrades apply; 21/41 begin the next plant cycle. Previewing updates actual session progress, so subsequent seed collection continues from the chosen value. No persistence or collection/celebration side effects are triggered by scrubbing.
+
+The chick is positioned above the panel and held for inspection during adjustment. Pointer exit, focus leaving, panel collapse, modal opening or companion deactivation releases the hold. Controls are disabled until the companion is active, and the panel hides with project dialogs. Mobile layout clears the companion toggle. Public hosting does not display the panel by default; append `?growthDebug=1` for an explicit debug preview. New small modules: `sumi-growth-stages.js` and `sumi-growth-debug.js`. Cache key: `growth-debug-20261104`.
+
+Validation: `check-sumi-growth-debug.mjs` sends input events through the real slider at 0/1/8/10/19/20/21/39/40/41/60 and backward to 5/0, checks immediate body/plant state, reset, hold release, modal hiding, narrow-screen bounds and local/public-host gating. The 61-collection growth-cycle regression also passes. No runtime errors; no ZIP generated.
+
+### Stronger roundness at 20 / 40 / 60 seeds (2026-11-04)
+
+Body evolution now has three capped tiers, at 20, 40 and 60 seeds. Each tier applies twice the former proportion change, so the first upgrade matches the former maximum. Relative to the base body, width is 1.4× / 1.8× / 2.2× and depth is 1.24× / 1.48× / 1.72×. Breast, tail, wing pivots, hip/foot spacing, neck offset and ground shadow follow the same stronger proportion parameter. Head size remains fixed. Plant cycles remain twenty stages. Debug labels now include the third body tier; values above 60 in normal collection retain that maximum.
+
+Validation: the 61-seed regression confirms tiers [1,2,3], grounded feet, stable draw calls/textures and reduced-motion behavior. Offscreen body art review compares base, 20 and 60 seeds. Slider/reset/public-host gating checks pass. Initial parallel headless runs timed out during startup; isolated initialization and sequential reruns passed without runtime/shader errors. Cache key: `rounder-growth-20261104`.
+
+### Fixed face height during body growth (2026-11-04)
+
+Removed the growth-dependent vertical neck offset. All body tiers retain the base neck height; existing gaze/hop motion and forward offset remain. Scene syntax check passed. Bootstrap/scene cache key: `fixed-face-height-20261104`.
+
+### Third body tier: 15% extra vertical thickness (2026-11-04)
+
+Only body tier 3 adds a 1.15 multiplier to the existing body and breast Y scales. A smoothstep from tier 2 to 3 follows the existing gradual evolution; settled tiers 0–2 retain their exact prior proportions. Face/neck height and body X/Z scales remain unchanged. The 61-seed growth regression, grounded-foot checks and reduced-motion checks pass without runtime errors; offscreen body artwork was inspected. Cache key: `tier3-thickness-20261104`.
+
+### Body evolution on the next sprout (2026-11-04)
+
+At totals 19→20, 39→40 and 59→60 the chick keeps its body tier. Stage 20 now retains the same blossom tree as stage 19 (no fruit substitution), enlarging the tree sprite by 12% and its blossom drawings by another 12%. Body evolution occurs only at 20→21, 40→41 and 60→61, alongside the next sprout. The existing stronger body proportions and third-tier vertical thickness remain. The shared progress calculation now uses completed previous cycles, so the debug slider and natural collection agree. Slider maximum extends to 61 to allow third-tier inspection.
+
+Validation: slider checks cover both directions across 19/20/21, 39/40/41 and 59/60/61. The growth-cycle suite verifies unchanged body tiers at each tree finale, exactly 12% tree-scale increase, and simultaneous smaller sprout/new body tier on the following seed. Cache key: `sprout-evolution-20261104`.
+
+### Stronger tree finale (2026-11-04)
+
+At seeds 20, 40 and 60 (plant stage 20), the illustrated trunk is 21 canvas units wide instead of 7 (3× stage 19). Attached blossoms use 1.5× stage-19 drawing scale, replacing the subtle 1.12× blossom multiplier. The existing 12% overall finale ornament enlargement remains. Stages 56–59 keep the existing sapling-to-blossom progression before the emphasized tree at 60. Branches, leaf style, body tier timing (21/41/61), face position and collection behavior are unchanged. This redraws the same reusable texture without adding meshes or textures. Cache key: `tree-finale-20261104`.
+
+### Elastic body evolution (2026-11-04)
+
+Body upgrades at 21/41/61 now use a finite 0.84-second anticipation/pop/settle animation instead of gradual damping: compress to 92% width/depth and 86% height at 0.14s, grow to the new tier with a 113% width/depth and 110% height overshoot at 0.34s, then rebound through 96% and 102–102.5% before settling exactly at 100%. Body and breast deform; wing attachment width follows. Head/neck height and grounded foot Y positions receive no evolution offset. Collection briefly holds movement and delays its existing happy hop to 0.9s so both actions read separately. No new geometry, textures or effects are created.
+
+Local debug slider upward body-tier transitions preview the same motion; lower tiers/reset snap immediately and cancel any pending evolution. Reduced-motion users receive the final body immediately. The active-scene frame loop controls the timer, so hidden/suspended scenes do not skip the animation. Cache key: `elastic-growth-20261104`.
+
+### Fixed 61-flower portfolio tour (2026-11-04)
+
+The initial garden is now a single session-long plan of exactly 61 flowers: hero 10, projects 35, career/expertise 12, closing section 4. Each featured thumbnail has five flowers (three at its upper edge and two inside its lower edge). The current 15 ordinary project cards each have one thumbnail flower; ten randomly selected cards also have one hidden footer flower. Text flowers are spread across headings/descriptions rather than concentrated on one block. Initial anchor nodes, relative horizontal positions and variants are sampled once, then follow document layout through scrolling, resizing, filtering and expansion. Closed panels/filtered cards hide their slots without removing or replacing them. Reload starts a new session/plan.
+
+No collected flower is replanted until all 61 unique initial seeds have actually been collected by the chick. A separate set of initial flower IDs controls completion; moving the growth-debug slider to 61 cannot unlock it. Uncollected seeds no longer expire, so looking elsewhere cannot make the finite tour impossible. Seed collection can finish even if its card closes during the pickup animation. Duplicate collection is rejected.
+
+After the final initial seed, wait a randomized 16–24 seconds of active play, then plant one flower at a random eligible document anchor with subtle horizontal variation. Each new flower starts another 16–24-second delay. No catch-up burst occurs after a long frame or suspension; at most four uncollected flowers/seeds remain in the endless phase. The fixed pool is reduced from 80 to 61 DOM flower/seed pairs. Existing art, bloom effects, growth tiers and elastic body evolution remain intact.
+
+Validation: headless browser checks verify all regional counts, five flowers per featured thumbnail, fixed anchors at desktop and 390px width, real dwell/bloom/seed pickup, persistent seeds, filter hide/restore, no respawn after 60 pickups and a long wait, actual 61st-pickup completion, delayed single spawns, four-item cap, suspension, and debug isolation. Growth-cycle regression covers all 61 progression steps and reduced motion. Cache key: `fixed-garden-20261104`.
+
+### Subtle seed pickup count (2026-11-04)
+
+Each actual seed pickup shows a single reusable DOM label above the chick/head ornament: `1/61`, `61/61`, then `63/61` etc. Its session-long actual collection count is independent of the debug growth slider. The existing playful Chewy footprint font is used at 17px, maximum opacity 0.84; cream on hero/career/media backgrounds and muted olive on light areas. No badge or persistent HUD is added, and the label does not intercept input.
+
+The 1.35-second feedback rises 16px with a small scale overshoot, settles back 3px, holds briefly, then descends while fading out. It follows the projected head after pose updates, clears the visible sprout/tree, hides outside the viewport and during companion suspension/modal display, and reuses one element for rapid pickups. Reduced motion retains only opacity feedback. Disposal removes the element. The existing flower effects, body evolution and collection hops remain independent.
+
+Validation: the fixed-garden browser suite now verifies real pickup labels `1/61`, `61/61`, `63/61`, no label change from debug edits, upward/hold/downward timing, fade completion and suspension hiding. Cache key: `seed-counter-20261104`.
+
+### Hidden detail flowers and floating toolkit finds (2026-11-04)
+
+Career/toolkit flowers are reduced from 12 to 4: two fixed career heading flowers and two gently floating flowers inside the toolkit field. Their slow, bounded elliptical drift stays within the central dot-cloud area; reduced motion holds the initial position. On bloom, the floating anchor freezes at the contact location so the chick can reliably collect its seed.
+
+The removed eight slots are allocated to eight distinct, randomly selected project detail pages (one each). Stable project IDs and random heading/notes choices are assigned once per session. Detail DOM anchors resolve when that project opens, and rebind after its markup is recreated. Unvisited projects reserve their slots without displaying flowers on the main page. Collected IDs stay depleted across close/reopen and previous/next navigation. Total remains 61: hero 10, projects 35, career/toolkit 4, project details 8, ending 4.
+
+The companion now stays active in project dialogs. Its existing transparent canvas, page-flower layer and count label are mounted inside the native dialog top layer, with pointer events still passing through. Flower coordinates use viewport space in the modal; the camera follows the dialog scroll while preserving chick size. Main-page chick position is restored on close. Main-page footprints are suppressed in detail mode and old ink buffers cleared on surface changes. Canvas/flowers/count feedback are clipped to the dialog bounds. Image enlargement still suspends the companion; video/buttons/links retain their normal interactions. No separate game instance or duplicate renderer is created.
+
+Validation: headless browser checks exercise all eight assigned detail pages, real dwell/bloom/seed pickup, dialog scrolling while the main page remains scrolled, canvas top-layer mounting and viewport dimensions, return to the main page, and no respawn on reopening. Floating flowers move before contact and remain stationary as seeds. Fixed-garden/count and growth-cycle checks cover the retained 61-item rules. Cache key: `hidden-garden-20261104`.
+# Body-growth pickup count emphasis (2026-11-04)
+
+- Actual body-tier increases (normally seed 21, 41 and 61) use a 28px count instead of the normal 17px label. Detection compares growth tiers before/after collection, so later plant cycles at the capped body size do not trigger false growth emphasis.
+- The count compresses at 0.14s, pops to 1.24× horizontal / 1.18× vertical scale at 0.34s alongside body expansion, and settles by 0.84s. It holds until 1.2s, then descends and fades out by 1.9s; peak opacity is 98%.
+- Ordinary pickups keep the original subtle timing, opacity and size. Reduced motion retains larger milestone text with opacity-only feedback. The same reusable DOM label works on the main page and in project details, without changing layout or adding particles.
+- Verified with headless `check-sumi-growth-counter.mjs` (mobile viewport, timing, ordinary-state reset, reduced motion and cleanup) and `check-sumi-fixed-garden.mjs` (61 collectibles, real pickups, count continuity and regeneration).
+
+# Click pickup-count feedback (2026-11-04)
+
+- A primary page click that triggers the chick's hop replays the normal 17px pickup count above its head, using the current real collection total (including `0/61` before collecting). Click feedback always uses the normal size/timing, even at 21/41/61; the large elastic emphasis is reserved for actual body-tier increases during collection.
+- Clicks never increment collections or growth. The single existing counter is restarted on repeated clicks, so labels do not stack. Interactive controls and inactive companion states retain their existing input exclusions; reduced-motion feedback stays opacity-only.
+
+# Project-detail media waiting spot (2026-11-04)
+
+- Replaces the previous media-exclusion route: when the pointer enters `.dialog-stage`, the butterfly flies smoothly to the lower-right dialog margin. It may cross media during this flight; there is no hard barrier or position snap. Leaving the stage resumes ordinary pointer following.
+- The waiting spot sits in the right notes margin when available, otherwise near the lower-right media edge, clamped to the visible dialog. Hover detection includes native `:hover` for embedded YouTube frames. Seven-second idle wandering is suppressed while waiting.
+- Within 42px of the spot, wing motion eases down to a 7-radian/second phase rate and a smaller flap span; a 3–4px slow drift keeps it alive. Heading settles rather than twitching during that drift. Reduced motion removes the spot's drift.
+- All active cursor following now shares the accepted media-return motion: a 4.4 follow rate and 2× the screen-speed cap derived from the pointer-out path's maximum velocity. This applies on the main page and in details, including final approach, without a special return-state speed switch. Gentler wing motion continues until within 12px of the cursor. Arrival at the lower-right spot, seven-second idle wandering and pointer-out free flight retain their existing speeds.
+- Chick pursuit remains unrestricted. Media controls, click feedback and the enlarged image viewer's pause behavior remain intact; no overlay intercepts input.
+- Headless QA: `check-sumi-media-perch.mjs` verifies smooth arrival, settled position/flap rate, video-to-gallery-image switching, release on pointer exit and return to the main page without runtime errors. The older avoidance test is superseded.
+
+## Three flower sizes (2026-11-04)
+
+- Each planted flower randomly receives one of three fixed sizes: 80%, 100% or 120% of the existing 34.4px base. The choice persists through scrolling, card expansion, detail visits and bloom animation; a newly respawned flower gets a new choice.
+- Flower-head collision offset and dwell radius scale with that flower. Seeds, the chick's head ornament, the 61-item quota and respawn timing remain unchanged. Existing 192px canvases are reused with CSS transforms; no additional images or render loop are introduced.
+
+
+## Featured giant-flower event (2026-11-04)
+
+- KRAFTON Cinematic Workflow Toolkit and KRAFTON Production Breakdown each have two ordinary flowers along the upper thumbnail edge and one giant flower growing inside the lower edge. The ordinary flowers retain the random 80/100/120% sizes; the giant uses 180% of the base size and the same illustrated flower families/colors.
+- Each giant requires three separate butterfly visits (0.28s contact each). Staying on it cannot repeatedly count: the butterfly must leave the contact radius by another 14px for at least 0.18s before the next visit. Each visit briefly pulses the flower and opens its petals further; reduced motion suppresses the pulse.
+- The third visit blooms and releases three ordinary-size seeds in a small 34px-spaced fan. Every seed is separately collectible and triggers the existing count, growth and happy-hop behavior. These seeds stay document-anchored and persist through scrolling/filtering until collected.
+- Each featured project still rewards five seeds: two from ordinary flowers plus three from its giant. There are 57 initial visible flower slots and four reserved seed reward slots, retaining 61 unique collectible IDs in the same fixed DOM pool. Regional reward allocation stays hero 10, projects 35, career/toolkit 4, details 8, closing 4. No extra detail flowers or network assets were added.
+- After all 61 seeds are collected, the existing quiet endless phase produces ordinary flowers only, with the same 16–24 second delay and four-item cap.
+- Headless checks: `check-sumi-featured-event.mjs` verifies allocation, separate-visit gating, three distinct seed positions and three physical pickups. `check-sumi-fixed-garden.mjs` verifies responsive anchor stability, 61-item completion, counters and respawn; `check-sumi-hidden-garden.mjs` verifies detail and floating-flower collection. All passed without page runtime errors.
+- Cache key: `featured-flower-event-20261104`. Earlier dated allocation notes describe historical states; this section is the current featured-project allocation.
+
+## Featured flower continuous-hover charge (2026-11-04)
+
+Supersedes the three-visit event above. Each featured project still has two normal flowers plus one 180% giant flower, awarding five seeds in total; the global goal stays 61.
+
+- Hold the actual cursor over the giant flower head for approximately six seconds. Butterfly follow easing or idle flight does not interrupt the hold. Normal flowers retain their existing butterfly dwell behavior.
+- Five escalating squash/stretch beats begin at 0.15, 1.5, 2.8, 4.0 and 5.1 seconds. Each briefly compresses, springs and recoils around the planted stem base, with progressively stronger small pollen bursts. Petals open progressively; no literal sound-effect text or sound is added.
+- Charge reaches full at 5.58 seconds, followed by the existing 0.42-second bloom/pop. A final stronger pollen burst and three 48px-spaced seed trajectories signal completion. Each seed is separately collectible through the existing chick growth/counter behavior.
+- Leaving the hover target drains charge at twice its buildup rate; it cannot finish while the pointer is away. Companion suspension pauses all timers. Reduced motion removes squash/stretch, rotation and final scale pop while retaining progress and rewards.
+- Reuses existing canvas slots, particle pool and frame loop; adds no remote assets or timers. Cache key: `featured-flower-charge-20261104`.
+- Validation: `check-sumi-featured-charge.mjs` replaces the previous visit-count test and verifies interruption/recovery, five escalating beats, release at 6.017 seconds at 60fps, three distinct seeds and three pickups. Fixed-garden regression retains the 61-ID collection and respawn checks.
+
+## Hero event flower and subtle event glints (2026-11-04)
+
+- The hero now has seven ordinary flowers and one randomly placed giant event flower (eight visible flowers, ten seed rewards). One original ordinary slot becomes a three-seed event, and two other ordinary flowers are removed to offset its extra rewards. Its anchor is selected once per session from existing hero text/specification anchors, excluding the changing reel title.
+- The two featured projects retain their existing giant events. Across the page there are now three giants, 55 initial visible flower slots and six reserved seed slots: 61 unique seed rewards in the same pool. Details and all other regional reward quotas stay unchanged.
+- All giant flowers receive three tiny cream/olive four-point glints around their petals. Their opacity softly varies between 12% and 60%, with staggered phases, using the same flower canvas. Only visible event flowers redraw, at most about 11 times per second; no new DOM elements, WebGL textures or particle emitters are added. Reduced motion uses static glints and redraws only when charge stages change.
+- Six-second continuous-hover charge, escalating spring/pollen feedback and three-seed release remain unchanged. Headless fixed-garden, featured-charge and hidden-garden suites passed; hero allocation is explicitly checked as seven normal + one giant + two reserved reward IDs, and total completion remains 61.
+- Cache key: `hero-event-glints-20261104`.
+
+## Event flower breeze (2026-11-04)
+
+All three giant flowers gently sway around the existing planted-stem transform origin. Two slow sine waves (roughly six and 3.4 seconds, combined maximum 3.7 degrees) use each flower's own phase to avoid synchronized movement. The breeze fades during the first 0.6 seconds of charging so the existing elastic beats remain clear, and returns as charge drains after pointer exit. Reduced motion disables the sway. Normal flowers, seed rewards, anchor positions and six-second charge timing are unchanged. Uses the existing frame loop and CSS transform without new elements or assets. Cache key: `event-flower-breeze-20261104`.
+
+### Stronger event-flower breeze (2026-11-04)
+
+Doubled both sway amplitudes (0.104 and 0.024 radians, combined maximum approximately 7.3 degrees) and multiplied both angular frequencies by 1.5 (1.575 and 2.745 rad/s; approximately 4.0 and 2.3 second periods). Charge blending, elastic beats, six-second event timing and reduced-motion behavior remain unchanged. Cache key: `event-flower-breeze-stronger-20261104`.
+
+## Scroll recovery during collection reactions (2026-11-04)
+
+Fixed a reproducible state deadlock: queued reward hops made `celebrating` block movement while offscreen recovery forbade starting those hops. Consequently rewardHops never decreased and the chick could remain offscreen indefinitely, including after ordinary seed collection and body upgrades.
+
+Recovery is now resolved before choosing the seed/butterfly target and before applying reaction locks. While recovering, pending reward hops and collection wait timers are deferred, active hops are grounded, idle settling is suppressed and the visible butterfly goal has priority. Elastic body-evolution time pauses until recovery ends. Once comfortably inside the viewport, the retained timers, remaining reward hops and body evolution resume normally. Seed counts, awarded growth tiers and usual walking/click speeds are preserved.
+
+Related transition cleanup: entering, leaving or changing project-detail surfaces clears stale click-hop, reward-hop, collection, peck and idle state. A pending body evolution settles at its already-earned target tier, without changing the collection count. This avoids replaying old reactions at unrelated document coordinates.
+
+Headless regression `check-sumi-scroll-recovery.mjs` first reproduced the original failure (zero speed and no return after 20 simulated seconds). After the fix, 16 upward/downward 1200px camera-scroll scenarios cover ordinary collection, double-hop rewards, tiers 21/41/61, a hop in progress, sleeping and click pursuit. Every case returned in approximately three seconds at the existing speed cap, with no recovery hesitation; pending reactions completed afterward. Additional assertions verify paused evolution and dialog entry/exit state cleanup without growth loss. Click-pursuit, full growth-cycle/reduced-motion and hidden-detail-garden suites also passed without runtime errors.
+
+Cache key: `reaction-scroll-recovery-20261104`.
+
+## Clearer event-flower glints (2026-11-04)
+
+Increased the existing three event glints' peak radius from 4.8 to 7.4 canvas units (about 1.54x), and opacity range from 12–60% to 20–88%. Cream/olive colors are slightly lighter. The shimmer envelope uses a squared rather than cubed sine to keep each bright moment visible longer, retaining its original slow timing and staggered phases. No extra particles or glints are added; charge, sway, reduced-motion behavior and collection remain unchanged. Cache key: `event-glints-clearer-20261104`.
+
+## Event flower size 200% (2026-11-04)
+
+All three giant event flowers now use 200% of the 34.4px base (68.8px canvas box), replacing 180%. A shared size constant also updates the three-seed launch height. Hover radius and head position already scale with flower size. Ordinary flower sizes, seed sizes, six-second charge and the 61-reward goal remain unchanged. Cache key: `event-flower-200-20261104`.
+
+## Hero flower focal position (2026-11-04)
+
+Moved the existing hero giant flower from a randomly chosen text/spec anchor to the hero section itself: horizontal position is sampled once between 64–68% and vertical position between 52–58%. This creates a slightly right-of-center focal point over the reel, with small session-to-session variation. It follows the document on scroll and keeps the same relative position on resize. Its two reserved seed slots share the new anchor. Seven ordinary hero flowers, three event seeds, the 61-seed total, size and animations are unchanged. Cache key: `hero-flower-focal-point-20261104`.
+
+
+## Hero ordinary focal flower and title event (2026-11-04)
+
+The right-of-center reel focal point is now an ordinary flower, retaining the normal three size variations. The single hero event flower randomly chooses either the top of artistic (30–70% across that word) or the nic area of technical (60–70% across that word). Both title anchors follow their actual responsive text bounds, and the choice stays stable for the session. The ordinary reel flower remains at 64–68% horizontal and 52–58% vertical within the hero. No extra flowers or rewards were added: seven ordinary hero flowers plus one three-seed event, with the overall 61-seed goal unchanged. Cache key: `hero-flower-title-ledges-20261104`.
+
+
+## Ordinary thumbnail flowers at the bottom (2026-11-04)
+
+All non-featured project thumbnail flowers now anchor to the bottom edge, blooming inside the image with randomized horizontal positions. The two featured KRAFTON projects retain their existing top-edge ordinary flowers and bottom event flower. Hidden card-description flowers, reward allocation and the total 61 seeds are unchanged. Cache key: `ordinary-flowers-bottom-20261104`.
+
+
+## Ordinary thumbnail flower variety (2026-11-04)
+
+Ordinary thumbnails now receive 0, 1 or 2 bottom-edge flowers. On each fresh garden, 4–6 randomly selected thumbnails are empty and an equal number receive two blooms; the remaining thumbnails receive one. This preserves 15 ordinary-thumbnail rewards and the overall 61-seed goal. Horizontal positions span 8–92% of the thumbnail, with at least 18% width between paired stems. Placement remains stable through hover, filtering and resize. Featured flowers and hidden description flowers are unchanged. Cache key: `ordinary-flower-variety-20261104`.
+
+
+## One floating flower and a surprise event (2026-11-04)
+
+Reduced toolkit floating flowers from two to one, and ending flowers from four to three. Each fresh garden promotes one randomly chosen existing ordinary flower to a three-seed event, using the two freed reward slots. Eligible locations include hero text, ordinary project thumbnails/descriptions, career text, project details and the ending. The hero reel focal flower stays ordinary and the two featured projects stay unchanged. The selected location is stable for the session; it uses existing event size, sway, sparkle and six-second charge. There are now four event flowers, eight reserved reward slots and 61 total seed rewards. Cache key: `surprise-event-flower-20261104`.
+
+
+## 61-seed dragon-breath reward (2026-11-04)
+
+Actual pickup number 61 unlocks a separate 60-second fire state. The growth debug slider does not unlock it or fabricate pickups. Every later seed restores 10 seconds, capped at 60; after expiration, another seed starts a 10-second charge. Collection totals never reset. The timer uses active wall-clock frame deltas independently of the physics timestep cap, so slow rendering does not lengthen the minute. It runs only while the companion is active and pauses with hidden tabs, enlarged-image viewing, the companion toggle and held growth previews.
+
+The chick blends to warm red over 0.30 seconds and stays fully red for the entire charged interval. At expiration it returns to its original per-material yellows over 0.22 seconds. After the existing tier-61 elastic evolution completes, body roundness tracks remaining charge (three tiers at full charge to the base body at zero) with damped interpolation, also smoothing refills. Head height stays unchanged. Subsequent 20-seed growth callbacks cannot override the charge-driven body. The original crown-growth cycle and pickup feedback remain intact.
+
+Eligible page clicks while charged replace the click hop with a one-second dragon breath from the projected beak, aligned with the head's projected forward direction, and open the beak. Ordinary links, buttons and video controls retain input isolation. One reused 640x320 canvas draws three flowing flame skins plus sixteen bounded embers, approximately 490px long at desktop size, scaled down on small screens. Repeated clicks have a 0.85-second emission cooldown and do not accumulate canvas elements, particles, textures or shader programs. Reduced-motion mode uses a shorter, non-turbulent flame without flying embers. A small 64px countdown bar below the chick avoids covering its crown and pickup counter. The overlay is pointer-transparent and follows the active dialog host; changing surfaces or suspending clears an in-progress breath.
+
+Validation: `check-sumi-fire-mode.mjs` covers actual pickup activation, debug isolation, refill and cap, late red color, expiration, post-expiration refill, click emission, bounded repeated emission, pause/resume, body shrink, dialog hosting, original yellow restoration and reduced motion. Existing fixed-garden, scroll-recovery and click-pursuit regressions cover the surrounding game. Browser checks reported no runtime errors; repeated isolated fire updates did not increase WebGL texture/program counts. This is not a physical-device FPS guarantee. Cache key: `dragon-breath-20261104`.
+
+
+## Debug slider simulates real collection (2026-11-04)
+
+The local growth slider now sets the actual seed counter, finite-garden collected IDs, growth and fire reward together. Setting 61 removes all initial rewards, activates a full 60-second red/fire state immediately, and schedules the usual delayed single-flower respawn. Lowering the slider rebuilds the remaining initial garden; values below 61 reset fire mode. Reset to zero restores the full tour and yellow base body. Reserved event rewards are marked consumed before parent flowers to prevent inaccessible orphan seeds during partial debug collection. This is a debug-only state setter, not repeated pickup animation; production collection remains unchanged. The timer stays paused while holding the preview and resumes after leaving the panel. The panel is still restricted to localhost or explicit growthDebug query opt-in. Cache key: `debug-actual-pickups-20261104`.
+
+
+## Continuous fast following in fire mode (2026-11-04)
+
+While fire charge is positive, following uses the same full pursuit boost, acceleration, turning and speed cap as click catch-up. Random hesitation, idle settling, floor pecks and unsolicited near-butterfly hops are suppressed. Reaching the butterfly still brakes safely; moving away starts pursuit immediately using the stop-distance threshold. Nearby seed detours remain available for refilling, with boosted travel; pickup/reward animations and offscreen recovery remain intact. Fire following is a derived state, not a permanently latched click flag, so depletion restores ordinary movement automatically. Cache key: `fire-fast-pursuit-20261104`.
+
+
+### Fire transformation head ornament
+- While fire charge is positive, the existing head-crown sprite shows a warm illustrated flame instead of its growth-stage plant. Expiration restores the current plant stage without resetting collection progress or moving the head.
+- One cached 1024×768 flame atlas (48 frames, 128px each), played at 24fps with time-based stretch/sway. Independently deforming tips, notches, and inner tongues change the silhouette. Reduced motion uses a still frame. No per-frame texture redraws/uploads or extra sprites. The texture is disposed with the flower artwork.
+- The collection debug slider reflects this immediately at 61 and restores the plant when lowered.
+
+- Head flame motion tuning: layered 19–43 rad/s oscillations (roughly 3–7 Hz), stronger stretch and sway for a brisk burning effect. Base position/opacity stay stable; reduced-motion mode remains still. Reuses the cached texture with no per-frame uploads.
+
+- Head flame shape animation: a seamless two-second flipbook updates only UV offsets; the base stays anchored on the head. Expiration restores the separate growth texture, so atlas transforms never affect the plant.
+
+
+### Repeatable collection cycle (supersedes the previous endless-garden rules)
+- Actual pickup 59 starts assistance: every 7 active seconds, spawn up to 3 ordinary flowers at separated layout anchors, prioritizing the current viewport. Keeps the existing 61-slot pool; occupied flowers/seeds are never overwritten and a delayed frame never creates multiple catch-up batches.
+- Assistance continues through the charged transformation. Extra seeds still refill 10 seconds, capped at 60.
+- Once charge expires and the brief red-to-yellow transition finishes, reset actual/display counts to 0/61, remove the head plant/flame, restore base body, clear pending reward reactions, and replant the original 61-reward tour. Assistance stops until the new cycle reaches 59. Unlocking fire again requires a fresh 61 pickups.
+- Debug collection at 59/60 uses the same seven-second schedule; holding the debug preview pauses the assistance and fire clocks.
+
+
+### Carry-over and timing revision (current rules)
+- From 59 actual pickups, assistance plants up to two ordinary flowers every ten active seconds, using the existing bounded pool and separated layout anchors.
+- Fire duration/cap is 30 seconds. Each extra seed adds five seconds, capped at 30; the gauge ratio uses the same duration constant.
+- At the end of the red-to-yellow transition, subtract the 61-seed transformation cost and carry all excess seeds into the next cycle. Restore both plant stage and body tier from this count: 71 becomes 10/61 (stage-10 flower), 82 becomes 21/61 (tier-one chick/sprout), 61 becomes 0/61 with no plant.
+- The renewed tour marks the carried count as already collected; assist timing follows the carried count, with no stale pickup reactions. Debug remains capped at 61, while normal carry-over never truncates excess seeds.
+
+
+### Random elemental transformations
+- At the 61-seed unlock, select fire, lightning, or ice with equal probability. Selection happens once per transformation; refills/clicks never reroll it. A consecutive cycle can legitimately select the same element.
+- Fire: red/orange fur, animated flame head atlas, existing broad dragon breath. Lightning: saturated gold fur, illustrated bolt crown with small arcs, six staggered ground strikes around the cast position with impact rings, cracks and sparks. Ice: sky-blue fur, faceted crystal crown, five planted crystal pillars erupting sequentially in the cast-time forward direction.
+- The same click input launches the selected skill, with pointer-control exclusions, fast pursuit, modal hosting, and pause behavior. Fire retains its 0.85-second cooldown; lightning/ice use 1.8/2.8 seconds so one complete ground cast plays before the next. One 640×320 fire canvas and one bounded 900×720 ground canvas are reused; no extra WebGL lights, particle systems, or per-click allocations of canvases/textures. Two small cached crown textures are disposed with the artwork. Lightning uses continuous local strokes, not screen flashes.
+- Shared rules remain: 30-second duration/cap, +5 seconds per extra seed; flowers at 59+ spawn two per ten seconds; expiration carries total minus 61 into the matching normal growth/body stage. The small gauge shows the element name and matching color.
+- Reduced motion keeps crowns static and reduces the skill length/particle count. Debug slider 0 → 61 samples a fresh element, just like a new transformation. Internal fireMode names remain for compatibility, but cover all three elements.
+
+### Ground-anchored click skills (2026-11-04)
+- `sumi-ground-skills.js` captures the chick foot position and facing at the accepted click. It never re-anchors to the moving chick. Document/dialog scroll offsets move the effect with the original page position.
+- Lightning drops six bolts with 105 ms spacing; ice pillars erupt with 130 ms spacing, overshoot briefly, remain planted, then fade. Ground effects render below the chick, are pointer-transparent, and are clipped to the open dialog.
+- Cooldown clicks do not relocate/restart the active cast. Pause, surface changes, viewport changes and mode expiration clear it. No accumulating effect nodes or GPU textures; reduced motion uses three simultaneous ground marks and omits flying debris.
+- Headless checks cover fire/lightning/ice activation, palettes, refill/carry-over, stable GPU texture counts, reduced motion, stationary cast coordinates during chick movement, cooldown, document/dialog scrolling, expiry and suspension. Canvas artwork was rendered separately for visual inspection.

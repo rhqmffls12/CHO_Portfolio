@@ -3,10 +3,10 @@ import * as THREE from './assets/vendor/three-r186/three.module.min.js';
 // An occasional run of footsteps writes a phrase one character at a time.
 // Resample the planted trail by glyph width, not by a fixed number of footsteps.
 const SECTIONS = [
-  { selector: '.hero', key: 'hero', dark: true, lines: ['SHOWREEL'] },
-  { selector: '#work', key: 'work', dark: false, lines: ['PROJECTS'] },
-  { selector: '#capabilities', key: 'career', dark: true, lines: ['EXPERTISE'] },
-  { selector: '#about', key: 'closing', dark: false, lines: ['CONNECT'] },
+  { selector: '.hero', key: 'hero', dark: true, lines: ['Welcome behind the scenes.'] },
+  { selector: '#work', key: 'work', dark: false, lines: ['Looks good. Works better.'] },
+  { selector: '#capabilities', key: 'career', dark: true, lines: ['Less clicking. More creating.'] },
+  { selector: '#about', key: 'closing', dark: false, lines: ['What shall we make next?'] },
 ];
 const INK = {
   light: '#FFF4E2',

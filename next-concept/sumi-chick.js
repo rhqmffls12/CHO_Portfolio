@@ -1,4 +1,5 @@
 // Optional page-wide companion. It never owns page pointer events or changes layout.
+import { createGrowthDebug } from './sumi-growth-debug.js?v=ground-skills-20261104';
 const button = document.querySelector('[data-sumi-control]');
 const canvas = document.querySelector('[data-sumi-canvas]');
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
@@ -7,12 +8,19 @@ const status = document.querySelector('[data-sumi-status]');
 let enabled = finePointer.matches && !motion.matches;
 let scene, loading, failed = false, pageAway = false;
 let activity = '';
+const growthDebug=createGrowthDebug({
+  onChange(value) { return scene?.setGrowthDebug(value); },
+  onRelease() { scene?.setGrowthDebugHolding(false); },
+});
 
 function suspended() {
-  return document.hidden || pageAway || Boolean(document.querySelector('dialog[open]'));
+  return document.hidden || pageAway || Boolean(document.querySelector('.image-viewer[open]'));
 }
 
 function sync() {
+  const projectDialog=document.querySelector('.project-dialog[open]');
+  const host=projectDialog||document.body;
+  if(canvas.parentElement!==host)host.append(canvas);
   const active = enabled && !suspended() && !failed;
   button.hidden = Boolean(document.querySelector('dialog[open]'));
   button.setAttribute('aria-pressed', String(enabled && !failed));
@@ -23,22 +31,25 @@ function sync() {
   button.title = enabled && activity && !failed ? `${label} · ${activity}` : label;
   canvas.hidden = !active || !scene;
   scene?.setActive(active);
+  growthDebug?.sync({active:active&&Boolean(scene),hidden:Boolean(document.querySelector('dialog[open]'))});
 }
 
 async function load() {
   if (scene || loading || !enabled || suspended()) return;
   failed = false;
-  loading = import('./sumi-chick-scene.js?v=chewy-trail-20261103');
+  loading = import('./sumi-chick-scene.js?v=ground-skills-20261104');
   sync();
   try {
     const { createSumiChick } = await loading;
     scene = createSumiChick(canvas, {
+      onGrowthChange(progress) { growthDebug?.render(progress); },
       onActivity(label) {
         activity = label;
         if (enabled) button.title = `병아리 숨기기 · ${label}`;
       },
     });
     canvas.dataset.ready = 'true';
+    growthDebug?.render(scene.growthProgress);
   } catch (error) {
     failed = true;
     enabled = false;
@@ -69,7 +80,7 @@ motion.addEventListener('change', () => {
 window.addEventListener('pagehide', event => {
   pageAway = true;
   sync();
-  if (!event.persisted) { scene?.dispose(); scene = null; dialogs.disconnect(); }
+  if (!event.persisted) { scene?.dispose(); scene = null; dialogs.disconnect(); growthDebug?.dispose(); }
 });
 window.addEventListener('pageshow', event => { pageAway = false; sync(); if (event.persisted) void load(); });
 canvas.addEventListener('webglcontextlost', event => {

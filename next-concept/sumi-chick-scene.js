@@ -4,12 +4,18 @@ import * as THREE from "./assets/vendor/three-r186/three.module.min.js";
 import { createPageCamera } from "./sumi-chick-camera.js?v=document-scroll-20261103";
 import { createChaseRhythm, chaseUrgency, chaseSpeedLimit } from "./sumi-chick-chase.js?v=click-pursuit-20261103";
 import { createButterflyFlight } from "./sumi-butterfly-flight.js?v=random-flight-20261103";
-import { createTextTracks } from "./sumi-text-tracks.js?v=chewy-trail-20261103";
-import { createButterflyPollen } from "./sumi-butterfly-pollen.js?v=pollen-20261103";
+import { mediaPerch } from "./sumi-media-perch.js?v=ground-skills-20261104";
+import { createTextTracks } from "./sumi-text-tracks.js?v=ground-skills-20261104";
+import { createButterflyPollen } from "./sumi-butterfly-pollen.js?v=ground-skills-20261104";
+import { createFlowerGame } from "./sumi-flower-game.js?v=ground-skills-20261104";
 
-export function createSumiChick(canvas, { onActivity = () => {} } = {}) {
+import { createFireMode } from "./sumi-fire-mode.js?v=ground-skills-20261104";
+
+export function createSumiChick(canvas, { onActivity = () => {}, onGrowthChange = () => {} } = {}) {
 const events = new AbortController();
 let running = false, disposed = false, activity = "";
+let growthDebugHolding = false;
+let projectSurface=null,surfaceKey='',savedPagePosition=null;
 let viewWidth = Math.max(1, window.innerWidth), viewHeight = Math.max(1, window.innerHeight);
 const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: "low-power" });
 renderer.setClearColor(0x000000, 0);
@@ -566,8 +572,9 @@ chick.add(body);
 // one long egg with the rear tipped slightly up carries the rump, so the profile has no steps
 const bodyMesh = part(body, SPHERE, M.body, [0, 0, -0.01], [0.19, 0.18, 0.24], [0.12, 0, 0]);
 const BODY_SCALE = bodyMesh.scale.clone();
-part(body, SPHERE, M.body, [0, -0.045, 0.1], [0.15, 0.14, 0.13]);   // breast
-part(body, SPHERE, M.body, [0, 0.07, -0.2], [0.06, 0.07, 0.06], [-0.9, 0, 0]); // tail tuft, barely past the body line
+const breastMesh = part(body, SPHERE, M.body, [0, -0.045, 0.1], [0.15, 0.14, 0.13]);
+const BREAST_SCALE = breastMesh.scale.clone();
+const tailMesh = part(body, SPHERE, M.body, [0, 0.07, -0.2], [0.06, 0.07, 0.06], [-0.9, 0, 0]);
 
 const wings = [1, -1].map((s) => {
   const pivot = new THREE.Group();
@@ -778,6 +785,7 @@ let printHead = 0;
 const _pm = new THREE.Matrix4(), _pq = new THREE.Quaternion(), _pe = new THREE.Euler(), _ps = new THREE.Vector3(), _pp = new THREE.Vector3();
 
 function stampPrint(worldPos, heading, side) {
+  if(projectSurface)return;
   const printHeading = heading - side * .14 + (Math.random() - .5) * .15;
   // A letter spans both foot lanes instead of alternating between tiny left/right stamps.
   textFootPosition.set(
@@ -864,7 +872,7 @@ let idleWandering = false;
 const wanderOffset = new THREE.Vector2();
 const butterflyFlight = createButterflyFlight();
 let clickFlutter = 0;
-const interactive = 'a, button, input, textarea, select, summary, iframe, dialog, [contenteditable], [role="button"], [data-sumi-control]';
+const interactive = 'a, button, input, textarea, select, summary, iframe, [contenteditable], [role="button"], [data-sumi-control]';
 function setPointer(e) {
   if (!running || e.isPrimary === false || e.pointerType === "touch") return;
   if (e.target?.closest?.('[data-sumi-control]')) return;
@@ -887,11 +895,19 @@ window.addEventListener("pointerdown", (e) => {
   const video = e.target?.closest?.('video');
   if (video && (video.controls || !video.matches('.hero .hero-video'))) return;
   aimAt(e);
+  flowerGame.showCount();
+  if(fireMode.cast()){
+    C.peep=1;C.startle=.4;C.settle=0;C.peckT=-1;C.pauseT=0;
+    C.clickChase=true;C.clickHopPending=false;
+    return;
+  }
   pollen.burst(butterfly.position, viewHeight);
   clickFlutter = reduceMotion ? 0 : 1;
   C.startle = 1;
   C.clickChase = true;
   C.clickHopPending = C.hopT < 0;
+  C.rewardHops = 0;
+  C.collectT = 0;
   C.pauseT = 0;
 }, listenerOptions);
 document.documentElement.addEventListener("pointerleave", () => { pointerActive = false; }, listenerOptions);
@@ -924,6 +940,9 @@ const C = {
   chaseBoost: 0,
   clickChase: false,
   clickHopPending: false,
+  rewardHops: 0,
+  rewardWait: 0,
+  collectT: 0,
   idleT: 0,
   settle: 0,
   peck: 0,
@@ -938,6 +957,10 @@ const C = {
   landed: 0,
   startle: 0,
   puff: 0,
+  roundness: 0,
+  roundnessTarget: 0,
+  evolutionTime: -1,
+  evolutionFrom: 0,
   peep: 0,
   peepIn: 2,
   blink: 0,
@@ -953,6 +976,31 @@ const C = {
 };
 
 const v1 = new THREE.Vector3(), v2 = new THREE.Vector3(), v3 = new THREE.Vector3();
+const fireMode = createFireMode(camera,head,beakUpper,chick,M,{reducedMotion:reduceMotion});
+const flowerGame = createFlowerGame(scene, camera, {
+  head, reducedMotion: reduceMotion,
+  onGrowthChange,
+  onBloom(position, height, strength = .6) { pollen.burst(position, height, strength); clickFlutter = reduceMotion ? 0 : .6; },
+  onCollect(position,actualCount) {
+    fireMode.state.collect(actualCount);
+    C.collectT = .34; C.speed = 0; C.peckT = 0; C.peckLeft = 1; C.peep = 1;
+    C.rewardHops = reduceMotion ? 0 : 1; C.rewardWait = .36;
+    C.puff = reduceMotion ? 0 : .35;
+  },
+  onReward() { C.rewardHops = reduceMotion ? 0 : 2; C.rewardWait = .36; C.puff = reduceMotion ? 0 : .5; },
+  onEvolution(tier) {
+    if(fireMode.state.unlocked && fireMode.state.total>61)return;
+    const growing = tier > C.roundnessTarget;
+    C.evolutionFrom = C.roundness;
+    C.roundnessTarget = tier;
+    C.evolutionTime = growing && !reduceMotion ? 0 : -1;
+    if (C.evolutionTime >= 0) {
+      // Let the grounded body change read before the usual collection hop.
+      C.collectT = .9; C.rewardWait = .9; C.puff = 0;
+      C.speed = 0; C.move = 0; C.settle = 0;
+    } else C.roundness = tier;
+  },
+});
 const q1 = new THREE.Quaternion(), q2 = new THREE.Quaternion(), q3 = new THREE.Quaternion();
 const eLook = new THREE.Euler(0, 0, 0, "YXZ");
 const UP = new THREE.Vector3(0, 1, 0);
@@ -978,39 +1026,55 @@ const easeOut = (x) => 1 - (1 - x) * (1 - x);
 const easeInOut = (x) => x * x * (3 - 2 * x);
 
 function updateBehaviour(dt) {
-  const goal = goalInView(butterfly.position.x, butterfly.position.z);
-  const dx = goal.x - C.pos.x, dz = goal.z - C.pos.z;
-  const dist = Math.hypot(dx, dz);
-  const bearing = wrap(Math.atan2(dx, dz) - C.heading);
-  C.bfNear = Math.hypot(butterfly.position.x - C.pos.x, butterfly.position.z - C.pos.z);
+  // A charged fire reward keeps the same pursuit boost as click catch-up.
+  const firePursuit = fireMode.state.remaining > 0;
+  if (firePursuit) { C.settle=0; C.idleT=0; C.peckT=-1; C.peck=0; }
+
+  // Resolve recovery before choosing a target or applying celebration locks.
   v3.set(C.pos.x, .35 + C.hopY, C.pos.z).project(camera);
   const outside = Math.abs(v3.x) > 1 || Math.abs(v3.y) > 1 || Math.abs(v3.z) > 1;
   // Stay in recovery until comfortably inside; crossing the edge must not chatter.
   C.recovering = outside || (C.recovering && (Math.abs(v3.x) > .84 || Math.abs(v3.y) > .84));
   C.chaseBoost = damp(C.chaseBoost, C.recovering ? 1 : 0, C.recovering ? 12 : 7, dt);
   if (C.recovering) {
-    C.settle = 0;
+    C.settle = 0; C.idleT = 0;
     C.peckT = -1;
     C.peck = 0;
     C.clickHopPending = false;
     if (C.hopT >= 0) { C.hopT = -1; C.hopY = 0; C.landed = 1; }
   }
+  // Pending reactions are deferred, never allowed to block an offscreen return.
+  if (!C.recovering) {
+    C.collectT = Math.max(0, C.collectT - dt);
+    C.rewardWait = Math.max(0, C.rewardWait - dt);
+  }
+  const seedTarget = !C.clickChase && !C.recovering ? flowerGame.target : null;
+  const gathering = Boolean(seedTarget);
+  const celebrating = !C.recovering && C.rewardHops > 0;
+  const collecting = !C.recovering && C.collectT > 0;
+  const goal = seedTarget || goalInView(butterfly.position.x, butterfly.position.z);
+  const dx = goal.x - C.pos.x, dz = goal.z - C.pos.z;
+  const dist = Math.hypot(dx, dz);
+  const bearing = wrap(Math.atan2(dx, dz) - C.heading);
+  C.bfNear = Math.hypot(butterfly.position.x - C.pos.x, butterfly.position.z - C.pos.z);
   const hopping = C.hopT >= 0;
   const urgency = chaseUrgency(C.bfNear);
   // a fluttering butterfly invites a hop; one that has gone still is soon ignored for the floor
   const bfFluttering = !pointerActive || idleWandering || performance.now() / 1000 - lastPointerMove < 1.5;
 
   // Irregular curiosity pauses nearby; longer uninterrupted runs at a distance.
-  const followDistance = idleWandering ? 1.35 : FOLLOW;
-  const stopDistance = idleWandering ? .85 : STOP;
+  const followDistance = gathering ? .16 : idleWandering ? 1.35 : FOLLOW;
+  const stopDistance = gathering ? .12 : idleWandering ? .85 : STOP;
   // A click owns one hop-and-catch-up run; release only after landing near the target.
   if (C.clickChase && !hopping && !C.clickHopPending && dist <= stopDistance + .25) C.clickChase = false;
-  const pursuitBoost = C.clickChase ? 1 : C.chaseBoost;
-  if (C.clickChase) { C.settle = 0; C.peckT = -1; C.peck = 0; }
+  const fastPursuit = C.clickChase || firePursuit;
+  const pursuitBoost = fastPursuit ? 1 : C.chaseBoost;
+  if (fastPursuit || gathering || celebrating) { C.settle = 0; C.peckT = -1; C.peck = 0; }
   if (!C.moving && dist > followDistance) C.moving = true;
-  if (C.clickChase && dist > stopDistance) C.moving = true;
+  if (fastPursuit && dist > stopDistance) C.moving = true;
   if (C.moving && dist < stopDistance) C.moving = false;
-  C.pauseT = chaseRhythm.update(dt, C.bfNear, C.moving, C.recovering || C.clickChase);
+  if (celebrating || collecting) { C.moving = false; C.turning = false; }
+  C.pauseT = chaseRhythm.update(dt, C.bfNear, C.moving, C.recovering || fastPursuit || gathering || celebrating);
   if (C.moving) {
     C.turning = false;
   } else {
@@ -1023,15 +1087,15 @@ function updateBehaviour(dt) {
   C.idleT = active || C.startle > 0.5 ? 0 : C.idleT + dt;
 
   // hunker down after a long quiet spell; the butterfly coming close or a click wakes it
-  const settleTarget = C.idleT > 7 && C.bfNear > 0.7 ? 1 : 0;
+  const settleTarget = !firePursuit && !C.recovering && !celebrating && !collecting && C.idleT > 7 && C.bfNear > 0.7 ? 1 : 0;
   const wasDown = C.settle > 0.5;
   C.settle = damp(C.settle, settleTarget, settleTarget ? 1.6 : 7, dt);
   if (C.settle > 0.5 !== wasDown) C.puff = 1;
-  const canMove = C.settle < 0.15 && !hopping && !C.clickHopPending;
+  const canMove = C.settle < 0.15 && !hopping && !C.clickHopPending && !celebrating && !collecting;
 
   let desired = 0;
   if (running && canMove) {
-    const limit = chaseSpeedLimit(dist, urgency, pursuitBoost);
+    const limit = gathering && !firePursuit ? 1.4 : chaseSpeedLimit(dist, urgency, pursuitBoost);
     const remaining = Math.max(0, dist - stopDistance);
     const arrivalSpeed = Math.min(remaining * 2.2 + .35, Math.sqrt(40 * remaining));
     desired = Math.min(limit, arrivalSpeed) * clamp(1.2 - Math.abs(bearing) / 1.5, 0, 1);
@@ -1060,7 +1124,10 @@ function updateBehaviour(dt) {
       C.hopReach = 0;
       C.hopCool = Math.max(C.hopCool, 1.5);
       C.clickHopPending = false;
-    } else if (!C.moving && C.hopCool <= 0 && C.bfNear < 0.6 && bfFluttering) {
+    } else if (celebrating && C.rewardWait <= 0) {
+      C.hopT = 0; C.hopDir = C.heading; C.hopReach = 0;
+      C.rewardHops--; C.rewardWait = HOP_TIME + .14; C.hopCool = 2;
+    } else if (!firePursuit && !gathering && !celebrating && !collecting && !C.moving && C.hopCool <= 0 && C.bfNear < 0.6 && bfFluttering) {
       C.hopT = 0;
       C.hopCool = R(2.5, 5);
       C.hopDir = Math.atan2(butterfly.position.x - C.pos.x, butterfly.position.z - C.pos.z);
@@ -1099,7 +1166,7 @@ function updateBehaviour(dt) {
   C.phase += (adv * dt) / C.cycleLen;
 
   // pecking at the floor in quiet moments, a few quick jabs at a time
-  const quiet = !active && C.settle < 0.1;
+  const quiet = !firePursuit && !active && C.settle < 0.1;
   if (!quiet) C.peckT = -1;
   if (C.peckT >= 0) {
     C.peckT += dt;
@@ -1166,7 +1233,31 @@ function placeBetween(mesh, from, to) {
   mesh.quaternion.setFromUnitVectors(UP, v3);
 }
 
+// Time / horizontal bulge / vertical stretch. Smoothstep interpolation gives
+// readable anticipation, one soft overshoot, then diminishing rebounds.
+const EVOLUTION_KEYS = [
+  [0, 1, 1], [.14, .92, .86], [.34, 1.13, 1.10],
+  [.50, .96, .96], [.65, 1.025, 1.02], [.84, 1, 1],
+];
 function updatePose(dt, t) {
+  let evolutionXZ = 1, evolutionY = 1;
+  if (C.evolutionTime >= 0 && !reduceMotion) {
+    const age = C.evolutionTime = Math.min(.84, C.evolutionTime + (C.recovering ? 0 : dt));
+    C.roundness = lerp(C.evolutionFrom, C.roundnessTarget, smoothstep(age, .14, .34));
+    for (let i = 1; i < EVOLUTION_KEYS.length; i++) {
+      const a = EVOLUTION_KEYS[i - 1], b = EVOLUTION_KEYS[i];
+      if (age <= b[0]) {
+        const f = smoothstep(age, a[0], b[0]);
+        evolutionXZ = lerp(a[1], b[1], f);
+        evolutionY = lerp(a[2], b[2], f);
+        break;
+      }
+    }
+    if (age >= .84) C.evolutionTime = -1;
+  } else C.roundness = fireMode.state.unlocked && !growthDebugHolding ? damp(C.roundness,C.roundnessTarget,4,dt) : C.roundnessTarget;
+  // First upgrade matches the previous maximum; continue through three tiers.
+  const roundness = C.roundness * 2;
+  const thirdTierThickness = 1 + .15 * smoothstep(C.roundness, 2, 3);
   const settle = smoothstep(C.settle, 0, 1);
   const step = C.phase * Math.PI * 2;
   const breathe = Math.sin(t * 3.4) * 0.004;
@@ -1183,18 +1274,29 @@ function updatePose(dt, t) {
   // fluffs up and shakes when settling or rising
   const puff = Math.sin(Math.min(C.puff, 1) * Math.PI);
   bodyMesh.scale.copy(BODY_SCALE).multiplyScalar(1 + puff * 0.07 + Math.sin(t * 3.4) * 0.01);
+  bodyMesh.scale.x *= (1 + roundness * .20) * evolutionXZ;
+  bodyMesh.scale.y *= (1 + roundness * .035) * thirdTierThickness * evolutionY;
+  bodyMesh.scale.z *= (1 + roundness * .12) * evolutionXZ;
+  breastMesh.scale.copy(BREAST_SCALE);
+  breastMesh.scale.x *= (1 + roundness * .16) * evolutionXZ;
+  breastMesh.scale.y *= (1 + roundness * .03) * thirdTierThickness * evolutionY;
+  breastMesh.scale.z *= (1 + roundness * .10) * evolutionXZ;
+  tailMesh.position.z = -.2 - roundness * .025;
+  hipL.position.x = .065 * (1 + roundness * .10);
+  hipR.position.x = -hipL.position.x;
+  for (const w of wings) w.pivot.position.x = .17 * w.s * (1 + roundness * .20) * evolutionXZ;
 
   // head-bob: while walking the head holds still in the world, then thrusts forward
   const bobAmp = Math.min(0.035, C.cycleLen * 0.25) * C.move;
   const sb = (C.phase * 2) % 1;
   const bob = sb < 0.7 ? bobAmp * (0.5 - sb / 0.7) : bobAmp * (-0.5 + (sb - 0.7) / 0.3);
-  neck.position.set(0, 0.1 + Math.max(0, C.pitch) * 0.035 + Math.sin(Math.PI * hopS) * 0.02, 0.08 + bob + C.peck * 0.05);
+  neck.position.set(0, 0.1 + Math.max(0, C.pitch) * 0.035 + Math.sin(Math.PI * hopS) * 0.02, 0.08 + roundness * .012 + bob + C.peck * 0.05);
   neck.rotation.set(C.peck * 0.95, C.yaw * 0.25, 0);
   chick.updateMatrixWorld(true);
 
   // the gaze snaps from pose to pose; to look up, the head cocks so one eye faces the butterfly
   head.getWorldPosition(v1);
-  v2.subVectors(butterfly.position, v1);
+  v2.subVectors(flowerGame.target || butterfly.position, v1);
   chickQInv.copy(chick.quaternion).invert();
   v2.applyQuaternion(chickQInv);
   const rawYaw = clamp(Math.atan2(v2.x, v2.z), -1.8, 1.8);
@@ -1220,7 +1322,7 @@ function updatePose(dt, t) {
   head.getWorldQuaternion(q3);
   U.uCombHead.value.set(0, -0.3, -1).applyQuaternion(q3).normalize().multiplyScalar(0.6);
 
-  beakHinge.rotation.x = Math.sin(Math.min(C.peep, 1) * Math.PI) * 0.5;
+  beakHinge.rotation.x = Math.max(Math.sin(Math.min(C.peep, 1) * Math.PI) * 0.5,fireMode.state.breath>0?.42:0);
   const lid = 1 - Math.sin(Math.min(C.blink, 1) * Math.PI) * 0.9;
   for (const e of eyes) e.scale.set(1, lid, 1);
 
@@ -1252,7 +1354,7 @@ function updatePose(dt, t) {
       curl = Math.sin(Math.PI * s) * C.move;
     }
     if (C.hopT >= 0) { y = C.hopY * 0.8; curl = Math.sin(Math.PI * hopS); }
-    leg.foot.set(leg.x, TOE_Y + y, leg.a.z + 0.01 + z);
+    leg.foot.set(leg.x * (1 + roundness * .10), TOE_Y + y, leg.a.z + 0.01 + z);
     if (p < leg.prevP && C.speed > 0.15 && C.hopT < 0) {
       v3.copy(leg.foot);
       chick.localToWorld(v3);
@@ -1278,7 +1380,7 @@ function updatePose(dt, t) {
   shadow.position.set(v1.x, 0.0015, v1.z);
   shadow.rotation.y = C.heading;
   const sh = 1 - C.hopY * 2.5;
-  shadow.scale.set(0.5 * sh, 1, 0.58 * sh);
+  shadow.scale.set(0.5 * sh * (1 + roundness * .20), 1, 0.58 * sh * (1 + roundness * .12));
 }
 
 /* ------------------------------------------------------------------ butterfly motion */
@@ -1287,11 +1389,19 @@ const bfPrev = new THREE.Vector3().copy(butterfly.position);
 const bfVel = new THREE.Vector3();
 let bfYaw = 0;
 let flapPhase = 0;
+let mediaRestBlend = 0;
+const FREE_FLIGHT_FOLLOW_RATE = 2.2;
+const CURSOR_FOLLOW_SPEED_MULTIPLIER = 2;
 
 function updateButterfly(dt, t) {
-  const shouldWander = pointerActive && performance.now() / 1000 - lastPointerMove >= 7;
   const cursorX = (ndc.x + 1) * viewWidth / 2;
   const cursorY = (1 - ndc.y) * viewHeight / 2;
+  const stage=projectSurface?.querySelector('.dialog-stage');
+  const mediaRect=stage?.getBoundingClientRect();
+  // :hover also works over an embedded YouTube frame, whose pointer events do not bubble.
+  const mediaHover=Boolean(mediaRect?.width&&mediaRect.height&&
+    ((pointerActive&&cursorX>=mediaRect.left&&cursorX<=mediaRect.right&&cursorY>=mediaRect.top&&cursorY<=mediaRect.bottom)||stage.matches(':hover')));
+  const shouldWander = !mediaHover && pointerActive && performance.now() / 1000 - lastPointerMove >= 7;
   if (shouldWander) {
     if (!idleWandering) butterflyFlight.reset();
     v3.set(C.pos.x, BF_H, C.pos.z).project(camera);
@@ -1319,9 +1429,29 @@ function updateButterfly(dt, t) {
     raycaster.setFromCamera(_ndc, camera);
     raycaster.ray.intersectPlane(bfPlane, pointerTarget);
   }
-  const k = pointerActive && !idleWandering ? 16 : 2.2;
-  butterfly.position.x = damp(butterfly.position.x, pointerTarget.x, k, dt);
-  butterfly.position.z = damp(butterfly.position.z, pointerTarget.z, k, dt);
+  butterfly.visible=true;
+  let nearPerch=false;
+  if(mediaHover){
+    const p=mediaPerch(mediaRect,projectSurface.getBoundingClientRect(),viewWidth,viewHeight,t,reduceMotion);
+    v3.copy(butterfly.position).project(camera);
+    nearPerch=Math.hypot((v3.x+1)*viewWidth/2-p.x,(1-v3.y)*viewHeight/2-p.y)<42;
+    raycaster.setFromCamera(_ndc.set(p.x/viewWidth*2-1,1-p.y/viewHeight*2),camera);
+    raycaster.ray.intersectPlane(bfPlane,pointerTarget);
+  }
+  const followingCursor=pointerActive&&!idleWandering&&!mediaHover;
+  v1.copy(butterfly.position).project(camera);v2.copy(pointerTarget).project(camera);
+  const gap=Math.hypot((v2.x-v1.x)*viewWidth/2,(v2.y-v1.y)*viewHeight/2);
+  mediaRestBlend=damp(mediaRestBlend,nearPerch?1:followingCursor&&gap>12?.45:0,5,dt);
+  const k = mediaHover ? 3.2 : followingCursor ? FREE_FLIGHT_FOLLOW_RATE * CURSOR_FOLLOW_SPEED_MULTIPLIER : FREE_FLIGHT_FOLLOW_RATE;
+  let followAlpha=1-Math.exp(-k*dt);
+  if(followingCursor){
+    // Use the free-flight path's screen-speed envelope as well as its damping.
+    // Damping alone would still cause a rush when the cursor is far away.
+    const freeSpeed=Math.hypot(viewWidth*(.55*.31+.1*.83)/2,viewHeight*.35*.23/2);
+    if(gap>.001)followAlpha=Math.min(followAlpha,freeSpeed*CURSOR_FOLLOW_SPEED_MULTIPLIER*dt/gap);
+  }
+  butterfly.position.x = lerp(butterfly.position.x, pointerTarget.x, followAlpha);
+  butterfly.position.z = lerp(butterfly.position.z, pointerTarget.z, followAlpha);
   butterfly.position.y = BF_H;
   bfVel.subVectors(butterfly.position, bfPrev).divideScalar(Math.max(dt, 1e-4));
   bfPrev.copy(butterfly.position);
@@ -1329,7 +1459,7 @@ function updateButterfly(dt, t) {
   const previousYaw = bfYaw;
   // The antennae point along local +Z. Even a slow turn must follow velocity;
   // an unrelated idle yaw caused the butterfly to keep flying tail-first.
-  if (sp > .001) {
+  if (sp > .001 && (!mediaHover || mediaRestBlend < .8)) {
     const heading = Math.atan2(bfVel.x, bfVel.z);
     bfYaw = wrap(bfYaw + wrap(heading - bfYaw) * (1 - Math.exp(-18 * dt)));
   }
@@ -1337,12 +1467,12 @@ function updateButterfly(dt, t) {
   const yawRate = dt > 0 ? wrap(bfYaw - previousYaw) / dt : 0;
   butterfly.rotation.z = damp(butterfly.rotation.z, clamp(-yawRate * .09, -.22, .22), 6, dt);
 
-  const resting = pointerActive && !idleWandering && performance.now() / 1000 - lastPointerMove > 1.2;
+  const resting = !mediaHover && pointerActive && !idleWandering && performance.now() / 1000 - lastPointerMove > 1.2;
   clickFlutter = Math.max(0, clickFlutter - dt / .28);
-  flapPhase += ((resting ? 9 : 24 + Math.min(sp / 3, 3) * 6) + clickFlutter * 26) * dt;
+  flapPhase += (lerp(resting ? 9 : 24 + Math.min(sp / 3, 3) * 6,7,mediaRestBlend) + clickFlutter * 26) * dt;
   const s1 = 0.5 + 0.5 * Math.sin(flapPhase);
   const s2 = 0.5 + 0.5 * Math.sin(flapPhase - 0.45);
-  const lo = resting ? 0.5 : 0.05, span = resting ? 0.75 : 1.25;
+  const lo = lerp(resting ? 0.5 : 0.05,.48,mediaRestBlend), span = lerp(resting ? 0.75 : 1.25,.55,mediaRestBlend);
   const fore = lo + span * Math.pow(s1, 0.7);
   const hind = lo + span * 0.92 * Math.pow(s2, 0.7);
   bfWings.foreR.rotation.z = fore;
@@ -1405,23 +1535,49 @@ let lastFrame = null, elapsed = 0;
 const frameInterval = matchMedia("(pointer: coarse)").matches ? 1000 / 30 : 1000 / 60;
 function animate(now) {
   if (lastFrame !== null && now - lastFrame < frameInterval - 1) return;
-  const dt = lastFrame === null ? 1 / 60 : Math.min((now - lastFrame) / 1000, 1 / 20);
+  const clockDt = lastFrame === null ? 1 / 60 : (now - lastFrame) / 1000;
+  const dt = Math.min(clockDt, 1 / 20);
   lastFrame = now;
   elapsed += dt;
-  frame(dt, elapsed);
+  frame(dt, elapsed, clockDt);
 }
 function setActive(active) {
   running = Boolean(active) && !disposed;
   lastFrame = null;
   if (!running) { pollen.clear(); clickFlutter = 0; }
+  flowerGame.setActive(running);
+  fireMode.setActive(running);
   canvas.hidden = !running;
   renderer.setAnimationLoop(running ? animate : null);
   if (!running) pointerActive = false;
 }
 
-function frame(dt, t) {
-  const scrollY = window.scrollY;
+function frame(dt, t, clockDt = dt) {
+  projectSurface=document.querySelector('.project-dialog[open]');
+  const key=projectSurface?.dataset.activeWork||'';
+  const changed=key!==surfaceKey;
+  if(changed&&!surfaceKey&&key)savedPagePosition=C.pos.clone();
+  const scrollY = window.scrollY+(projectSurface?.scrollTop||0);
   const groundDelta = pageCamera.scrollTo(scrollY);
+  if(changed){
+    if(!key&&savedPagePosition)C.pos.copy(savedPagePosition);
+    else {
+      raycaster.setFromCamera(_ndc.set(.35,-.2),camera);
+      if(raycaster.ray.intersectPlane(groundPlane,goalPt))C.pos.copy(goalPt);
+    }
+    C.speed=0;C.move=0;C.hopT=-1;C.hopY=0;C.clickChase=false;C.recovering=false;
+    // A new surface must not inherit a pending hop/collection lock from the old one.
+    C.clickHopPending=false;C.rewardHops=0;C.rewardWait=0;C.collectT=0;
+    C.idleT=0;C.settle=0;C.peckT=-1;C.peck=0;C.moving=false;C.turning=false;
+    C.evolutionTime=-1;C.roundness=C.roundnessTarget;
+    fireMode.state.clearBreath();
+    pointerActive=false;surfaceKey=key;
+    for(const target of [rtA,rtB]){renderer.setRenderTarget(target);renderer.clear();}renderer.setRenderTarget(null);
+  }
+  const trail=scene.getObjectByName('section-text-footprints');if(trail)trail.visible=!projectSurface;
+  prints.visible=!projectSurface;
+  if(projectSurface){const r=projectSurface.getBoundingClientRect();canvas.style.clipPath=`inset(${Math.max(0,r.top)}px ${Math.max(0,viewWidth-r.right)}px ${Math.max(0,viewHeight-r.bottom)}px ${Math.max(0,r.left)}px)`;}
+  else canvas.style.clipPath='';
   // The butterfly acts as the cursor, so it stays in viewport coordinates.
   // Chick, contact shadow and stamped footprints stay at their document positions.
   butterfly.position.z += groundDelta;
@@ -1432,15 +1588,34 @@ function frame(dt, t) {
   U.uComb.value.set(-Math.sin(C.heading) * 0.4, -0.35, -Math.cos(C.heading) * 0.4);
 
   const bfSpeed = updateButterfly(dt, t);
+  beakUpper.getWorldPosition(v1);
+  flowerGame.update(dt, {
+    width: viewWidth, height: viewHeight, scrollY, clockDt: growthDebugHolding?0:clockDt,
+    butterfly: butterfly.position, chickPosition: C.pos, beakPosition: v1, pointerActive, pointerX: (ndc.x + 1) * viewWidth / 2, pointerY: (1 - ndc.y) * viewHeight / 2,
+    canSeek: !growthDebugHolding && !C.clickChase && !C.recovering && C.hopT < 0 && !C.rewardHops && C.collectT <= 0,
+    canCollect: !fireMode.state.ending && !growthDebugHolding && !C.clickChase && !C.recovering && C.hopT < 0 && !C.rewardHops && C.collectT <= 0,
+  });
   pollen.update(dt, renderer.getPixelRatio());
-  updateBehaviour(dt);
+  if (!growthDebugHolding) updateBehaviour(dt);
   textTracks.update(dt);
+  if(fireMode.state.unlocked&&!growthDebugHolding&&C.evolutionTime<0)C.roundnessTarget=3*fireMode.state.ratio;
   updatePose(dt, t);
+  fireMode.update(growthDebugHolding?0:clockDt,viewWidth,viewHeight);
+  const carriedSeeds=fireMode.state.consumeCycleReset();
+  if(carriedSeeds!==null){
+    const progress=flowerGame.resetCycle(carriedSeeds);
+    C.roundness=C.roundnessTarget=progress.tier;C.evolutionTime=-1;
+    C.rewardHops=0;C.rewardWait=0;C.collectT=0;C.puff=0;
+    C.hopT=-1;C.hopY=0;C.hopRequested=false;C.clickChase=false;
+    updatePose(0,t);
+  }
+  flowerGame.updateFireCrown(fireMode.state.remaining>0,t,fireMode.state.element);
+  flowerGame.updateFeedback(dt,viewWidth,viewHeight);
 
   for (let i = 0; i < PRINTS; i++) printAge.array[i] += dt;
   printAge.needsUpdate = true;
 
-  emitInk(dt, bfSpeed);
+  if(!projectSurface)emitInk(dt, bfSpeed);
   simMat.uniforms.uPrev.value = rtA.texture;
   simMat.uniforms.uTime.value = t * simSpeed;
   simMat.uniforms.uDt.value = dt * simSpeed;
@@ -1462,6 +1637,26 @@ function frame(dt, t) {
 frame(0, 0);
 return {
   setActive,
+  get growthProgress() { return flowerGame.progress; },
+  setGrowthDebugHolding(value) { growthDebugHolding = Boolean(value); },
+  setGrowthDebug(value) {
+    const count=Math.min(61,Math.max(0,Math.floor(Number(value)||0)));
+    fireMode.state.setCollectionDebug(count);
+    flowerGame.setCollectionDebug(count);
+    flowerGame.updateFireCrown(fireMode.state.remaining>0,elapsed,fireMode.state.element);
+    growthDebugHolding = true;
+    if (C.evolutionTime < 0) C.roundness = C.roundnessTarget;
+    C.hopT = -1; C.hopY = 0; C.hopRequested = false; C.landed = false;
+    C.rewardHops = 0; C.rewardWait = 0; C.collectT = 0; C.puff = 0;
+    C.speed = 0; C.move = 0; C.moving = false; C.settle = 0; C.peck = 0;
+    C.clickChase = false; C.recovering = false; C.heading = .6;
+    // Bring the preview above the debug panel, including after a long page scroll.
+    const x = Math.max(90, viewWidth - 160), y = Math.max(180, viewHeight - 275);
+    raycaster.setFromCamera(_ndc.set(x / viewWidth * 2 - 1, 1 - y / viewHeight * 2), camera);
+    if (raycaster.ray.intersectPlane(groundPlane, goalPt)) C.pos.copy(goalPt);
+    updatePose(0, elapsed);
+    return flowerGame.progress;
+  },
   dispose() {
     if (disposed) return;
     setActive(false);
@@ -1469,6 +1664,8 @@ return {
     events.abort();
     textTracks.dispose();
     pollen.dispose();
+    flowerGame.dispose();
+    fireMode.dispose();
     const resources = new Set();
     for (const root of [scene, simScene, emitScene]) root.traverse(object => {
       if (object.geometry) resources.add(object.geometry);

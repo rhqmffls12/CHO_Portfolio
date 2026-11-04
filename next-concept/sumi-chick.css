@@ -10,6 +10,20 @@
   background: transparent;
 }
 .sumi-chick-canvas[hidden], .sumi-chick-control[hidden] { display: none; }
+.sumi-seed-counter {
+  position: fixed;
+  z-index: 16;
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
+  font: 400 17px/1 "Sumi Trail Chewy", "Comic Sans MS", cursive;
+  font-variant-numeric: tabular-nums;
+  color: #536334;
+  transform-origin: 50% 100%;
+}
+.sumi-seed-counter[data-theme='dark'] { color: #fff4e2; text-shadow: 0 1px 3px #10171066; }
+.sumi-seed-counter[data-emphasis='evolution'] { font-size: 28px; }
+.sumi-seed-counter[hidden] { display: none; }
 .sumi-chick-control {
   position: fixed;
   top: calc(96px + env(safe-area-inset-top, 0px));
@@ -51,3 +65,52 @@
 @media (prefers-reduced-motion: reduce) {
   .sumi-chick-control { transition: none; }
 }
+
+.sumi-growth-debug {
+  position: fixed;
+  right: max(18px, env(safe-area-inset-right, 0px));
+  bottom: max(18px, env(safe-area-inset-bottom, 0px));
+  z-index: 22;
+  width: min(300px, calc(100vw - 32px));
+  box-sizing: border-box;
+  border: 1px solid #bac2a6;
+  border-radius: 12px;
+  background: #f4f5f1;
+  color: #252d23;
+  box-shadow: 0 6px 24px #11181320;
+  font: 12px/1.5 Pretendard, sans-serif;
+}
+.sumi-growth-debug[hidden] { display: none; }
+.sumi-growth-debug summary { min-height: 44px; box-sizing: border-box; padding: 12px 16px; cursor: pointer; font-weight: 700; }
+.sumi-growth-debug summary span { margin-left: 8px; color: #596444; font-weight: 400; }
+.sumi-growth-debug-body { padding: 0 16px 12px; }
+.sumi-growth-debug-heading, .sumi-growth-debug-marks, .sumi-growth-debug-bottom { display: flex; align-items: center; justify-content: space-between; }
+.sumi-growth-debug output { font-variant-numeric: tabular-nums; font-weight: 700; color: #55642c; }
+.sumi-growth-debug input { display: block; width: 100%; height: 32px; margin: 0; padding: 0; accent-color: #7d8c3b; cursor: ew-resize; }
+.sumi-growth-debug-marks { color: #636b5d; font-size: 11px; }
+.sumi-growth-debug p { margin: 10px 0 4px; font-size: 12px; color: #252d23; }
+.sumi-growth-debug-bottom { gap: 8px; font-size: 10px; color: #636b5d; }
+.sumi-growth-debug button { min-width: 48px; min-height: 32px; border: 1px solid #bac2a6; border-radius: 6px; background: transparent; color: #3f4d24; cursor: pointer; font: inherit; font-size: 11px; }
+.sumi-growth-debug :focus-visible { outline: 2px solid #718b2c; outline-offset: 3px; }
+.sumi-growth-debug :disabled { cursor: default; opacity: .5; }
+@media (max-width: 600px) { .sumi-growth-debug { bottom: calc(76px + env(safe-area-inset-bottom, 0px)); right: 14px; } }
+
+/* One bounded breath canvas and a quiet countdown, outside layout/hit testing. */
+.sumi-fire-layer { position:fixed; inset:0; z-index:16; pointer-events:none; overflow:hidden; }
+.sumi-fire-layer[hidden], .sumi-dragon-breath[hidden], .sumi-fire-gauge[hidden] { display:none; }
+.sumi-dragon-breath { position:absolute; width:640px; height:320px; max-width:none; transform-origin:16px 160px; pointer-events:none; }
+.sumi-fire-gauge { position:absolute; width:64px; height:4px; border-radius:4px; background:#39261ec7; box-shadow:0 0 0 1px #fff5df55; transform:translate(-50%,-100%); pointer-events:none; }
+.sumi-fire-gauge i { display:block; width:100%; height:100%; border-radius:inherit; background:linear-gradient(90deg,#ec6c42,#ffcc72); transform-origin:left center; }
+.sumi-fire-gauge span { position:absolute; left:calc(100% + 6px); top:-5px; color:#ffe5b7; font:10px/1.4 Pretendard,sans-serif; font-variant-numeric:tabular-nums; text-shadow:0 1px 3px #322017; }
+
+.sumi-fire-gauge span { white-space: nowrap; }
+.sumi-fire-layer[data-element='lightning'] .sumi-fire-gauge { background:#443913c7; }
+.sumi-fire-layer[data-element='lightning'] .sumi-fire-gauge i { background:linear-gradient(90deg,#dea62e,#fff07d); }
+.sumi-fire-layer[data-element='lightning'] .sumi-fire-gauge span { color:#fff1b4; }
+.sumi-fire-layer[data-element='ice'] .sumi-fire-gauge { background:#193b4dc7; }
+.sumi-fire-layer[data-element='ice'] .sumi-fire-gauge i { background:linear-gradient(90deg,#56b6df,#d4faff); }
+.sumi-fire-layer[data-element='ice'] .sumi-fire-gauge span { color:#d4faff; text-shadow:0 1px 3px #183548; }
+
+/* Cast-time ground effects sit below the chick and never intercept portfolio input. */
+.sumi-ground-layer { position:fixed; inset:0; z-index:14; pointer-events:none; overflow:hidden; }
+.sumi-ground-skill { position:absolute; width:900px; height:720px; max-width:none; transform-origin:0 0; pointer-events:none; }
