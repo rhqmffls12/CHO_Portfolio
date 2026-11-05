@@ -1,3 +1,4 @@
+import {COLLECTION_GOAL} from './sumi-growth-stages.js?v=relaxed-garden-20261105';
 import * as THREE from './assets/vendor/three-r186/three.module.min.js';
 
 // One reusable, screen-facing label; no texture allocation per pickup.
@@ -25,7 +26,7 @@ export function createSeedCounter(camera,head,crown,{reducedMotion=false}={}) {
   return {
     setHost(host){if(label.parentElement!==host)host.append(label);},
     show(total,{evolution:grow=false}={}){
-      label.textContent=`${total}/61`;evolution=grow;
+      label.textContent=`${total}/${COLLECTION_GOAL}`;evolution=grow;
       label.dataset.emphasis=grow?'evolution':'normal';age=0;
     },
     update(dt,width,height){

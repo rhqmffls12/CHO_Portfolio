@@ -131,10 +131,25 @@ export function createTextTracks(scene, camera, { hold, fade, glyphHeight, rando
     return { section, hit, theme: section?.dark || onMedia ? 'light' : 'dark' };
   }
 
-  function colorAt(worldPosition, width, height) {
+  // Inside a project dialog the main page's sections are hidden behind it and must not decide the
+  // ink: the dialog's own surface does. Its paper takes the dark ink; media and dark panels (the
+  // stage, a gallery thumbnail) take the light one.
+  function dialogTheme(x, y, width, height, surface) {
+    const hit = x >= 0 && x < width && y >= 0 && y < height ? document.elementFromPoint(x, y) : null;
+    for (let el = hit; el && el !== surface && surface.contains(el); el = el.parentElement) {
+      if (/^(IMG|VIDEO|IFRAME|CANVAS|PICTURE|OBJECT)$/.test(el.tagName)) return 'light';
+      const c = getComputedStyle(el).backgroundColor.match(/[\d.]+/g);
+      if (!c || c.length < 3 || (c.length > 3 && +c[3] < 0.5)) continue;
+      return (0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]) / 255 < 0.45 ? 'light' : 'dark';
+    }
+    return 'dark';
+  }
+
+  // surface: the open project dialog, or null on the main page
+  function colorAt(worldPosition, width, height, surface = null) {
     projected.set(worldPosition.x, .002, worldPosition.z).project(camera);
     const x = (projected.x + 1) * width / 2, y = (1 - projected.y) * height / 2;
-    return inkColors[surfaceAt(x, y, width, height).theme];
+    return inkColors[surface ? dialogTheme(x, y, width, height, surface) : surfaceAt(x, y, width, height).theme];
   }
 
   function visibleSurface(worldPosition, width, height) {

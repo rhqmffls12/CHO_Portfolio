@@ -10,7 +10,7 @@ export function createChaseRhythm(random = Math.random) {
   const range = (min, max) => min + (max - min) * random();
   const nextThreshold = () => -Math.log(Math.max(.000001, 1 - random()));
   let threshold = nextThreshold();
-  let hazard = 0, pause = 0, cooldown = range(.2, .65);
+  let hazard = 0, pause = 0, cooldown = range(.6, 1.95);
   return {
     update(dt, distance, moving, uninterrupted) {
       const urgency = chaseUrgency(distance);
@@ -28,13 +28,14 @@ export function createChaseRhythm(random = Math.random) {
       }
       cooldown = Math.max(0, cooldown - dt);
       if (cooldown > 0) return 0;
-      const rate = 1.1 - .6 * urgency;
+      // Threefold rarer curiosity checks and longer uninterrupted runs.
+      const rate = (1.1 - .6 * urgency) / 3;
       hazard += rate * dt;
       if (hazard >= threshold && distance > 1.05) {
         hazard = 0;
         threshold = nextThreshold();
         pause = (random() < .75 ? range(.32, .56) : range(.56, .9)) * (1 - .15 * urgency);
-        cooldown = range(.45, 1.25) * (1 + urgency * .4);
+        cooldown = range(1.5, 8);
       }
       return pause;
     },

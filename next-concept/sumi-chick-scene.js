@@ -1,20 +1,23 @@
+import {COLLECTION_GOAL} from './sumi-growth-stages.js?v=chase-wait-20261105';
 // Adapted from Q:/Codex/threejs/sumi-chick.html. The original file stays unchanged.
 // Chick geometry, behaviour, IK, butterfly and footprint simulation are retained.
 import * as THREE from "./assets/vendor/three-r186/three.module.min.js";
-import { createPageCamera } from "./sumi-chick-camera.js?v=document-scroll-20261103";
-import { createChaseRhythm, chaseUrgency, chaseSpeedLimit } from "./sumi-chick-chase.js?v=click-pursuit-20261103";
-import { createButterflyFlight } from "./sumi-butterfly-flight.js?v=random-flight-20261103";
-import { mediaPerch } from "./sumi-media-perch.js?v=ground-skills-20261104";
-import { createTextTracks } from "./sumi-text-tracks.js?v=ground-skills-20261104";
-import { createButterflyPollen } from "./sumi-butterfly-pollen.js?v=ground-skills-20261104";
-import { createFlowerGame } from "./sumi-flower-game.js?v=ground-skills-20261104";
+import { createPageCamera } from "./sumi-chick-camera.js?v=chase-wait-20261105";
+import { createChaseRhythm, chaseUrgency, chaseSpeedLimit } from "./sumi-chick-chase.js?v=chase-wait-20261105";
+import { createButterflyFlight } from "./sumi-butterfly-flight.js?v=chase-wait-20261105";
+import { mediaPerch } from "./sumi-media-perch.js?v=chase-wait-20261105";
+import { createTextTracks } from "./sumi-text-tracks.js?v=badges-20261105";
+import { createButterflyPollen } from "./sumi-butterfly-pollen.js?v=chase-wait-20261105";
+import { createFlowerGame } from "./sumi-flower-game.js?v=flower-element-20261105";
 
-import { createFireMode } from "./sumi-fire-mode.js?v=ground-skills-20261104";
+import { createFireMode, elementForFlower } from "./sumi-fire-mode.js?v=thumb-fx-20261105";
 
-export function createSumiChick(canvas, { onActivity = () => {}, onGrowthChange = () => {} } = {}) {
+export function createSumiChick(canvas, { onActivity = () => {}, onGrowthChange = () => {}, onElementState = () => {} } = {}) {
 const events = new AbortController();
 let running = false, disposed = false, activity = "";
 let growthDebugHolding = false;
+// debug: 'auto' (head flower colour) or a forced 'fire' / 'lightning' / 'ice'
+let elementChoice = 'auto';
 let projectSurface=null,surfaceKey='',savedPagePosition=null;
 let viewWidth = Math.max(1, window.innerWidth), viewHeight = Math.max(1, window.innerHeight);
 const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: "low-power" });
@@ -400,13 +403,24 @@ const U = {
   uCombHead: { value: new THREE.Vector3(0, -0.3, -1) },
   uLight: { value: LIGHT_DIR },
 };
+// Elemental coat, driven by sumi-element-fx.js: a wipe front repaints the down from the feet up,
+// then each element adds its own surface life (rising flame licks, crawling arcs, frost glints).
+const FX_U = {
+  uElemColor: { value: new THREE.Vector3() },
+  uElemTip: { value: new THREE.Vector3() },
+  uElemKind: { value: new THREE.Vector3() },
+  uElemShade: { value: 0 },   // dark's white coat: a soft grey at the silhouette (0 = none)
+  uWipe: { value: 0 },
+  uFxTime: { value: 0 },
+  uFxGlow: { value: new THREE.Vector3() },
+};
 
 const FUR_VERT = /* glsl */ `
   attribute vec3 aRest;
   uniform float uLen, uShells, uTime, uCombAmt;
   uniform vec3 uComb;
   varying float vH;
-  varying vec3 vRest, vN, vView, vT;
+  varying vec3 vRest, vN, vView, vT, vWorld;
   void main() {
     float h = float(gl_InstanceID) / (uShells - 1.0);
     vec4 wp = modelMatrix * vec4(position, 1.0);
@@ -415,6 +429,7 @@ const FUR_VERT = /* glsl */ `
     vec3 d = wn * uLen * h + comb * (uLen * pow(h, 1.5));
     d += vec3(sin(uTime * 1.7 + wp.y * 19.0 + wp.x * 11.0), 0.3 * sin(uTime * 2.1 + wp.z * 15.0), cos(uTime * 1.3 + wp.z * 17.0)) * uLen * 0.16 * h * h;
     wp.xyz += d;
+    vWorld = wp.xyz;
     vRest = aRest * vec3(length(modelMatrix[0].xyz), length(modelMatrix[1].xyz), length(modelMatrix[2].xyz));
     vH = h;
     vN = wn;
@@ -427,9 +442,17 @@ const FUR_VERT = /* glsl */ `
 const FUR_FRAG = /* glsl */ `
   uniform float uDensity;
   uniform vec3 uColor, uTip, uLight;
+  uniform vec3 uElemColor, uElemTip, uElemKind, uFxGlow;
+  uniform float uWipe, uFxTime, uElemShade;
   varying float vH;
-  varying vec3 vRest, vN, vView, vT;
+  varying vec3 vRest, vN, vView, vT, vWorld;
   float hash13(vec3 p) { p = fract(p * 0.1031); p += dot(p, p.zyx + 31.32); return fract((p.x + p.y) * p.z); }
+  float vn3(vec3 p) {
+    vec3 i = floor(p), f = fract(p);
+    f = f * f * (3.0 - 2.0 * f);
+    return mix(mix(mix(hash13(i), hash13(i + vec3(1.0, 0.0, 0.0)), f.x), mix(hash13(i + vec3(0.0, 1.0, 0.0)), hash13(i + vec3(1.0, 1.0, 0.0)), f.x), f.y),
+               mix(mix(hash13(i + vec3(0.0, 0.0, 1.0)), hash13(i + vec3(1.0, 0.0, 1.0)), f.x), mix(hash13(i + vec3(0.0, 1.0, 1.0)), hash13(i + vec3(1.0, 1.0, 1.0)), f.x), f.y), f.z);
+  }
   vec3 hash33(vec3 p) { p = fract(p * vec3(0.1031, 0.1030, 0.0973)); p += dot(p, p.yxz + 33.33); return fract((p.xxy + p.yxx) * p.zyx); }
   float strand(vec3 p, float h) {
     vec3 c = floor(p);
@@ -467,6 +490,30 @@ const FUR_FRAG = /* glsl */ `
     vec3 col = base;
     col += vec3(0.08, 0.07, 0.04) * sheen * h;
     col += uTip * 0.18 * rim * h;
+    if (uWipe > 0.0) {
+      // The wipe climbs from the feet (y = 0) past the crown, along a ragged noise front.
+      float field = clamp(vWorld.y / 0.72, 0.0, 1.0) * 0.8 + vn3(vRest * 9.0) * 0.35;
+      float front = uWipe * 1.3 - 0.1;
+      float m = 1.0 - smoothstep(front - 0.04, front + 0.04, field);
+      vec3 e = mix(uElemColor, uElemTip, pow(h, 1.2)) + uElemTip * 0.22 * rim * h + vec3(0.08) * sheen * h;
+      float lick = vn3(vRest * 7.0 + vec3(0.0, -uFxTime * 2.4, uFxTime * 0.3));
+      e += uElemKind.x * vec3(1.0, 0.55, 0.12) * smoothstep(0.55, 0.9, lick * 0.75 + h * 0.45) * 0.55;
+      e += uElemKind.x * vec3(1.0, 0.85, 0.5) * step(0.985, hash13(floor(vRest * 60.0) + floor(uFxTime * 6.0))) * h;
+      float arc = abs(vn3(vRest * 10.0 + vec3(uFxTime * 7.0, 0.0, -uFxTime * 5.0)) - 0.5);
+      float burst = step(0.45, fract(sin(floor(uFxTime * 9.0) * 12.9898) * 43758.5453));
+      e += uElemKind.y * vec3(1.0, 0.97, 0.78) * (1.0 - smoothstep(0.0, 0.035, arc)) * burst * (0.3 + h);
+      vec3 cell = floor(vRest * 90.0);
+      float glint = step(0.992, hash13(cell + floor(uFxTime * 3.0 + hash13(cell) * 3.0)));
+      e += uElemKind.z * (vec3(1.0) * glint * h * 1.2 + vec3(0.75, 0.92, 1.0) * rim * 0.35);
+      // a white coat (dark) greys softly toward its silhouette, so it still reads against the
+      // white smoke around it
+      e = mix(e, e * vec3(0.6, 0.61, 0.66), uElemShade * rim);
+      float wiping = step(0.001, uWipe) * step(uWipe, 0.999);
+      float edge = (1.0 - smoothstep(0.0, 0.06, abs(field - front))) * wiping;
+      vec3 edgeColor = uElemKind.x * vec3(1.0, 0.85, 0.4) + uElemKind.y * vec3(1.0, 0.93, 0.55) + uElemKind.z * vec3(0.9, 1.0, 1.0);
+      col = mix(col, e, m) + edgeColor * edge * 0.9;
+    }
+    col += uFxGlow * (0.3 + h);
     gl_FragColor = vec4(col, a);
   }
 `;
@@ -483,6 +530,7 @@ function furMat(len, density, combAmt, combUniform, color, tip) {
       uTime: U.uTime,
       uComb: combUniform,
       uLight: U.uLight,
+      ...FX_U,
     },
     vertexShader: FUR_VERT,
     fragmentShader: FUR_FRAG,
@@ -702,6 +750,7 @@ const printUniforms = {
   uHold: { value: PRINT_HOLD },
   uFade: { value: PRINT_FADE },
   uDt: { value: 0.016 },
+  uGlow: { value: 0 },   // dark element: footprints glow white (set by applyDarkLook)
 };
 const PRINT_VERT = /* glsl */ `
   attribute float aAge;
@@ -738,12 +787,24 @@ const prints = new THREE.InstancedMesh(printGeo, new THREE.ShaderMaterial({
   vertexShader: PRINT_VERT,
   fragmentShader: /* glsl */ `
     ${PRINT_COMMON}
+    uniform float uGlow;
     varying vec3 vInk;
     void main() {
       vec3 s = printSample();
       float a = s.x * 0.90 * (1.0 - 0.65 * s.z);
-      if (a < 0.003) discard;
-      gl_FragColor = vec4(vInk, a);
+      // dark element: the print turns white and glows (blended additively, see applyDarkLook):
+      // a much stronger core and a soft halo taken from its own shape
+      float halo = 0.0;
+      if (uGlow > 0.001) {
+        for (int i = 0; i < 8; i++) {
+          float an = float(i) * 0.7854;
+          halo += texture2D(uTex, vUv + vec2(cos(an), sin(an)) * 0.12).a + texture2D(uTex, vUv + vec2(cos(an), sin(an)) * 0.06).a;
+        }
+        halo *= uGlow * 0.1 * (1.0 - s.z) * smoothstep(0.0, 0.15, vAge);
+      }
+      float alpha = clamp(a * (1.0 + 2.2 * uGlow) + halo, 0.0, 1.0);
+      if (alpha < 0.003) discard;
+      gl_FragColor = vec4(mix(vInk, vec3(1.0), uGlow), alpha);
       #include <colorspace_fragment>
     }
   `,
@@ -773,6 +834,32 @@ printsEmit.instanceMatrix = prints.instanceMatrix;
 printsEmit.frustumCulled = false;
 const emitScene = new THREE.Scene();
 emitScene.add(printsEmit);
+// Dark element: the same eroding edge pours white smoke into the element's ink buffer instead,
+// so each glowing print rises and swirls away as white smoke, like the ink cat's paw prints.
+const printsSmoke = new THREE.InstancedMesh(printGeo, new THREE.ShaderMaterial({
+  transparent: true,
+  depthTest: false,
+  depthWrite: false,
+  blending: THREE.AdditiveBlending,
+  uniforms: printUniforms,
+  vertexShader: PRINT_VERT,
+  fragmentShader: /* glsl */ `
+    ${PRINT_COMMON}
+    uniform float uGlow;
+    void main() {
+      vec3 s = printSample();
+      // the eroding band rises as white smoke across the whole dissolve, a thin trickle rather than
+      // the print body poured at once (which left one lump per footprint)
+      float e = (s.y * 9.0 + s.x * s.z * 0.8) * uDt * uGlow;
+      if (e <= 0.0) discard;
+      gl_FragColor = vec4(e, 0.0, 0.0, 1.0);
+    }
+  `,
+}), PRINTS);
+printsSmoke.instanceMatrix = prints.instanceMatrix;
+printsSmoke.frustumCulled = false;
+const printSmokeScene = new THREE.Scene();
+printSmokeScene.add(printsSmoke);
 
 const FOOTPRINT_SIZE = .085;
 const FOOT_SPACING = Math.abs(LEGS[0].x - LEGS[1].x);
@@ -785,7 +872,9 @@ let printHead = 0;
 const _pm = new THREE.Matrix4(), _pq = new THREE.Quaternion(), _pe = new THREE.Euler(), _ps = new THREE.Vector3(), _pp = new THREE.Vector3();
 
 function stampPrint(worldPos, heading, side) {
-  if(projectSurface)return;
+  // Footprints (and the element's footstep effects) also mark a project dialog; only the section
+  // phrases, which belong to the main page's sections, stay on the page.
+  fireMode.footstep(worldPos);
   const printHeading = heading - side * .14 + (Math.random() - .5) * .15;
   // A letter spans both foot lanes instead of alternating between tiny left/right stamps.
   textFootPosition.set(
@@ -793,7 +882,7 @@ function stampPrint(worldPos, heading, side) {
     .002,
     worldPos.z + Math.sin(heading) * side * FOOT_SPACING / 2,
   );
-  if (textTracks.tryStamp(textFootPosition, heading, viewWidth, viewHeight)) return;
+  if (!projectSurface && textTracks.tryStamp(textFootPosition, heading, viewWidth, viewHeight)) return;
   const i = printHead;
   printHead = (printHead + 1) % PRINTS;
   _pe.set(0, printHeading, 0); // chicks toe in a little
@@ -806,7 +895,9 @@ function stampPrint(worldPos, heading, side) {
   printAge.array[i] = 0;
   printSeed.array[i] = Math.random() * 50;
   printSeed.needsUpdate = true;
-  const ink = textTracks.colorAt(_pp, viewWidth, viewHeight);
+  // the ink follows the surface under the print: in a project dialog that is the dialog itself,
+  // never the main-page section hidden behind it (which turned dialog prints cream at random)
+  const ink = textTracks.colorAt(_pp, viewWidth, viewHeight, projectSurface);
   printColor.setXYZ(i, ink.r, ink.g, ink.b);
   printColor.needsUpdate = true;
 }
@@ -857,6 +948,17 @@ const bfWings = (() => {
 bfInner.scale.setScalar(0.14);
 bfInner.rotation.x = -0.2;
 butterfly.add(bfInner);
+// The dark element turns the butterfly glowing white: the wing shader blends to white by uWhite
+// and the body follows; the effects module adds a soft halo around it.
+const bfWhite = { value: 0 };
+for (const m of new Set([bfWings.foreR.material, bfWings.hindR.material])) {
+  m.onBeforeCompile = (shader) => {
+    shader.uniforms.uWhite = bfWhite;
+    shader.fragmentShader = 'uniform float uWhite;\n' + shader.fragmentShader.replace('#include <dithering_fragment>',
+      'gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(1.0), uWhite);\n#include <dithering_fragment>');
+  };
+}
+const bfBodyMat = bfInner.children.find((o) => o.isMesh && o.material.color && o.material.color.getHex() === 0x141416)?.material;
 butterfly.position.set(0.9, BF_H, 0.7);
 scene.add(butterfly);
 
@@ -890,15 +992,25 @@ const listenerOptions = { passive: true, signal: events.signal };
 window.addEventListener("pointermove", setPointer, listenerOptions);
 window.addEventListener("pointerdown", (e) => {
   // Observe page input without taking hit targets, preventing scrolling, or intercepting links.
-  if (!running || e.isPrimary === false || e.button > 0 || e.target?.closest?.(interactive)) return;
+  if (!running || e.isPrimary === false || e.button > 0) return;
+  // While transformed, clicks on the page's own controls (project cards, pause/expand, a dialog's
+  // close or play buttons, videos) also send the chick; the control still does its own job.
+  // The chick's switch and the debug panel never do.
+  const transformed = fireMode.state.remaining > 0;
+  if (e.target?.closest?.('[data-sumi-control]')) return;
+  if (!transformed && e.target?.closest?.(interactive)) return;
   // The decorative hero video is page background; other videos keep their input isolation.
   const video = e.target?.closest?.('video');
-  if (video && (video.controls || !video.matches('.hero .hero-video'))) return;
+  if (!transformed && video && (video.controls || !video.matches('.hero .hero-video'))) return;
   aimAt(e);
   flowerGame.showCount();
   if(fireMode.cast()){
-    C.peep=1;C.startle=.4;C.settle=0;C.peckT=-1;C.pauseT=0;
-    C.clickChase=true;C.clickHopPending=false;
+    C.peep=1;C.startle=.4;C.settle=0;C.peckT=-1;C.pauseT=0;C.clickHopPending=false;
+    // transformed: the chick travels to the spot under the butterfly in its element's own way
+    // (lightning dash, ice pillars, fire meteor); mid-move or on cooldown it just chases
+    const dest=goalInView(pointerTarget.x,pointerTarget.z);
+    if(fireMode.blink(dest)){C.heading=Math.atan2(dest.x-C.pos.x,dest.z-C.pos.z);C.clickChase=false;}
+    else C.clickChase=true;
     return;
   }
   pollen.burst(butterfly.position, viewHeight);
@@ -976,7 +1088,12 @@ const C = {
 };
 
 const v1 = new THREE.Vector3(), v2 = new THREE.Vector3(), v3 = new THREE.Vector3();
-const fireMode = createFireMode(camera,head,beakUpper,chick,M,{reducedMotion:reduceMotion});
+const fireMode = createFireMode(camera,head,beakUpper,chick,{
+  reducedMotion:reduceMotion, scene, renderer, furUniforms:FX_U, lowPower:matchMedia("(pointer: coarse)").matches,
+  aim:butterfly.position,
+  // the debug panel's choice, else the head flower's colour (purple: random); asked at the unlock
+  preferElement:()=>elementChoice!=='auto'?elementChoice:elementForFlower(flowerGame.growthVariant),
+});
 const flowerGame = createFlowerGame(scene, camera, {
   head, reducedMotion: reduceMotion,
   onGrowthChange,
@@ -984,16 +1101,19 @@ const flowerGame = createFlowerGame(scene, camera, {
   onCollect(position,actualCount) {
     fireMode.state.collect(actualCount);
     C.collectT = .34; C.speed = 0; C.peckT = 0; C.peckLeft = 1; C.peep = 1;
-    C.rewardHops = reduceMotion ? 0 : 1; C.rewardWait = .36;
-    C.puff = reduceMotion ? 0 : .35;
+    // the seed that unlocks an element leads straight into the transformation: no celebration hops
+    const unlocking = fireMode.state.unlocked;
+    C.rewardHops = reduceMotion || unlocking ? 0 : 1; C.rewardWait = .36;
+    C.puff = reduceMotion || unlocking ? 0 : .35;
   },
-  onReward() { C.rewardHops = reduceMotion ? 0 : 2; C.rewardWait = .36; C.puff = reduceMotion ? 0 : .5; },
+  onReward() { if (fireMode.state.unlocked) return; C.rewardHops = reduceMotion ? 0 : 2; C.rewardWait = .36; C.puff = reduceMotion ? 0 : .5; },
   onEvolution(tier) {
-    if(fireMode.state.unlocked && fireMode.state.total>61)return;
+    if(fireMode.state.unlocked && fireMode.state.total>COLLECTION_GOAL)return;
     const growing = tier > C.roundnessTarget;
     C.evolutionFrom = C.roundness;
     C.roundnessTarget = tier;
-    C.evolutionTime = growing && !reduceMotion ? 0 : -1;
+    // the unlocking seed goes straight into the transformation, without the growth pause
+    C.evolutionTime = growing && !reduceMotion && !fireMode.state.unlocked ? 0 : -1;
     if (C.evolutionTime >= 0) {
       // Let the grounded body change read before the usual collection hop.
       C.collectT = .9; C.rewardWait = .9; C.puff = 0;
@@ -1263,9 +1383,15 @@ function updatePose(dt, t) {
   const breathe = Math.sin(t * 3.4) * 0.004;
   const hopS = C.hopT >= 0 ? C.hopT / HOP_TIME : 0;
 
-  chick.position.set(C.pos.x, 0, C.pos.z);
+  // Elemental transformation: crouch and tremble while charging, spring up at the burst.
+  const fxPose = fireMode.pose;
+  // a move can lift the whole chick (the fire leap and meteor) or hide it inside its element
+  chick.position.set(C.pos.x + Math.sin(t * 93) * 0.01 * fxPose.shake, fxPose.rise, C.pos.z + Math.cos(t * 79) * 0.01 * fxPose.shake);
+  chick.visible = !fxPose.hidden;
+  shadow.visible = !fxPose.hidden;
   chick.rotation.y = C.heading;
-  body.position.set(0, lerp(0.32, 0.17, settle) + C.hopY - Math.abs(Math.sin(step)) * 0.014 * C.move + breathe, 0);
+  body.position.set(0, lerp(0.32, 0.17, settle) + C.hopY - Math.abs(Math.sin(step)) * 0.014 * C.move + breathe
+    - fxPose.crouch * 0.07 + fxPose.lift * 0.07, 0);
   body.rotation.set(
     lerp(-0.06, 0.04, settle) + Math.min(C.speed * 0.14, .52) - Math.sin(Math.PI * hopS) * 0.15,
     0,
@@ -1281,6 +1407,9 @@ function updatePose(dt, t) {
   breastMesh.scale.x *= (1 + roundness * .16) * evolutionXZ;
   breastMesh.scale.y *= (1 + roundness * .03) * thirdTierThickness * evolutionY;
   breastMesh.scale.z *= (1 + roundness * .10) * evolutionXZ;
+  const squash = 1 - fxPose.crouch * 0.12 + fxPose.lift * 0.08, spread = 1 + fxPose.crouch * 0.07;
+  bodyMesh.scale.multiply(_ps.set(spread, squash, spread));
+  breastMesh.scale.multiply(_ps.set(spread, squash, spread));
   tailMesh.position.z = -.2 - roundness * .025;
   hipL.position.x = .065 * (1 + roundness * .10);
   hipR.position.x = -hipL.position.x;
@@ -1322,7 +1451,7 @@ function updatePose(dt, t) {
   head.getWorldQuaternion(q3);
   U.uCombHead.value.set(0, -0.3, -1).applyQuaternion(q3).normalize().multiplyScalar(0.6);
 
-  beakHinge.rotation.x = Math.max(Math.sin(Math.min(C.peep, 1) * Math.PI) * 0.5,fireMode.state.breath>0?.42:0);
+  beakHinge.rotation.x = Math.max(Math.sin(Math.min(C.peep, 1) * Math.PI) * 0.5,fireMode.breathing?.42:0);
   const lid = 1 - Math.sin(Math.min(C.blink, 1) * Math.PI) * 0.9;
   for (const e of eyes) e.scale.set(1, lid, 1);
 
@@ -1330,7 +1459,7 @@ function updatePose(dt, t) {
     const fold = (1 - settle) * 0.08;
     const flap = C.wingFlap * (0.55 + 0.65 * Math.sin(C.wingPhase));
     const stretch = Math.sin(C.stretch * Math.PI) * 0.9;
-    w.pivot.rotation.set(-stretch * 0.25, 0, w.s * (fold + flap + stretch));
+    w.pivot.rotation.set(-stretch * 0.25, 0, w.s * (fold + flap + stretch + fxPose.wings * 1.25));
   }
 
   // legs
@@ -1379,7 +1508,7 @@ function updatePose(dt, t) {
   body.getWorldPosition(v1);
   shadow.position.set(v1.x, 0.0015, v1.z);
   shadow.rotation.y = C.heading;
-  const sh = 1 - C.hopY * 2.5;
+  const sh = Math.max(0, 1 - C.hopY * 2.5 - fxPose.rise * 0.3);
   shadow.scale.set(0.5 * sh * (1 + roundness * .20), 1, 0.58 * sh * (1 + roundness * .12));
 }
 
@@ -1442,13 +1571,15 @@ function updateButterfly(dt, t) {
   v1.copy(butterfly.position).project(camera);v2.copy(pointerTarget).project(camera);
   const gap=Math.hypot((v2.x-v1.x)*viewWidth/2,(v2.y-v1.y)*viewHeight/2);
   mediaRestBlend=damp(mediaRestBlend,nearPerch?1:followingCursor&&gap>12?.45:0,5,dt);
-  const k = mediaHover ? 3.2 : followingCursor ? FREE_FLIGHT_FOLLOW_RATE * CURSOR_FOLLOW_SPEED_MULTIPLIER : FREE_FLIGHT_FOLLOW_RATE;
+  // While transformed the butterfly chases the cursor twice as fast, so it stays close to it.
+  const elementBoost = fireMode.state.unlocked ? 2 : 1;
+  const k = mediaHover ? 3.2 : followingCursor ? FREE_FLIGHT_FOLLOW_RATE * CURSOR_FOLLOW_SPEED_MULTIPLIER * elementBoost : FREE_FLIGHT_FOLLOW_RATE;
   let followAlpha=1-Math.exp(-k*dt);
   if(followingCursor){
     // Use the free-flight path's screen-speed envelope as well as its damping.
     // Damping alone would still cause a rush when the cursor is far away.
     const freeSpeed=Math.hypot(viewWidth*(.55*.31+.1*.83)/2,viewHeight*.35*.23/2);
-    if(gap>.001)followAlpha=Math.min(followAlpha,freeSpeed*CURSOR_FOLLOW_SPEED_MULTIPLIER*dt/gap);
+    if(gap>.001)followAlpha=Math.min(followAlpha,freeSpeed*CURSOR_FOLLOW_SPEED_MULTIPLIER*elementBoost*dt/gap);
   }
   butterfly.position.x = lerp(butterfly.position.x, pointerTarget.x, followAlpha);
   butterfly.position.z = lerp(butterfly.position.z, pointerTarget.z, followAlpha);
@@ -1552,6 +1683,42 @@ function setActive(active) {
   if (!running) pointerActive = false;
 }
 
+// Dark element: the butterfly glows white, and the beak and legs follow the coat, which swaps
+// white <-> black at every move (fireMode.darkCoat). On the white coat they are a hair off pure
+// white, the beak's tip a little greyer, so the beak still reads on the white face; on the black
+// coat they go black.
+const LOOK = { beak: beakMat.color.clone(), tip: beakTipMat.color.clone(), skin: skinMat.color.clone(), body: new THREE.Color(0x141416) };
+const WHITE_C = new THREE.Color(0xf4f4ff);
+const PARTS = {
+  white: { beak: new THREE.Color(0xe6e8f0), tip: new THREE.Color(0xc2c6d2), skin: new THREE.Color(0xeceef5) },
+  black: { beak: new THREE.Color(0x0e0e11), tip: new THREE.Color(0x0e0e11), skin: new THREE.Color(0x0e0e11) },
+};
+let lastDark = -1, lastCoat = '';
+function applyDarkLook(k, coat = 'white') {
+  if (Math.abs(k - lastDark) < 0.002 && coat === lastCoat) return;
+  lastDark = k; lastCoat = coat;
+  bfWhite.value = k;
+  printUniforms.uGlow.value = k;
+  // glowing prints add light, so they still show where they cross the white smoke
+  prints.material.blending = k > 0.01 ? THREE.AdditiveBlending : THREE.NormalBlending;
+  bfBodyMat?.color.copy(LOOK.body).lerp(WHITE_C, k);
+  const parts = PARTS[coat] || PARTS.white;
+  beakMat.color.copy(LOOK.beak).lerp(parts.beak, k);
+  beakTipMat.color.copy(LOOK.tip).lerp(parts.tip, k);
+  skinMat.color.copy(LOOK.skin).lerp(parts.skin, k);
+}
+
+// The element badges (sumi-element-badges.js, owned by sumi-chick.js) hear the seed count and the
+// element whenever either changes: a string compare per frame, a callback only on change.
+let elementStateKey = '';
+function reportElementState() {
+  const s = fireMode.state, busy = s.ending || fireMode.transforming;
+  const key = `${s.total}|${s.element}|${s.unlocked}|${busy}`;
+  if (key === elementStateKey) return;
+  elementStateKey = key;
+  onElementState({ seeds: s.total, element: s.element, unlocked: s.unlocked, busy });
+}
+
 function frame(dt, t, clockDt = dt) {
   projectSurface=document.querySelector('.project-dialog[open]');
   const key=projectSurface?.dataset.activeWork||'';
@@ -1573,9 +1740,10 @@ function frame(dt, t, clockDt = dt) {
     fireMode.state.clearBreath();
     pointerActive=false;surfaceKey=key;
     for(const target of [rtA,rtB]){renderer.setRenderTarget(target);renderer.clear();}renderer.setRenderTarget(null);
+    // footprints belong to the surface they were made on: the new surface starts clean
+    printAge.array.fill(1e3);printAge.needsUpdate=true;
   }
   const trail=scene.getObjectByName('section-text-footprints');if(trail)trail.visible=!projectSurface;
-  prints.visible=!projectSurface;
   if(projectSurface){const r=projectSurface.getBoundingClientRect();canvas.style.clipPath=`inset(${Math.max(0,r.top)}px ${Math.max(0,viewWidth-r.right)}px ${Math.max(0,viewHeight-r.bottom)}px ${Math.max(0,r.left)}px)`;}
   else canvas.style.clipPath='';
   // The butterfly acts as the cursor, so it stays in viewport coordinates.
@@ -1588,34 +1756,52 @@ function frame(dt, t, clockDt = dt) {
   U.uComb.value.set(-Math.sin(C.heading) * 0.4, -0.35, -Math.cos(C.heading) * 0.4);
 
   const bfSpeed = updateButterfly(dt, t);
-  beakUpper.getWorldPosition(v1);
-  flowerGame.update(dt, {
-    width: viewWidth, height: viewHeight, scrollY, clockDt: growthDebugHolding?0:clockDt,
-    butterfly: butterfly.position, chickPosition: C.pos, beakPosition: v1, pointerActive, pointerX: (ndc.x + 1) * viewWidth / 2, pointerY: (1 - ndc.y) * viewHeight / 2,
-    canSeek: !growthDebugHolding && !C.clickChase && !C.recovering && C.hopT < 0 && !C.rewardHops && C.collectT <= 0,
-    canCollect: !fireMode.state.ending && !growthDebugHolding && !C.clickChase && !C.recovering && C.hopT < 0 && !C.rewardHops && C.collectT <= 0,
-  });
+  // From the unlock until the cycle resets, the garden is put away and does no work at all.
+  flowerGame.setSuspended(fireMode.state.unlocked);
+  if (!flowerGame.suspended) {
+    beakUpper.getWorldPosition(v1);
+    flowerGame.update(dt, {
+      width: viewWidth, height: viewHeight, scrollY, clockDt: growthDebugHolding?0:clockDt,
+      butterfly: butterfly.position, chickPosition: C.pos, beakPosition: v1, pointerActive, pointerX: (ndc.x + 1) * viewWidth / 2, pointerY: (1 - ndc.y) * viewHeight / 2,
+      canSeek: !growthDebugHolding && !C.clickChase && !C.recovering && C.hopT < 0 && !C.rewardHops && C.collectT <= 0,
+      canCollect: !fireMode.state.ending && !growthDebugHolding && !C.clickChase && !C.recovering && C.hopT < 0 && !C.rewardHops && C.collectT <= 0,
+    });
+  }
   pollen.update(dt, renderer.getPixelRatio());
+  // The chick holds its ground for the whole transformation; during a move the move places it.
+  if (fireMode.transforming || fireMode.blinking) { C.collectT = Math.max(C.collectT, .1); C.speed = 0; C.move = 0; }
   if (!growthDebugHolding) updateBehaviour(dt);
+  if (fireMode.blinking) { C.pos.x = fireMode.blinkPos.x; C.pos.z = fireMode.blinkPos.z; }
   textTracks.update(dt);
-  if(fireMode.state.unlocked&&!growthDebugHolding&&C.evolutionTime<0)C.roundnessTarget=3*fireMode.state.ratio;
+  if(fireMode.state.unlocked&&!growthDebugHolding&&C.evolutionTime<0)C.roundnessTarget=2*fireMode.state.ratio;
   updatePose(dt, t);
   fireMode.update(growthDebugHolding?0:clockDt,viewWidth,viewHeight);
-  const carriedSeeds=fireMode.state.consumeCycleReset();
-  if(carriedSeeds!==null){
-    const progress=flowerGame.resetCycle(carriedSeeds);
+  applyDarkLook(fireMode.darkness, fireMode.darkCoat);
+  if (fireMode.darkness > 0.01) { printUniforms.uDt.value = dt; fireMode.pourIntoInk(printSmokeScene, camera); }
+  // When the element ends the garden is replanted with the carried seeds: from scratch after a
+  // 20-seed transformation, with the rest after a badge summon (13 seeds: 3).
+  const carried=fireMode.state.consumeCycleReset();
+  if(carried!==null){
+    flowerGame.setSuspended(false);
+    const progress=flowerGame.resetCycle(carried);
     C.roundness=C.roundnessTarget=progress.tier;C.evolutionTime=-1;
     C.rewardHops=0;C.rewardWait=0;C.collectT=0;C.puff=0;
     C.hopT=-1;C.hopY=0;C.hopRequested=false;C.clickChase=false;
     updatePose(0,t);
   }
-  flowerGame.updateFireCrown(fireMode.state.remaining>0,t,fireMode.state.element);
+  flowerGame.updateFireCrown(fireMode.state.remaining>0);
   flowerGame.updateFeedback(dt,viewWidth,viewHeight);
+  reportElementState();
 
   for (let i = 0; i < PRINTS; i++) printAge.array[i] += dt;
   printAge.needsUpdate = true;
 
   if(!projectSurface)emitInk(dt, bfSpeed);
+  // A landing lasts one frame: it stamps both feet once (updatePose) and leaves a glint on the
+  // page (emitInk). emitInk used to be the only place that cleared it, and it does not run in a
+  // project dialog, so after any hop there the flag stuck and both feet were stamped every frame:
+  // dense smeared pairs between the real prints.
+  C.landed = 0;
   simMat.uniforms.uPrev.value = rtA.texture;
   simMat.uniforms.uTime.value = t * simSpeed;
   simMat.uniforms.uDt.value = dt * simSpeed;
@@ -1639,11 +1825,20 @@ return {
   setActive,
   get growthProgress() { return flowerGame.progress; },
   setGrowthDebugHolding(value) { growthDebugHolding = Boolean(value); },
+  setElementChoice(value) { elementChoice = ['fire', 'lightning', 'ice', 'dark'].includes(value) ? value : 'auto'; },
+  // An acquired element's badge: transform into it for `cost` seeds (the rest carry over). The
+  // unlock edge then plays the transformation and puts the garden away, as 20 seeds do.
+  transformWith(element, cost) {
+    if (growthDebugHolding || !fireMode.state.unlockWith(element, cost)) return false;
+    C.rewardHops = 0; C.rewardWait = 0; C.puff = 0; C.hopT = -1; C.hopY = 0; C.hopRequested = false; C.clickChase = false;
+    reportElementState();
+    return true;
+  },
   setGrowthDebug(value) {
-    const count=Math.min(61,Math.max(0,Math.floor(Number(value)||0)));
+    const count=Math.min(COLLECTION_GOAL,Math.max(0,Math.floor(Number(value)||0)));
     fireMode.state.setCollectionDebug(count);
     flowerGame.setCollectionDebug(count);
-    flowerGame.updateFireCrown(fireMode.state.remaining>0,elapsed,fireMode.state.element);
+    flowerGame.updateFireCrown(fireMode.state.remaining>0);
     growthDebugHolding = true;
     if (C.evolutionTime < 0) C.roundness = C.roundnessTarget;
     C.hopT = -1; C.hopY = 0; C.hopRequested = false; C.landed = false;
@@ -1667,7 +1862,7 @@ return {
     flowerGame.dispose();
     fireMode.dispose();
     const resources = new Set();
-    for (const root of [scene, simScene, emitScene]) root.traverse(object => {
+    for (const root of [scene, simScene, emitScene, printSmokeScene]) root.traverse(object => {
       if (object.geometry) resources.add(object.geometry);
       const materials = object.material ? (Array.isArray(object.material) ? object.material : [object.material]) : [];
       for (const material of materials) {

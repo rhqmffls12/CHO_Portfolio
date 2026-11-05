@@ -1,13 +1,16 @@
 import * as THREE from './assets/vendor/three-r186/three.module.min.js';
-import { createFlowerArtwork } from './sumi-flower-art.js?v=ground-skills-20261104';
-import { growthProgress } from './sumi-growth-stages.js?v=click-counter-normal-20261104';
-import { createSeedCounter } from './sumi-seed-counter.js?v=click-counter-normal-20261104';
+import { createFlowerArtwork } from './sumi-flower-art.js?v=element-crest-20261105';
+import { growthProgress, COLLECTION_GOAL } from './sumi-growth-stages.js?v=relaxed-garden-20261105';
+import { createSeedCounter } from './sumi-seed-counter.js?v=relaxed-garden-20261105';
 
-// A document-anchored tour with assistance from pickup 59; each fire cycle resets it.
-const INITIAL_FLOWERS = 61, CAPACITY = 61, DWELL = .28, BLOOM_TIME = .42;
-const GIANT_CHARGE_TIME = 5.58; // Plus 0.42s bloom: six seconds to seed release.
-const GIANT_BEATS = [.15, 1.5, 2.8, 4, 5.1];
-const ASSIST_START = 59, REPLANT_INTERVAL = 10, REPLANT_BATCH = 2;
+// A relaxed document garden, independent of the twenty-seed transformation goal.
+const CAPACITY = 128, DWELL = .28, BLOOM_TIME = .42;
+// Event flowers: four seconds from hover to seed release. The whole six-second timeline was
+// compressed by 2/3 (charge, beats, springs, bloom), so the animation plays faster rather than
+// being cut short: 3.72 s of charge plus a 0.28 s bloom.
+const GIANT_CHARGE_TIME = 3.72, GIANT_BLOOM_TIME = .28;
+const GIANT_BEATS = [.1, 1, 1.87, 2.67, 3.4];
+const ASSIST_START = COLLECTION_GOAL - 2, REPLANT_INTERVAL = 10, REPLANT_BATCH = 2;
 const FLOWER_SIZE = 34.4, FLOWER_HEAD_OFFSET = 14.4;
 const FLOWER_SIZE_STEPS = [.8, 1, 1.2];
 const GIANT_FLOWER_SIZE = 2;
@@ -31,10 +34,11 @@ export function createFlowerGame(scene, camera, { head, reducedMotion = false, r
   const group = new THREE.Group();group.name='sumi-flower-garden';scene.add(group);
   // Animation records only; neither flowers nor seeds are WebGL objects.
   const makeSprite = map => ({material:{map,opacity:0,rotation:0},position:new THREE.Vector3(),scale:new THREE.Vector3(),center:new THREE.Vector2(),visible:false});
-  const items=Array.from({length:CAPACITY},(_,i)=>({
+  const items=[];
+  const makeItem=()=>{const i=items.length;return {
     flower:makeSprite(art.flowers[i%24]),element:flowerElement(),seed:makeSprite(art.seed),seedElement:flowerElement(true),position:new THREE.Vector3(),
     state:'empty',age:0,dwell:0,life:0,offscreen:0,phase:random()*Math.PI*2,variant:i%24,anchor:null,initialId:null,
-  }));
+  };};
   const crown = new THREE.Sprite(new THREE.SpriteMaterial({map:art.growth,transparent:true,depthWrite:false,depthTest:false,toneMapped:false,opacity:0}));
   crown.name='sumi-flower-reward';crown.position.set(.015,.155,.015);crown.center.set(.5,.14);crown.scale.setScalar(.26);crown.visible=false;
   crown.renderOrder=4;
@@ -46,6 +50,8 @@ export function createFlowerGame(scene, camera, { head, reducedMotion = false, r
   const projected=new THREE.Vector3(), butterflyScreen=new THREE.Vector3(), chickScreen=new THREE.Vector3();
   let width=1,height=1,elapsed=0,scrollQuiet=1,lastScroll=window.scrollY;
   let anchors=[],active=true,targetItem=null,collected=0,totalCollected=0,growthStage=0,growthAge=0,growthVariant=0,disposed=false;
+  // While the chick is transformed the garden is put away entirely (see setSuspended).
+  let suspended=false;
   let planted=false,nextReplant=Infinity,gardenClock=0;
   let surface=null,renderScroll=window.scrollY;
   const initialCollected=new Set();
@@ -77,36 +83,29 @@ export function createFlowerGame(scene, camera, { head, reducedMotion = false, r
     const visuals=[...document.querySelectorAll('.work-card-visual')];
     if(visuals.length<2||!document.querySelector('.career-entry h4'))return null;
     const work=[];
-    for(const node of visuals.filter(isFeatured)){
-      for(let slot=0;slot<2;slot++)work.push({node,region:'work',slot,fx:slot===0?.18+random()*.12:.70+random()*.12,fy:0,dx:0,dy:-1});
-      const giant={node,region:'work',slot:2,giant:true,fx:.44+random()*.12,fy:1,dx:0,dy:-2};
-      work.push(giant);
-      // Reserve two reward IDs and existing canvas slots, not two extra visible flowers.
-      for(let slot=3;slot<5;slot++)work.push({...giant,slot,giant:false,reserveFor:giant});
+    const featured=visuals.filter(isFeatured),ordinary=shuffled(visuals.filter(node=>!isFeatured(node)));
+    // Three ordinary blooms total across the two featured top ledges.
+    for(let slot=0;slot<3;slot++){
+      const node=featured[slot%featured.length];
+      work.push({node,region:'work',slot,fx:slot===2?.65+random()*.20:.18+random()*.24,fy:0,dx:0,dy:-1});
     }
-    const ordinary=shuffled(visuals.filter(node=>!isFeatured(node)));
-    // Trade single flowers for equally many empty/double thumbnails, preserving rewards.
-    const pairs=Math.min(Math.floor(ordinary.length/2),4+Math.floor(random()*3));
-    ordinary.forEach((node,index)=>{
-      const count=index<pairs?0:index<pairs*2?2:1;
-      const first=.08+random()*.84;
-      for(let slot=0;slot<count;slot++){
-        let fx=first;
-        if(slot){
-          // Sample either side of the first flower, keeping a readable gap between blooms.
-          const left=Math.max(0,first-.18-.08),right=Math.max(0,.92-first-.18);
-          const pick=random()*(left+right);
-          fx=pick<left?.08+pick:first+.18+pick-left;
-        }
-        work.push({node,region:'work',slot,fx,fy:1,dx:0,dy:-2});
-      }
-    });
-    // Ten hidden description flowers complete the unchanged project reward quota.
-    for(const visual of ordinary){
-      if(work.length>=35)break;
+    const toolkit=featured.find(node=>node.dataset.openWork==='cinematic-workflow-toolkit');
+    const toolkitEvent={node:toolkit,region:'work',slot:3,giant:true,fx:.91,fy:1,dx:0,dy:-2};
+    work.push(toolkitEvent);
+    for(let slot=0;slot<2;slot++)work.push({...toolkitEvent,slot:4+slot,giant:false,reserveFor:toolkitEvent});
+    // Only two ordinary thumbnails in the entire collection have a flower.
+    ordinary.slice(0,2).forEach(node=>work.push({node,region:'work',slot:0,fx:.87+random()*.06,fy:1,dx:0,dy:-2}));
+    // Preserve ten hidden description-card flowers independently of thumbnail density.
+    for(const visual of ordinary.slice(0,10)){
       const node=visual.closest('.work-card')?.querySelector('.work-card-footer');
       if(node)work.push({node,region:'work',hiddenPanel:true,slot:0,fx:.38+random()*.38,fy:1,dx:0,dy:-3});
     }
+    // Each detail page gets a stable random allocation, sampled once per visit session.
+    const details=visuals.flatMap(node=>{
+      const count=Math.floor(random()*6);
+      return Array.from({length:count},(_,slot)=>({node:null,region:'detail',projectId:node.dataset.openWork,
+        pick:(slot+random()*.6)/Math.max(1,count),fx:.18+random()*.65,fy:0,dx:0,dy:0}));
+    });
     // Eight visible hero flowers: seven ordinary rewards plus one three-seed event.
     const hero=textAnchors('.hero-title-line,.hero-bottomline p,.hero-specs > div,.reel-overlay-panel h2',8,'hero');
     const heroCandidates=hero.filter(anchor=>!anchor.node.matches('.reel-overlay-panel h2'));
@@ -128,17 +127,17 @@ export function createFlowerGame(scene, camera, { head, reducedMotion = false, r
       ...work,
       ...textAnchors('.career-entry h4,.career-role h5',2,'career'),
       ...[0].map(slot=>({node:document.querySelector('.toolkit-field'),region:'career',floating:true,slot,phase:random()*Math.PI*2,fx:.5,fy:.5,dx:0,dy:0})),
-      ...shuffled(visuals).slice(0,8).map(node=>({node:null,region:'detail',projectId:node.dataset.openWork,pick:random(),fx:.28+random()*.48,fy:0,dx:0,dy:0})),
+      ...details,
       ...textAnchors('#about h2,#about > p',3,'ending'),
     ];
     // Reassign the removed toolkit/ending rewards to one surprise three-seed event.
     const surpriseCandidates=plan.filter(anchor=>!anchor.giant&&!anchor.reserveFor&&!anchor.floating
-      &&anchor!==heroFocal&&!(anchor.region==='work'&&isFeatured(anchor.node.closest('.work-card')?.querySelector('.work-card-visual')||anchor.node)));
+      &&anchor!==heroFocal&&anchor.region!=='work');
     const surprise=surpriseCandidates[Math.floor(random()*surpriseCandidates.length)];
     if(!surprise)return null;
     Object.assign(surprise,{giant:true,surpriseEvent:true});
     for(let slot=0;slot<2;slot++)plan.push({...surprise,slot:slot+3,giant:false,reserveFor:surprise});
-    return plan.length===INITIAL_FLOWERS?plan:null;
+    return plan.length<=CAPACITY?plan:null;
   }
   function anchorPoint(anchor) {
     resolveAnchor(anchor);
@@ -188,20 +187,22 @@ export function createFlowerGame(scene, camera, { head, reducedMotion = false, r
   function fillGarden() {
     if(!planted){
       const plan=planGarden();if(!plan)return;
-      anchors=plan;anchors.forEach((anchor,id)=>plant(items[id],anchor,id));planted=true;return;
+      anchors=plan;while(items.length<Math.min(CAPACITY,plan.length+REPLANT_BATCH))items.push(makeItem());anchors.forEach((anchor,id)=>plant(items[id],anchor,id));planted=true;return;
     }
     if(actualCollections<ASSIST_START||gardenClock<nextReplant)return;
     // One batch per interval, never a catch-up burst after a delayed frame.
     nextReplant=gardenClock+REPLANT_INTERVAL;
     const detailAnchors=surface?[...surface.querySelectorAll('.dialog-copy h2,.case-step h3,.technical-notes h4,.dialog-detail p,.dialog-copy')]
       .map(node=>({node,projectId:surface.dataset.activeWork,region:'detail',pick:.5,fx:.5,fy:0,dx:0,dy:2})):[];
-    const visible=shuffled([...anchors,...detailAnchors].filter(anchor=>!anchor.reserveFor&&anchorVisible(anchor))
+    const visible=shuffled([...anchors,...detailAnchors].filter(anchor=>!anchor.reserveFor&&anchor.region!=='work'&&anchorVisible(anchor))
       .flatMap(anchor=>[anchor,...[.22,.5,.78].map(fx=>({...anchor,fx:fx+(random()-.5)*.08}))]));
     const inView=anchor=>{const p=anchorPoint(anchor);return p.x>24&&p.x<width-24&&p.y>50&&p.y<height-24;};
     const choices=[...visible.filter(inView),...visible.filter(anchor=>!inView(anchor))];
     const usedNodes=new Set();
     for(let n=0;n<REPLANT_BATCH;n++){
-      const item=items.find(item=>item.state==='empty');if(!item)break;
+      let item=items.find(item=>item.state==='empty');
+      if(!item&&items.length<CAPACITY){item=makeItem();items.push(item);}
+      if(!item)break;
       const separated=anchor=>{
         const p=anchorPoint(anchor);
         return !items.some(other=>other.state!=='empty'&&other.anchor&&anchorVisible(other.anchor)&&Math.hypot(p.x-anchorPoint(other.anchor).x,p.y-anchorPoint(other.anchor).y)<60);
@@ -249,7 +250,7 @@ export function createFlowerGame(scene, camera, { head, reducedMotion = false, r
     item.destination=beakPosition?beakPosition.clone():chickPosition.clone().add(new THREE.Vector3(0,.30,0));
     if(targetItem===item)targetItem=null;
     const cycle=Math.floor(totalCollected/20);
-    totalCollected++;collected=(totalCollected-1)%20+1;growthStage=collected;growthAge=0;
+    totalCollected++;collected=growthProgress(totalCollected).stage;growthStage=collected;growthAge=0;
     seedCounter.show(++actualCollections,{evolution:growthProgress(totalCollected).tier>previousTier});
     if(actualCollections>=ASSIST_START&&!Number.isFinite(nextReplant))nextReplant=gardenClock+REPLANT_INTERVAL;
     // Keep a coherent flower family within a cycle, vary the next cycle gently.
@@ -257,7 +258,7 @@ export function createFlowerGame(scene, camera, { head, reducedMotion = false, r
     art.setGrowth(growthStage,growthVariant);
     crown.visible=true;onCollect(item.position,actualCollections);
     if(growthStage===10||growthStage===20)onReward();
-    if(growthStage===1&&totalCollected>1)onEvolution(growthProgress(totalCollected).tier);
+    if(growthProgress(totalCollected).tier>previousTier)onEvolution(growthProgress(totalCollected).tier);
     onGrowthChange(growthProgress(totalCollected));
   }
   function setGrowthPreview(value) {
@@ -277,6 +278,7 @@ export function createFlowerGame(scene, camera, { head, reducedMotion = false, r
     const order=anchors.map((anchor,id)=>({anchor,id})).sort((a,b)=>
       (a.anchor.giant?2:a.anchor.reserveFor?1:0)-(b.anchor.giant?2:b.anchor.reserveFor?1:0));
     initialCollected.clear();targetItem=null;
+    for(const item of items){item.state='empty';item.element.style.display='none';item.seedElement.style.display='none';item.flower.visible=false;item.seed.visible=false;}
     order.forEach(({anchor,id},index)=>{
       const item=items[id];
       if(index<count){
@@ -292,7 +294,7 @@ export function createFlowerGame(scene, camera, { head, reducedMotion = false, r
     return progress;
   }
   function update(dt, context) {
-    if(disposed||!active)return;
+    if(disposed||!active||suspended)return;
     width=context.width;height=context.height;elapsed+=dt;gardenClock+=Math.max(0,context.clockDt??dt);
     syncSurface();
     const scrolled=context.scrollY!==lastScroll;
@@ -355,13 +357,13 @@ export function createFlowerGame(scene, camera, { head, reducedMotion = false, r
           }
           item.element.dataset.flowerCharge=progress.toFixed(3);
           const amplitude=.12+Math.max(0,beat)*.065;
-          const phase=Math.min(1,item.beatAge/(.72-Math.max(0,beat)*.04));
+          const phase=Math.min(1,item.beatAge/(.48-Math.max(0,beat)*.027));
           // Brief squash, tall spring, then a damped recoil; feet stay on the edge.
           const spring=reducedMotion?0:Math.sin(phase*Math.PI*3)*Math.pow(1-phase,1.5);
           const base=unit*FLOWER_SIZE*item.size*(1+progress*.14);
           item.flower.scale.set(base*(1+spring*amplitude*.55),base*(1-spring*amplitude),1);
           const breeze=(Math.sin(elapsed*1.575+item.phase)*.104+Math.sin(elapsed*2.745+item.phase*.7)*.024)
-            *(1-THREE.MathUtils.smoothstep(item.charge,0,.6));
+            *(1-THREE.MathUtils.smoothstep(item.charge,0,.4));
           item.flower.material.rotation=reducedMotion?0:breeze+Math.sin(phase*Math.PI*4)*amplitude*.18*(1-phase);
           item.flower.material.opacity=.92;item.flower.visible=true;
           if(held&&item.charge>=GIANT_CHARGE_TIME){item.state='bloom';item.age=0;}
@@ -377,7 +379,7 @@ export function createFlowerGame(scene, camera, { head, reducedMotion = false, r
           }
         }
       } else if(item.state==='bloom') {
-        const t=Math.min(1,item.age/BLOOM_TIME);
+        const t=Math.min(1,item.age/(item.anchor.giant?GIANT_BLOOM_TIME:BLOOM_TIME));
         item.flower.scale.setScalar(unit*FLOWER_SIZE*item.size*(1+(reducedMotion?0:item.anchor.giant?.55:.25)*Math.sin(t*Math.PI)));
         item.flower.material.opacity=.92*(1-THREE.MathUtils.smoothstep(t,.22,1));
         if(t>=1){
@@ -423,47 +425,44 @@ export function createFlowerGame(scene, camera, { head, reducedMotion = false, r
       }}
     }
   }
-  function updateFireCrown(burning,time=0,element='fire') {
+  // While an element is charged the in-scene crest (sumi-element-fx.js) takes the crown's place:
+  // a shader flame, a crackling bolt or a 3D ice crown. Otherwise the growth plant shows.
+  function updateFireCrown(burning) {
     if(disposed)return;
-    const texture=burning?art.elementCrown(element,reducedMotion?0:time):art.growth;
-    if(crown.material.map!==texture)crown.material.map=texture;
-    // Layered frequencies keep the flame lively instead of a slow pendulum.
-    crown.material.rotation=burning&&!reducedMotion
-      ?Math.sin(time*23)*.115+Math.sin(time*37+1.2)*.045:0;
-    if(burning){
-      crown.visible=active;crown.material.opacity=1;
-      if(element==='lightning'){
-        crown.material.rotation=reducedMotion?0:Math.sin(time*29)*.065;
-        const pulse=reducedMotion?0:Math.sin(time*32)*.04;
-        crown.scale.set(.33*(1-pulse),.36*(1+pulse),1);
-        return;
-      }
-      if(element==='ice'){
-        crown.material.rotation=reducedMotion?0:Math.sin(time*2.2)*.035;
-        const pulse=reducedMotion?0:Math.sin(time*3)*.025;
-        crown.scale.set(.34,.36*(1+pulse),1);
-        return;
-      }
-      const pulse=reducedMotion?0:Math.sin(time*27)*.7+Math.sin(time*43+.8)*.3;
-      const flare=reducedMotion?0:Math.sin(time*19+1.1);
-      crown.scale.set(.34*(1-pulse*.11),.36*(1+pulse*.16+flare*.045),1);
-    }else{
-      crown.visible=active&&growthStage>0;
-      const pop=reducedMotion?1:1+Math.sin(Math.min(growthAge/.45,1)*Math.PI)*.08;
-      crown.scale.setScalar((growthStage<=6?.26:growthStage<=10?.30:growthStage<=15?.34:growthStage===20?.4256:.38)*pop);
-    }
+    if(burning||suspended){crown.visible=false;return;}
+    if(crown.material.map!==art.growth)crown.material.map=art.growth;
+    crown.material.rotation=0;
+    crown.visible=active&&growthStage>0;
+    const pop=reducedMotion?1:1+Math.sin(Math.min(growthAge/.45,1)*Math.PI)*.08;
+    crown.scale.setScalar((growthStage<=6?.26:growthStage<=10?.30:growthStage<=15?.34:growthStage===20?.4256:.38)*pop);
   }
   function setActive(value) {
-    active=value;group.visible=value;pageFlowers.style.display=value?'block':'none';crown.visible=value&&growthStage>0;
-    seedCounter.setActive(value);
+    active=value;group.visible=value;pageFlowers.style.display=value&&!suspended?'block':'none';crown.visible=value&&growthStage>0;
+    seedCounter.setActive(value&&!suspended);
     if(!value){targetItem=null;for(const item of items)item.dwell=0;}
   }
+  // While the chick is transformed nothing of the garden runs: flowers and seeds leave the page
+  // (one display switch on their layer), the butterfly no longer blooms flowers into seeds, the
+  // chick has no seed to seek or eat, the click counter stays hidden and update() returns at
+  // once. Waking only shows the layer again; the caller replants the garden from the start.
+  function setSuspended(value) {
+    if(suspended===value||disposed)return;
+    suspended=value;
+    targetItem=null;
+    for(const item of items)item.dwell=0;
+    pageFlowers.style.display=active&&!value?'block':'none';
+    seedCounter.setActive(active&&!value);
+  }
   return {
-    showCount(){if(active&&!disposed)seedCounter.show(actualCollections);},
+    setSuspended,
+    get suspended(){return suspended;},
+    // the head flower's variant (palette = floor(variant / 4)); it chooses the element
+    get growthVariant(){return growthVariant;},
+    showCount(){if(active&&!disposed&&!suspended)seedCounter.show(actualCollections);},
     updateFireCrown,
-    updateFeedback(dt,width,height){seedCounter.update(dt,width,height);},
+    updateFeedback(dt,width,height){if(!suspended)seedCounter.update(dt,width,height);},
     resetCycle(count=0){return restoreCollection(count);},
-    setCollectionDebug(value){return restoreCollection(Math.min(INITIAL_FLOWERS,Math.max(0,Number(value)||0)));},setGrowthPreview,get progress(){return growthProgress(totalCollected);},
+    setCollectionDebug(value){return restoreCollection(Math.min(COLLECTION_GOAL,Math.max(0,Number(value)||0)));},setGrowthPreview,get progress(){return growthProgress(totalCollected);},
     update,setActive,get target(){return targetItem?.position||null;},
     dispose(){if(disposed)return;disposed=true;seedCounter.dispose();pageFlowers.remove();scene.remove(group);head.remove(crown);
       crown.material.dispose();art.dispose();},

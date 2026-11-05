@@ -123,74 +123,7 @@ export function createFlowerArtwork() {
     c.beginPath();c.moveTo(64,28);c.quadraticCurveTo(70,55,87,64);c.quadraticCurveTo(69,71,64,98);c.quadraticCurveTo(57,71,41,64);c.quadraticCurveTo(58,55,64,28);c.fill();c.stroke();
     ellipse(c,61,58,3,6,.3,'#FFF0AD');
   });
-  // A single precomputed flipbook changes the silhouette without frame-time uploads.
-  const fireColumns=8,fireRows=6,fireFrames=48,fireTile=128;
-  const fireCanvas=document.createElement('canvas');
-  fireCanvas.width=fireColumns*fireTile;fireCanvas.height=fireRows*fireTile;
-  const fireContext=fireCanvas.getContext('2d');
-  function drawFlame(c,phase){
-    const wave=(n,offset=0)=>Math.sin(phase*n+offset);
-    const tipX=68+wave(3)*13+wave(5,.6)*4;
-    const tipY=19+wave(4,.7)*9;
-    const leftX=38+wave(4,1.3)*7,leftY=58+wave(5)*13;
-    const rightX=97+wave(3,2)*6,rightY=54+wave(4,2.1)*15;
-    const leftNotch=80+wave(3,.4)*9,rightNotch=74+wave(5,1.8)*9;
-    c.fillStyle='#F15B2A';c.beginPath();c.moveTo(65,112);
-    c.bezierCurveTo(26,112,24,83,leftX,leftY);
-    c.quadraticCurveTo(leftX+1,leftY+18,50,leftNotch);
-    c.bezierCurveTo(41+wave(4)*7,49,tipX+9,43,tipX,tipY);
-    c.bezierCurveTo(tipX+28,tipY+21,83+wave(3)*5,62,89,rightNotch);
-    c.quadraticCurveTo(rightX-1,rightY+12,rightX,rightY);
-    c.bezierCurveTo(117,85,102,112,65,112);c.fill();
-    // The gold and cream tongues move independently inside the orange silhouette.
-    c.fillStyle='#FFAF32';c.beginPath();c.moveTo(65,112);
-    c.bezierCurveTo(42,110,40,92,54,77+wave(4,1)*6);
-    c.quadraticCurveTo(55,89,61,87);
-    c.quadraticCurveTo(57+wave(5)*5,66,74+wave(3,.6)*10,49+wave(4,1.2)*9);
-    c.bezierCurveTo(68,78,93,84,88,98);c.quadraticCurveTo(84,112,65,112);c.fill();
-    c.fillStyle='#FFE58A';c.beginPath();c.moveTo(65,110);
-    c.bezierCurveTo(54,105,58,95,69+wave(5,1.4)*6,85+wave(4)*7);
-    c.bezierCurveTo(67,96,82,102,73,108);c.quadraticCurveTo(69,111,65,110);c.fill();
-  }
-  for(let frame=0;frame<fireFrames;frame++){
-    fireContext.save();fireContext.translate((frame%fireColumns)*fireTile,Math.floor(frame/fireColumns)*fireTile);
-    drawFlame(fireContext,frame/fireFrames*Math.PI*2);fireContext.restore();
-  }
-  const fireCrown=new THREE.CanvasTexture(fireCanvas);
-  fireCrown.name='sumi-head-flame';fireCrown.colorSpace=THREE.SRGBColorSpace;
-  fireCrown.minFilter=THREE.LinearFilter;fireCrown.generateMipmaps=false;
-  fireCrown.repeat.set(1/fireColumns,1/fireRows);
-  function setFireTime(time=0){
-    const frame=((Math.floor(time*24)%fireFrames)+fireFrames)%fireFrames;
-    fireCrown.offset.set((frame%fireColumns)/fireColumns,1-(Math.floor(frame/fireColumns)+1)/fireRows);
-    // UV transform only: the cached texture stays on the GPU.
-    return fireCrown;
-  }
-  setFireTime(0);
-  const lightningCrown=map(c=>{
-    c.lineJoin='round';c.fillStyle='#FFD53F';c.strokeStyle='#CC8D25';c.lineWidth=2;
-    c.beginPath();c.moveTo(68,16);c.lineTo(41,66);c.lineTo(60,65);c.lineTo(52,111);
-    c.lineTo(91,53);c.lineTo(70,56);c.lineTo(80,16);c.closePath();c.fill();c.stroke();
-    c.fillStyle='#FFF6BA';c.beginPath();c.moveTo(68,27);c.lineTo(51,61);c.lineTo(66,59);c.lineTo(61,86);c.lineTo(79,59);c.lineTo(65,61);c.closePath();c.fill();
-    c.strokeStyle='#FFE981';c.lineWidth=3;
-    for(const [x,y,sign] of [[28,52,1],[102,74,-1]]){c.beginPath();c.moveTo(x,y-14);c.lineTo(x+sign*6,y-3);c.lineTo(x-sign*3,y+2);c.lineTo(x+sign*5,y+14);c.stroke();}
-  });
-  lightningCrown.name='sumi-head-lightning';
-  const iceCrown=map(c=>{
-    function crystal(x,y,size,angle){
-      c.save();c.translate(x,y);c.rotate(angle);
-      c.fillStyle='#64BFEA';c.strokeStyle='#C9F4FF';c.lineWidth=1.5;
-      c.beginPath();c.moveTo(0,-size);c.lineTo(size*.34,-size*.58);c.lineTo(size*.24,0);c.lineTo(0,size*.12);c.lineTo(-size*.24,0);c.lineTo(-size*.34,-size*.58);c.closePath();c.fill();c.stroke();
-      c.fillStyle='#C6F5FF';c.beginPath();c.moveTo(0,-size);c.lineTo(size*.34,-size*.58);c.lineTo(0,size*.12);c.closePath();c.fill();
-      c.strokeStyle='#EBFCFF';c.beginPath();c.moveTo(0,-size);c.lineTo(0,size*.12);c.stroke();c.restore();
-    }
-    crystal(49,104,57,-.4);crystal(80,104,62,.35);crystal(64,103,86,0);
-    c.fillStyle='#F1FCFF';c.beginPath();c.moveTo(96,28);c.lineTo(98,34);c.lineTo(104,36);c.lineTo(98,38);c.lineTo(96,44);c.lineTo(94,38);c.lineTo(88,36);c.lineTo(94,34);c.closePath();c.fill();
-  });
-  iceCrown.name='sumi-head-ice';
-  function elementCrown(element,time=0){
-    return element==='lightning'?lightningCrown:element==='ice'?iceCrown:setFireTime(time);
-  }
+  // The elemental head marks (flame, bolt, ice crown) are drawn in-scene by sumi-element-fx.js.
   const growth=map(()=>{});
   growth.name='sumi-head-plant';
   function setGrowth(stage,variant=0) {
@@ -213,5 +146,5 @@ export function createFlowerArtwork() {
     }
     c.restore();
   }
-  return {flowers,crowns,sprout,buds,seed,growth,fireCrown,elementCrown,setFireTime,setGrowth,drawEventFlower,dispose(){for(const t of [...flowers,...crowns,sprout,...buds,seed,growth,fireCrown,lightningCrown,iceCrown])t.dispose();}};
+  return {flowers,crowns,sprout,buds,seed,growth,setGrowth,drawEventFlower,dispose(){for(const t of [...flowers,...crowns,sprout,...buds,seed,growth])t.dispose();}};
 }
