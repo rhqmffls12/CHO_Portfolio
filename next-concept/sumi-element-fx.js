@@ -760,7 +760,7 @@ const CREST_VERT = /* glsl */ `
   }
 `;
 const CREST_FRAG = /* glsl */ `
-  uniform float uTime, uShow;
+  uniform float uTime, uShow, uOrb;   // uOrb (dark): 0 black orb, 1 white, 2 half and half
   uniform int uKind;
   varying vec2 vUv;
   ${NOISE2}
@@ -859,7 +859,11 @@ const CREST_FRAG = /* glsl */ `
       float sway = abs(q.x - 0.08 * sin(q.y * 4.0 + t * 0.9));
       float wisp = smoothstep(0.5, 0.82, n) * smoothstep(0.12, 0.4, q.y) * (1.0 - smoothstep(0.5, 0.95, q.y)) * (1.0 - smoothstep(0.12, 0.4, sway)) * 0.65;
       a = clamp(orb + halo + soft + wisp, 0.0, 1.0);
-      col = (vec3(0.02, 0.02, 0.03) * orb + vec3(0.93, 0.93, 1.0) * halo + vec3(0.8, 0.8, 0.9) * soft + vec3(0.9) * wisp) / max(a, 1e-3);
+      // the minigame colours the orb with the colour to break next: black, white, or half and half
+      float white = uOrb < 0.5 ? 0.0 : uOrb < 1.5 ? 1.0 : step(0.0, c.x);
+      vec3 orbCol = mix(vec3(0.02, 0.02, 0.03), vec3(0.97, 0.97, 1.0), white);
+      vec3 haloCol = mix(vec3(0.93, 0.93, 1.0), vec3(0.05, 0.05, 0.07), uOrb > 0.5 && uOrb < 1.5 ? 1.0 : 0.0);   // a white orb gets a dark ring
+      col = (orbCol * orb + haloCol * halo + vec3(0.8, 0.8, 0.9) * soft + vec3(0.9) * wisp) / max(a, 1e-3);
     } else {
       // frost halo behind the crystal crown: a cold glow, a slowly turning six-fold snowflake
       // and four twinkling glints
@@ -911,7 +915,7 @@ const HALO = [0, 0.2, 1];    // bolt layer weights for a wide strand that only g
 const ZERO = new THREE.Vector3();
 const v = () => new THREE.Vector3();
 
-export function createElementFx(scene, camera, { reducedMotion = false, lowPower = false, furUniforms, head = null, renderer = null, onBurst = null } = {}) {
+export function createElementFx(scene, camera, { reducedMotion = false, lowPower = false, furUniforms, head = null, renderer = null, onBurst = null, onIcePillar = null, blinkSpeed = null } = {}) {
   const quality = reducedMotion ? 0.3 : lowPower ? 0.55 : 1;
   // Scale of everything a skill emits relative to the chick (sizes, speeds, reach). The coat's
   // own aura stays chick-sized; the transformation burst and footsteps use fractions of it.
@@ -1157,7 +1161,7 @@ export function createElementFx(scene, camera, { reducedMotion = false, lowPower
 
   // head crest: a procedural mark on the head plus, for ice, a small crown of 3D crystals.
   // Both are children of the head, so they follow its turns and bobbing.
-  const crestU = { uTime, uShow: { value: 0 }, uPop: { value: 1 }, uKind: { value: 0 }, uSize: { value: new THREE.Vector2(0.42, 0.56) } };
+  const crestU = { uTime, uShow: { value: 0 }, uPop: { value: 1 }, uKind: { value: 0 }, uOrb: { value: 0 }, uSize: { value: new THREE.Vector2(0.42, 0.56) } };
   const crest = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.ShaderMaterial({
     ...PREMULTIPLIED, depthTest: false, uniforms: crestU, vertexShader: CREST_VERT, fragmentShader: CREST_FRAG,
   }));
@@ -1777,8 +1781,10 @@ export function createElementFx(scene, camera, { reducedMotion = false, lowPower
       if (trailSpawns.some(q => Math.hypot(q.x - base.x, q.z - base.z) < 0.28)) return;
       lastSpike = time;
       trailSpawns.push({ x: base.x, z: base.z, t: time });
+      const life = R(3.5, 5);
       iceCluster(base, R(1, 3) * CHICK_H * (reducedMotion ? 0.7 : 1), new THREE.Vector3(t.x, 0, t.z), pos,
-        { limit: false, life: R(3.5, 5) });
+        { limit: false, life });
+      onIcePillar?.(base, life);   // the minigame freezes mobs on these (walking pillars only, never a move's)
     }
   }
 
@@ -1942,7 +1948,8 @@ export function createElementFx(scene, camera, { reducedMotion = false, lowPower
     if (tf || bk || time < blinkReadyAt) return false;
     const dist = Math.hypot(to.x - from.x, to.z - from.z);
     if (dist < 0.25) return false;
-    bk = { element, t0: time, from: v().set(from.x, 0, from.z), to: v().set(to.x, 0, to.z), dist, done: false, impact: false };
+    // blinkSpeed (minigame panel): >1 plays the whole move faster, its timing and travel alike
+    bk = { element, t0: time, speed: Math.max(0.1, blinkSpeed?.(element) || 1), from: v().set(from.x, 0, from.z), to: v().set(to.x, 0, to.z), dist, done: false, impact: false };
     blinkPos.copy(bk.from);
     if (reducedMotion) startPoof(bk);
     else if (element === 'lightning') startQuickAttack(bk);
@@ -2228,7 +2235,7 @@ export function createElementFx(scene, camera, { reducedMotion = false, lowPower
 
   function updateBlink(dt) {
     if (!bk) return;
-    const b = bk, a = time - b.t0;
+    const b = bk, a = (time - b.t0) * b.speed;
     if (a >= BLINK_TIME[b.element]) { endBlink(); return; }
     if (reducedMotion) {
       pose.hidden = a > 0.08 && a < 0.25;
@@ -2317,6 +2324,9 @@ export function createElementFx(scene, camera, { reducedMotion = false, lowPower
     get darkness() { return darkAmount; },
     // dark's current coat: 'white' or 'black' (the scene colours the beak and legs to match)
     get darkCoat() { return darkCoat; },
+    // dark minigame: colour the head orb with the colour to break next ('black' | 'white' | 'either'; null: plain black)
+    setOrbCue(cue) { crestU.uOrb.value = cue === 'white' ? 1 : cue === 'either' ? 2 : 0; },
+    get orbCue() { return ['black', 'white', 'either'][crestU.uOrb.value]; },
     // the surface the chick is on: the page (body) or an open project dialog; every effect,
     // the darkness included, applies on both, and page stamps follow it
     setSurface(host) { pageMarks?.setHost(host); darkHost = host; placeDarkCanvas(); },

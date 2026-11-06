@@ -10,7 +10,7 @@ import { createTextTracks } from "./sumi-text-tracks.js?v=badges-20261105";
 import { createButterflyPollen } from "./sumi-butterfly-pollen.js?v=chase-wait-20261105";
 import { createFlowerGame } from "./sumi-flower-game.js?v=flower-element-20261105";
 
-import { createFireMode, elementForFlower } from "./sumi-fire-mode.js?v=thumb-fx-20261105";
+import { createFireMode, elementForFlower } from "./sumi-fire-mode.js?v=p1-play2-20261106";
 
 export function createSumiChick(canvas, { onActivity = () => {}, onGrowthChange = () => {}, onElementState = () => {} } = {}) {
 const events = new AbortController();
@@ -1131,6 +1131,32 @@ const chickQInv = new THREE.Quaternion();
 const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
 const _ndc = new THREE.Vector2();
 const goalPt = new THREE.Vector3();
+// Transformed inside a project dialog: once the transformation has played, the chick uses its
+// element's move to leave. The dialog closes while the chick is hidden mid-move, and the chick
+// lands on the page (the surface switch lands the move and plays the element's arrival there).
+let exitWasTransforming = false, exitAt = -1, exitMoveT = -1;
+function dialogExit(t) {
+  const dialogOpen = Boolean(document.querySelector('.project-dialog[open]'));
+  const charged = fireMode.state.remaining > 0 && !fireMode.state.ending;
+  if (exitWasTransforming && !fireMode.transforming && dialogOpen && charged) exitAt = t + 0.35;
+  exitWasTransforming = fireMode.transforming;
+  if (!dialogOpen || !charged) { exitAt = exitMoveT = -1; return; }
+  if (exitAt >= 0 && t >= exitAt && !fireMode.blinking) {
+    // to the other side of the view from where the chick stands, a little below the middle
+    v3.copy(C.pos).project(camera);
+    raycaster.setFromCamera(_ndc.set(v3.x > 0 ? -0.35 : 0.35, -0.15), camera);
+    const dest = new THREE.Vector3();
+    if (raycaster.ray.intersectPlane(groundPlane, dest) && fireMode.blink(dest)) {
+      C.heading = Math.atan2(dest.x - C.pos.x, dest.z - C.pos.z); C.clickChase = false;
+      exitAt = -1; exitMoveT = t;
+    }
+  }
+  // close once the chick has vanished (or a moment into the move for an element that never hides)
+  if (exitMoveT >= 0 && (fireMode.pose.hidden || t - exitMoveT > 0.35 || !fireMode.blinking)) {
+    exitMoveT = -1;
+    document.querySelector('.project-dialog[open] .dialog-close')?.click();
+  }
+}
 function goalInView(x, z) {
   v3.set(x, 0, z).project(camera);
   const cx = clamp(v3.x, -0.8, 0.8), cy = clamp(v3.y, -0.7, 0.5);
@@ -1219,6 +1245,7 @@ function updateBehaviour(dt) {
     const remaining = Math.max(0, dist - stopDistance);
     const arrivalSpeed = Math.min(remaining * 2.2 + .35, Math.sqrt(40 * remaining));
     desired = Math.min(limit, arrivalSpeed) * clamp(1.2 - Math.abs(bearing) / 1.5, 0, 1);
+    desired *= fireMode.walkScale;   // transformed: per-element walking speed (minigame panel)
   }
   // Ease into a run, but stop promptly enough for a short hesitation to read.
   const response = C.pauseT > 0 ? 22 : desired > C.speed ? 5 : 11;
@@ -1772,10 +1799,14 @@ function frame(dt, t, clockDt = dt) {
   if (fireMode.transforming || fireMode.blinking) { C.collectT = Math.max(C.collectT, .1); C.speed = 0; C.move = 0; }
   if (!growthDebugHolding) updateBehaviour(dt);
   if (fireMode.blinking) { C.pos.x = fireMode.blinkPos.x; C.pos.z = fireMode.blinkPos.z; }
+  dialogExit(t);
   textTracks.update(dt);
   if(fireMode.state.unlocked&&!growthDebugHolding&&C.evolutionTime<0)C.roundnessTarget=2*fireMode.state.ratio;
   updatePose(dt, t);
-  fireMode.update(growthDebugHolding?0:clockDt,viewWidth,viewHeight);
+  // The charge and its minigame run on the real clock, but never more than a quarter second per
+  // frame: a hidden tab stops the frames, and the whole gap arriving at once would end the charge
+  // (and fail the round) the moment the visitor comes back. Away from the tab, they wait.
+  fireMode.update(growthDebugHolding?0:Math.min(clockDt,.25),viewWidth,viewHeight);
   applyDarkLook(fireMode.darkness, fireMode.darkCoat);
   if (fireMode.darkness > 0.01) { printUniforms.uDt.value = dt; fireMode.pourIntoInk(printSmokeScene, camera); }
   // When the element ends the garden is replanted with the carried seeds: from scratch after a

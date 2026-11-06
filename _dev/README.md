@@ -1644,6 +1644,170 @@ The dark chick still transforms white, but every move (click-to-move, dialog arr
   - `check-sumi-element-fx.mjs`, `check-sumi-dialog-fx.mjs` and `check-sumi-control-blink.mjs` pass.
 - Cache key: `dark-mono-20261105` (scripts), `dark-mono2-20261105` (`sumi-chick.css`).
 
+### Element minigame: walls (2026-11-06)
+Mobs in every mode now bounce off four walls instead of the window edges and page ends (`GAME_CONFIG.walls`):
+
+| wall | where |
+|---|---|
+| sides | `side` × window width free on each side (0.115, about where the drawn lines were) |
+| top | `top` px (50) above the hero's eyebrow line |
+| bottom | through the closing title, at `bottom` × its height (0.75): the second line, "Build the systems behind it." |
+
+- The top and bottom walls are page coordinates read once when the mobs come out. Mobs start inside the walls (clamped), and each roam range is clipped to them.
+- The side walls follow the window width each frame.
+- The overlay draws the walls as dashed red lines.
+- The tuning panel has a shared "벽" section above the element fields. Side changes apply at once; top and bottom from the next round.
+- Verification: `check-sumi-minigame.mjs` checks that every mob stays inside all four walls during a lightning round (top 99 px, bottom 5093 px on the 1440×900 page). Captures of the hero and the closing section show the walls where they were drawn. Passes.
+- Cache key: `minigame-walls-20261106`.
+
+### Element minigame: ice and dark MVP (2026-11-06)
+All four elements now have a game (`GAME_CONFIG.elements.ice`, `.dark`), with their own panel tabs (얼음 / 어둠) and overlays.
+
+- **Ice**:
+  - The crystal pillars that rise behind the steps freeze mobs. `sumi-element-fx.js` reports each walking pillar through the new `onIcePillar(base, life)` option; a move's pillars are never reported. `fireMode` keeps the live ones (page only) and hands the game their screen points each frame.
+  - A mob within `pillarR` + its hit radius of a pillar freezes: it stands still for `freezeTime` (0.9 s), then can't freeze again for `immune` (1.3 s).
+  - It breaks on its tier's last freeze (`freezes` 1/2/2).
+  - Defaults (tuned in the panel, 2026-11-06): count 6/3/2, speed 180/110/110, rate ×1, hit radius 30/40/50, roam 1.5, pillar reach 70 px, walk ×1.3, move speed ×1.5.
+  - Freeze and immunity run on game time (`round.clock`), not the wall clock: the first cut used `performance.now()`, which drifts from the game when frames stall or the tab is hidden.
+  - Overlay: each pillar's reach circle, and each mob's freezes with "얼음" / "면역".
+- **Dark**:
+  - Mobs are black (white outline) or white (black outline), drawn with static CSS filters (`.sumi-mob.is-black` / `.is-white`). Small and medium mobs keep one colour (split evenly); the **largest** switch every `flicker` (1.2 s). Changed 2026-11-06: small mobs used to be the ones switching.
+  - The chick breaks a mob of **its own colour** (`fireMode.darkCoat`, which turns over with every move) by touching it: chick body within `touchR` (45 px) + the mob's hit radius.
+  - Order: the first colour is set at the start (black or white at random; never "either"), then colours alternate. The wrong colour in the order bounces off.
+  - **The largest goes last**: it keeps switching black/white, but while any small or medium mob is left, touching it only pushes it away (even in the chick's colour). Once it is the only one left, it breaks only when the head orb (the colour due next), the chick's colour and its current colour all match; otherwise it is pushed. The orb keeps the alternating order.
+  - Never a dead end: if no small or medium mob shows the colour due next, the one farthest from the chick turns to that colour, so the order always alternates (a safety net; with an even split of fixed colours it rarely triggers).
+  - Any touch that does not break (the other colour, or out of order) pushes the mob straight away from the chick, the switching large one included.
+  - **The head orb** shows the colour to break next. This is the dark element's existing crest orb, not a new mark: a new crest uniform `uOrb` colours it black or white (a white orb gets a dark ring).
+    - `fireMode` sets it each frame from `game.cue` via `fx.setOrbCue`. Outside a dark round it stays the plain black orb.
+    - It shows the set first colour from the start of the transform (the round exists, waiting, while the chick transforms), so the orb no longer flashes black first.
+    - The HUD also adds "병아리 흰 · 다음 검".
+  - Defaults (tuned in the panel, 2026-11-06): count 5/3/1, speed 100/140/180, rate ×1, hit radius 15/20/50, roam 1.5, reach 45, flicker 1.2 s, large size 84 px.
+  - The large one is drawn 1.5x (84 px instead of 56) so it reads as the last, different mob: dark has its own `size: [28, 40, 84]` (other elements keep the shared `size`), its hit radius set separately. Panel: "큰 몹 크기(px)".
+  - Overlay: the chick's reach circle in its colour, and each mob's colour (the large switching ones marked "(바뀜)").
+- Verification: `check-sumi-minigame.mjs` adds ice and dark, each with synthetic inputs layered on the real frames. Passes.
+  - Ice: real pillars reach the game; a pillar freezes a mob, which stands still; no second freeze while frozen or immune; the last freeze breaks it; clearing records.
+  - Dark: the real chick place and coat reach the game; the other colour does nothing; own colour breaks and the next is the other; out of order bounces; the other colour pushes a mob (large one too) away; the large one cannot break while others are left; the order alternates through the last one; with only the large one left the orb keeps the order and a chick matching the mob but not the orb is pushed; the large one is drawn 84 px; the walk and move speed fields exist and move speed 2 halves the move; the orb shows the first colour already during the transform; the order continues; clearing records.
+- **Chick speeds per element** (every tab): "병아리 걷기 속도 배율" (`walk`) and "순간이동 속도 배율" (`blinkSpeed`), both 1 by default, applied at once.
+  - `walk` multiplies the transformed chick's desired walking speed (`fireMode.walkScale`, read in `sumi-chick-scene.js`; 1 when not transformed).
+  - `blinkSpeed` runs the whole move faster or slower: `sumi-element-fx.js` scales the blink's local clock by the speed taken when the move starts (`createElementFx` option `blinkSpeed`, wired from `fireMode`), so its timing, travel and smoke keep in step. 2 halves the move.
+- Lightning defaults (tuned in the panel, 2026-11-06): count 8/4/3, speed 80/110/170, rate 2.5/3/3.5, hit radius 30/40/50, roam 1.5, walk ×1.7, move speed ×1, hits 1/1/1, reach 60 px.
+- **Page buttons locked while transformed** (`sumi-fire-mode.js`, `LOCKED`): while the chick is transformed (`state.remaining > 0`), a capture-phase `click` listener on `window` cancels clicks on project cards, the hero reel's play button (`.hero-video-toggle`), the scroll arrow (`.hero-scroll-cue`), the filter chips, the collapse/expand buttons (`.card-details-option`) and the contact icons (`.contact-icon-link`).
+  - Hover stays: a card still opens and plays its thumbnail preview; only the click into the dialog is stopped. The press still sends the chick (its `pointerdown`).
+  - Never locked: the chick's switch and badges (`[data-sumi-control]`), the debug panels, and an open dialog (so it can be closed).
+  - `html.sumi-transform-lock` is set meanwhile; it only turns those controls' cursor to the default arrow.
+  - Verification: the dark round in `check-sumi-minigame.mjs` clicks each locked control while transformed (every click cancelled, no dialog, filter unchanged, no jump); the panel aid test shows a card click opens the dialog again once not transformed.
+- **Off-screen pins** (every element): a mob above or below the window shows a pin at that edge, at the mob's x (kept 24 px inside the sides): a red arrow pointing out of the screen and the mob's picture in a small round badge (sized by tier; dark mobs show their colour). Top pins sit 12 px below the site header; bottom pins 12 px above the bottom edge. The arrow bobs gently (still under reduced motion). Pins appear only while the mob is fully off screen and go with the mob. The HUD's ↑/↓ counts stay.
+  - Verification: the dark round counts one pin per off-screen mob, the right direction for each, all inside the window, at the top of the page and scrolled to the bottom.
+  - The ice check now follows its test mob by position: the 70 px pillar reach can freeze or break a neighbour too.
+- **Teleport out of a dialog** (`sumi-chick-scene.js`, `dialogExit`): when a transformation finishes inside an open project dialog (a seed transform or a badge summon) and the chick is still charged, after 0.35 s it uses its element's move toward the other side of the view, a little below the middle. Once the chick vanishes mid-move (or 0.35 s into it, for an element that never hides), the dialog's close button is pressed (the normal close, history included). The surface switch lands the move and plays the element's arrival on the page, and the minigame round starts there.
+  - Only a transformation that finishes in a dialog does this. No other dialog opens while transformed: `app.js`'s `openWork` refuses while `html.sumi-transform-lock` is set (card click, back/forward or a link; a refused history step turns the hash back to `#work`). The "dialog trap" is gone.
+  - Verification: `check-sumi-minigame.mjs` transforms inside an open dialog for each element: the chick moves out, the dialog closes, no round in the dialog, and the round starts on the page.
+  - Other checks updated: `check-sumi-thumb-fx.mjs` opens the charged dialog through the hash (card clicks are locked while transformed); `check-sumi-dialog-prints.mjs` turns off the panel's card-click aid before clicking a card.
+- **No dialog while transformed** (2026-11-06): cards still open on hover and play their thumbnails; nothing enters a project. `check-sumi-thumb-fx.mjs` now checks that a project asked for through the hash while transformed stays shut and the hash returns to `#work` (it used to check the stage burst). `app.js` key: `transform-no-dialog-20261106`.
+- **Finished play UI, lightning first** (`GAME_CONFIG.elements.lightning.polish: true`; other elements keep the small text HUD until they get the flag):
+  - **Start banner**: when the clock starts, "⚡ 번개 사냥!" pops in the middle with "N마리를 순간이동으로 가로질러 잡아라", gone after 1.5 s.
+  - **HUD**: a dark capsule at the top centre, under the site header: the element icon, the mobs left (big yellow number, pops on each break) over the total, the clock, and a bar for the time left (the charge left over the charge at the start; `fireMode` now passes `timeLeft`). The last 5 s turn it red and pulsing. The old text HUD is hidden (`.is-quiet`) but still kept up to date. Top pins sit below the capsule.
+  - **Mobs alive**: a slow wobble (rotate and scale, out of step) and a blue target ring (2026-11-06; replaced the yellow rim, which melted into the transformed page's colours). The ring is 7 px (`RING_PAD`) larger than the icon all round, not the hit radius, breathes (scale 1 to 1.1) and its rim shines bright for a moment every 1.8 s, each ring out of step (the spinning arc it had first was dropped); it moves, shows and goes with its mob (`m.ring`).
+  - **"N마리 남음!" in the middle**: every break that leaves mobs shows the count left, big, in the middle of the screen for 0.9 s (red for the last three); it replaces the start banner if that is still up.
+  - **Hits**: a break plays a burst where the mob was (a white-yellow flash, eight rays, its picture popping); a hit that does not break yet (more hits needed) flashes white and shakes. Breaks in one move count a combo, "2연속!" and up, where the last one broke.
+  - **Result card**: clear shows "클리어!", the time, "새 기록!" or the rank, and the top 3 with this run highlighted; fail shows "아깝다!", the mobs left and the top 3. Gone after 3.8 s.
+  - Reduced motion: no wobble, pulse or rays.
+  - Code: `sumi-minigame.js` (`.sumi-play` layer, `banner`, `burst`, `comboText`, `hitFlash`, `showResult`, `updatePlay`), styles at the end of `sumi-chick.css`.
+  - Verification: `check-sumi-minigame.mjs` section 2e plays a lightning round through it (banner, HUD count, live mobs, blue rings larger than and centred on the icons, bursts and the combo from one move, the middle count, urgent, clear card with the records, fail card) and saves `minigame-shots/polish-1..5`.
+  - Fix (2026-11-06): the icons had drifted off their hit circles. The wobble animates the CSS `rotate` and `scale` properties, which apply after `translate` but before `transform`, so the `transform` that placed each mob was scaled and rotated around the screen corner (worse the further from the top-left). Mobs are now placed with the `translate` property; the combo text with `left`/`top`. The polish check measures each shown icon's centre against its hit position (under 3 px).
+- **Finished play UI for every element** (2026-11-06; `polish: true` on fire, ice and dark too). Same base as lightning (banner, HUD, live mobs, rings, bursts, the middle count, result card), with an accent per element (`--acc`: lightning yellow, fire orange, ice pale blue, dark white) and the ring telling each element's rule (`syncRing`):
+  - **Banner line per element** (`HOWTO`): lightning "순간이동으로 가로질러 잡아라", fire "불길을 쏘여 동그라미 게이지를 채워라", ice "얼음 기둥으로 동그라미를 하나씩 깨라", dark "머리 위 색과 같은 몹을 번갈아 잡아라 · 큰 몹은 마지막".
+  - **Ring bands**: the ring is now a container (`.sumi-mob-ring`) with one band (`.sumi-ring-band`, 6 px apart) per hit (lightning `hits`) or freeze (ice `freezes`) still needed; a used band cracks off (dashed, spins out and fades).
+  - **Fire**: a heat gauge fills clockwise round the ring (`--p` = heat / exposure needed) while the breath is on it and drains as it cools; the ring turns orange while hot.
+  - **Ice**: white-blue rings; a frozen mob's rings fill pale and its icon stills and frosts (`.sumi-mob.is-frozen`); thawed but not freezable yet shows dashed and dim.
+  - **Dark**: the ring in the mob's colour (black with a white edge, or white with a dark edge), thicker when it is the colour due next; the big one is dashed grey with a lock until it is the last; the HUD shows "다음" with the colour due next (the head orb still shows it too).
+  - Bursts and "N마리 남음!" now come with every element's breaks (fire, ice, dark break in `update`, through `kill`).
+  - Mobs carry an `id` for the round (in `game.round.mobs`), so checks follow one mob exactly.
+  - `sumi-text-fx.js`: the dark text glow skips the game layers (`.sumi-play`, `.sumi-game-layer`, HUD, panel); it had been hiding the HUD's "다음" as page text.
+  - Verification: `check-sumi-minigame.mjs` 2f, for fire, ice and dark: banner and how-to line, HUD, a ring per mob; fire's gauge fills; ice's medium mob has two bands, one cracks off on a freeze, frozen shows on the ring and the icon, then not-yet-freezable; dark's big ring locked with the lock, rings in their colours, the HUD's next colour readable; a break bursts and shows the count. Captures `minigame-shots/polish-<element>-1..3`. The old ice section now follows its mob by id (no more flakes).
+- **P0 fixes from the game review** (2026-11-06):
+  - **A hidden tab no longer fails the round.** The page stops drawing while its tab is hidden, and the whole gap used to reach the charge and the game in one frame on return: the charge emptied, the round failed and the mobs jumped. `sumi-chick-scene.js` now hands `fireMode.update` at most 0.25 s per frame, so the charge and the round wait while the tab is away (the flower game keeps its own clock).
+  - **Records per settings.** Each element's top 3 is stored under a short hash of that element's settings (counts, speeds, rates, hit sizes, its own rules, walk and move speed) plus the shared size and walls (`settingsKey`): tuning starts a fresh list instead of leaving an easier setting's time on top; setting the values back brings that list back. The round keeps the key it started with (a panel edit mid-round doesn't move it). `game.records` gives each element's list for its current settings; lists from before this change (keyed by the element alone) are no longer shown.
+  - Verification: the lightning polish section of `check-sumi-minigame.mjs` sends a 30 s frame gap mid-round (the round stays, no mob lost, at most 0.25 s of charge spent) and checks that a tuned speed shows an empty list and setting it back restores the record. Two flaky test lookups in 2f were fixed (the dark big ring read after scrolling to it; the ice break aimed at a fresh small mob).
+- **P1 play-experience fixes from the game review** (2026-11-06):
+  - **Ready countdown** (`GAME_CONFIG.ready`, 1.8 s): after the transformation the mobs come out and hold still, the banner stays with a big "2, 1" under it and the HUD clock reads "준비"; nothing breaks (`live` is false). Then "시작!" pops in the middle and the clock starts; the time bar starts from the charge left at that moment.
+  - **Scroll to the mobs** (`GAME_CONFIG.autoScroll`): at the start of the countdown the page scrolls smoothly so the median mob is in the middle, unless it already is in view.
+  - **Quit**: a "그만하기" button in the HUD (the only control there; `data-sumi-control`, so the chick and the transform lock ignore it) and Esc end the round with "그만!": no record, no new round on this charge (the transformation itself goes on).
+  - **Blocked touches**: dark (the wrong colour, out of order, or the locked big one) and ice (a pillar on a thawed mob that can't freeze yet; not while it is frozen) now flash the ring red and pop a small "✕" above the mob, at most every 0.6 s per mob.
+  - **Dark readability**: the HUD shows the chick's colour beside the colour due next ("병아리 ● 다음 ●"), and a ring is thick only when a touch breaks it now (the orb's, the chick's and the mob's colours alike, not locked).
+  - **Smooth speed ramp**: the multiplier now goes linearly from `rate[0]` at 0 s to `rate[1]` at 10 s to `rate[2]` at 15 s, then holds (it jumped at 10 s and 15 s). Panel labels "속도 배율 0초 / 10초 / 15초~".
+  - Not done here (design calls): a "one more round" without new seeds, and sound (it would need a mute toggle, off by default).
+  - Checks: `check-sumi-minigame.mjs` now serves the game module with `ready: 0` and `autoScroll: false` to every section (`open()`), so each acts at once where it scrolled; `open({real: true})` serves it as is. New section 2g: the countdown (mobs still, clock waiting, "준비", no breaks, then "시작!"), the scroll, the ramp (about 2.76 at 5.3 s), quit by button and by Esc (no record, no new round, the debug restart still starts one), dark's thick rings only with the chick in the colour due next and its HUD chip, and the blocked-touch cross for dark and ice. Capture `minigame-shots/p1-ready.png`.
+- Cache key: `p1-play2-20261106` (scripts), `p1-play-20261106` (`sumi-chick.css`) (was `minigame-all2-20261106`) (scripts, `sumi-element-fx.js`, `sumi-minigame.js`, `sumi-chick.css`).
+
+### Element minigame: per-element tuning, lightning defaults, fire MVP (2026-11-06)
+- **Per-element settings**: `GAME_CONFIG.elements.<element>` holds count, speed, rate (speed multiplier from 0/10/15 s), hitR, roam and the element's own rules. `size` (drawn size) and `turn` stay shared.
+- **Lightning defaults**, from the tuned panel:
+
+  | setting | small / medium / large |
+  |---|---|
+  | count | 6 / 3 / 2 |
+  | speed | 60 / 110 / 150 |
+  | hit radius | 30 / 40 / 50 |
+  | hits | 1 / 1 / 1 |
+
+  Rate ×2.5 / ×3 / ×3.5, margin 60 px, roam 1.5.
+- **Fire MVP**:
+  - While the breath is on (fire charged, not transforming or mid-meteor, on the page), `fireMode` hands the game the mouth and butterfly screen points.
+  - The breath is a cone from the mouth toward the butterfly: 24 px wide at the mouth, widening to `width` at `length`, set to roughly the visible flame. A mob whose hit circle overlaps the cone heats by dt per second.
+  - It burns up at `expose` (0.35 / 0.8 / 1.4 s). Off the breath, heat cools at `decay` (0.6 s per second) instead of resetting. The meteor move does nothing.
+  - Defaults (tuned in the panel): count 8/4/2, speed 250/200/150, rate ×1, walk ×1, move speed ×1, hit radius 20/30/50, roam 1.5, exposure 0.2/0.4/0.7 s, cooling 0.6, length 500 px, width 300 px.
+- **Tuning panel**:
+  - One tab per element (번개 / 불). It switches to the element being played and shows its fields: the common ones plus hits and margin for lightning, or exposure, cooling, breath length and width for fire.
+  - Its test aids now start on: hit areas, text and project selection blocked, project clicks blocked.
+  - Fire's overlay draws the cone and each mob's heat ("0.20/0.35s").
+- Verification: `check-sumi-minigame.mjs`. Passes.
+  - The lightning round as before (a large mob set to 2 hits breaks on the second), with the panel on the lightning tab.
+  - Fire: the real breath reaches the game; heat builds then cools off the breath; burning every mob clears with a record; the panel follows to fire.
+  - Aids on by default and each turns off; touch devices have no game.
+- Cache key: `minigame-fire2-20261106`.
+
+### Element minigame MVP: lightning (2026-11-06)
+First playable cut of `MINIGAME-PLAN.md`, lightning only, no effects or animation: only what the game needs, for a quick test and sign-off.
+
+- New `sumi-minigame.js`: `createMinigame({enabled})` (off for touch devices and reduced motion) and `createMinigameDebug({onRestart})`. `GAME_CONFIG` holds every number.
+- **Round**: one per lightning charge, from a 20-seed or a badge transformation.
+  - Picks 6 small, 3 medium and 2 large mobs, distinct pictures first:
+    - small: card tool logos and level-1 toolkit icons;
+    - medium: level-2/3 toolkit icons, mail and Slack;
+    - large: level-4 toolkit icons.
+  - Each comes out at its icon (a card logo hidden in a closed panel comes out over its card's thumbnail). The page icon is hidden until the round ends.
+- **Movement (plan A)**: mobs keep page coordinates, like the flowers. Each roams within ±1.5 screen heights of its start and the window width, bounces at the edges and turns gently every 1.5–3 s.
+  - Speeds are 170/130/95 px/s at 1440 px width, scaled by the window width, × lightning's rate (2.5, then 3.0 from 10 s, then 3.5 from 15 s).
+  - They are drawn above the chick (`.sumi-game-layer`, z 16) with `transform` only, hidden when off screen.
+- **Clock**: starts once the transformation has played. No project dialog opens while transformed (the old "dialog trap" was dropped, 2026-11-06); a dialog the chick transformed inside closes as it teleports out, before the round starts.
+- **Hit**: a quick attack on the page is tested along the way it really goes.
+  - Every frame of the move, `fireMode` hands `game.sweep(from, to, dashId)` a stretch of the move's **straight line**: start to landing, at body height (y 0.3) where the bolt is drawn. The stretch advances with the chick's real progress (`fx.blinkPos` projected onto that line). The bolt's zigzag is ignored, as chosen on 2026-11-06.
+  - A mob, at its position now, within its radius + 30 px of that stretch is hit, at most once per move. Hits needed: 1/1/2.
+  - **Fix (2026-11-06)**: the first cut tested one straight start-to-end line at the click, and misses grew with mob speed and dash length. The move zigzags: its two bends are pushed sideways by up to 28 % of the distance (at most 0.9 world units). It also lands 0.07–0.21 s after the click, by which time a fast mob (up to about 600 px/s) had moved 40–120 px. A real quick attack is now swept as about 24 chained per-frame segments.
+  - Hit tests use only script-held positions; nothing is measured per frame.
+- **End**:
+  - Clearing all mobs records the time (0.1 s) among this browser's top 3 for the element (`localStorage['sumi-minigame-records-v1']`) and shows "클리어 12.4초 · 새 기록!" or the rank.
+  - Running out of time shows "아깝다! 남은 몹 N" with no record.
+  - The HUD under the badges shows "남은 몹 7/11 · 12.4초 · ↑2 · ↓3" (off-screen counts).
+- **Tuning panel**: bottom left, local or `?growthDebug=1` only. Mob counts, speeds, lightning rates, mob hit radius per tier (`GAME_CONFIG.hitR`, 14/20/28 px by default, apart from the drawn size; shown as the body circle in the overlay), hits per tier, hit margin, roam range, plus "지금 판 다시 시작". Counts and roam apply from the next round; the rest apply at once.
+  - "판정 범위 보기" (`GAME_CONFIG.showHits`): a canvas over the mobs (`.sumi-game-hits`, z 17).
+    - Each move's stretches are drawn as a translucent band, as wide as twice the hit margin, with its centre line; they fade over a second.
+    - Each on-screen mob's body circle is drawn with its hits so far (e.g. "1/2"): blue while untouched, red once hit.
+    - A mob is hit when its circle touches the band.
+    - Fix (2026-11-06): every size and bound uses the view without scrollbars (`documentElement.clientWidth/clientHeight`). `innerWidth` counts the vertical scrollbar, while the overlay canvas fills only the visible area, so circles were squeezed left of their mobs, increasingly toward the right edge (about 14 px there). Mobs also bounced under the scrollbar.
+  - Test aids:
+    - "텍스트 선택·드래그 막기" (`html.sumi-game-noselect`): no text selection or drag of page content.
+    - "프로젝트 드래그 막기 (상세페이지 선택 포함)" (`html.sumi-game-nodrag`): no selection or drag in project cards or anywhere in a project dialog.
+    - "프로젝트 클릭(상세페이지 열기) 막기" (`html.sumi-game-nocards`): only the click on a project card is stopped, by a capture-phase `click` listener on `window` (before `app.js`'s delegated handler), so no dialog opens. The cards keep the pointer: hovering still opens the card and plays its thumbnail preview (`hover-preview.js`), and the chick still moves on the press (its `pointerdown` listener). Pressing a card ends its preview, as before. (Earlier, cards ignored the pointer entirely, which also stopped hover and previews.)
+    - Both are off by default and removed with the panel.
+- Not yet: other elements, badge persistence restored, edge arrows and effects (plan §9).
+- Verification: new `Q:\Codex\portfolio-exports\check-sumi-minigame.mjs`. Passes twice.
+  - 15 mobs (8/4/3) out and their icons hidden; the clock waits for the transformation.
+  - The HUD counts; a large mob breaks on its second hit; clearing records a new best and restores the icons.
+  - One round per charge; the debug restart works; running out fails with no record; a touch device gets no game.
+- Cache key: `minigame-mvp-20261106`.
+
 ### Deployment package for GitHub Pages (2026-11-05)
 A packaged copy of the site, for moving to another PC and publishing on GitHub Pages. Nothing here uploads anything: the local-only policy above still holds for this folder, and the upload is done by hand from the package.
 
@@ -1659,7 +1823,7 @@ A packaged copy of the site, for moving to another PC and publishing on GitHub P
 ### Thumbnail effects on hover, the stage on open, ice thumbnails blue (2026-11-05)
 - **Ice thumbnails stay blue**: after the refraction burst, thumbnails used to return to their own colours. While ice lasts, `.work-card-visual` and the dialog's gallery images take the same cold tint as the main video: `sepia(.3) hue-rotate(170deg) saturate(.62) brightness(1.1) contrast(.94)`. The burst's own filter (`.sumi-mfx-ice`, `!important`) wins while it runs.
 - **Hover plays one thumbnail**: while fire, lightning or ice lasts (charged, not ending, coat wipe past half), the pointer entering a thumbnail plays that element's media burst on that thumbnail only: heat haze, glitch or refraction (a page card's `.work-card-visual`, or a dialog's gallery button). It plays once per entry; moving inside the same thumbnail doesn't retrigger. Dark has no media burst.
-- **The stage on open**: opening a project while charged plays the burst on the dialog's `.dialog-stage`, 320 ms after the dialog becomes the surface so the stage has painted.
+- **The stage on open** (removed 2026-11-06): opening a project while charged used to play the burst on the dialog's stage. No project opens while transformed any more, so the stage timer is gone.
 - **Code**:
   - `sumi-media-fx.js` gains `playOn(element, target)` and `supports(element)`. All bursts go through one `burst()`: the SVG filters are shared and restart as a whole, so one burst runs at a time and a new one ends the last.
   - `sumi-fire-mode.js` adds a passive delegated `pointerover` listener (removed on dispose) and the stage timer (cleared on deactivate and dispose).

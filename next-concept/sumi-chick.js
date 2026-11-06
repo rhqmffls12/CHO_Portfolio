@@ -44,7 +44,7 @@ function sync() {
 async function load() {
   if (scene || loading || !enabled || suspended()) return;
   failed = false;
-  loading = import('./sumi-chick-scene.js?v=thumb-fx-20261105');
+  loading = import('./sumi-chick-scene.js?v=p1-play2-20261106');
   sync();
   try {
     const { createSumiChick } = await loading;

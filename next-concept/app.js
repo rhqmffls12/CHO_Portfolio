@@ -125,6 +125,12 @@ function projectURL(id) {
 function openWork(id, trigger, fromHistory = false) {
   const entry = work.find(item => item.id === id);
   if (!entry) return;
+  // The chick transformed (sumi-fire-mode.js sets this class): no project opens, by click,
+  // back/forward or link. A dialog already open (the chick transformed inside it) is left alone.
+  if (!dialog.open && document.documentElement.classList.contains("sumi-transform-lock")) {
+    if (fromHistory) history.replaceState(null,"",new URL("#work",location.href));
+    return;
+  }
   stopCardPreview();
   if (!dialog.open) projectTrigger = trigger || document.querySelector(`#work-${entry.id}`);
   if (!fromHistory) {

@@ -25,7 +25,7 @@ const TWINKLE_GROUPS = 4;   // small text twinkles in this many groups (sumi-chi
 // while the rest of the title stays black with its thin rim (sumi-spark in sumi-chick.css)
 const SPARK_WORDS = '.hero-title--vision .hero-title-word';
 const SPARK_PREFIXES = ['art', 'tech'];
-const SKIP = '[data-sumi-control], .sumi-growth-debug, .sumi-fire-layer, .sumi-mark-layer, .sumi-tglow-layer, .sumi-seed-counter, .sumi-veil, script, style, svg, noscript, canvas';
+const SKIP = '[data-sumi-control], .sumi-growth-debug, .sumi-play, .sumi-game-layer, .sumi-game-hud, .sumi-game-debug, .sumi-fire-layer, .sumi-mark-layer, .sumi-tglow-layer, .sumi-seed-counter, .sumi-veil, script, style, svg, noscript, canvas';
 // above the darkness already (z 20), so left as it is
 const DARK_SKIP = '.site-header';
 

@@ -1,7 +1,8 @@
 import {COLLECTION_GOAL} from './sumi-growth-stages.js?v=relaxed-garden-20261105';
-import {createElementFx} from './sumi-element-fx.js?v=badges-20261105';
+import {createElementFx} from './sumi-element-fx.js?v=transform-no-dialog-20261106';
 import {createMediaFx} from './sumi-media-fx.js?v=thumb-fx-20261105';
-import {createTextFx} from './sumi-text-fx.js?v=hero-spark-20261105';
+import {createTextFx} from './sumi-text-fx.js?v=p1-play-20261106';
+import {createMinigame,createMinigameDebug,GAME_CONFIG} from './sumi-minigame.js?v=p1-play2-20261106';
 import * as THREE from './assets/vendor/three-r186/three.module.min.js';
 
 // dark is the special element: only a purple head flower (or the debug panel) gives it; the random
@@ -81,15 +82,24 @@ export function createFireMode(camera,head,beak,chick,{reducedMotion=false,scene
   const mediaFx=createMediaFx({reducedMotion});
   // large text sways / glitches / refracts from the burst until the element ends
   const textFx=createTextFx();
-  const fx=createElementFx(scene,camera,{reducedMotion,lowPower,furUniforms,head,renderer,onBurst:element=>mediaFx.play(element)});
+  // the element minigame (MVP: lightning) and its local tuning panel; no game on touch devices
+  const game=createMinigame({enabled:!reducedMotion&&!matchMedia('(pointer: coarse)').matches});
+  const gameDebug=createMinigameDebug({onRestart:()=>game.restart()});
+  // ice pillars rising behind the steps (world position, until when) for the minigame
+  const pillars=[];
+  const fx=createElementFx(scene,camera,{reducedMotion,lowPower,furUniforms,head,renderer,onBurst:element=>mediaFx.play(element),
+    blinkSpeed:element=>GAME_CONFIG.elements[element]?.blinkSpeed||1,   // per-element move speed (minigame panel)
+    onIcePillar:(base,life)=>{if(document.querySelector('.project-dialog[open]'))return;pillars.push({x:base.x,z:base.z,until:performance.now()/1000+life});if(pillars.length>40)pillars.shift();}});
   const layer=document.createElement('div');layer.className='sumi-fire-layer';layer.setAttribute('aria-hidden','true');
   const gauge=document.createElement('div');gauge.className='sumi-fire-gauge';gauge.hidden=true;
   const fill=document.createElement('i');
   gauge.append(fill);layer.append(gauge);document.body.append(layer);
-  const top=new THREE.Vector3(),q=new THREE.Quaternion();
+  const top=new THREE.Vector3(),q=new THREE.Quaternion(),_dash=new THREE.Vector3(),dashFrom=new THREE.Vector3(),dashTo=new THREE.Vector3();
+  // the minigame follows a quick attack frame by frame (see the update)
+  let dashId=0,dashPrev=null;
   const g={mouth:new THREE.Vector3(),forward:new THREE.Vector3(),foot:new THREE.Vector3(),body:new THREE.Vector3(),
     element:'fire',charged:false,unlocked:false,ending:false,tint:0,aim};
-  let active=true,wasUnlocked=false,wasEnding=false,lastHost=null,stageTimer=0;
+  let active=true,wasUnlocked=false,wasEnding=false,lastHost=null;
   // While the element lasts, its media burst also plays on a single thumbnail as the pointer enters
   // it (page cards, a dialog's gallery), once per entry; dark has no media burst.
   const charged=()=>active&&state.remaining>0&&!state.ending&&fx.wipe>.5&&mediaFx.supports(state.element);
@@ -99,6 +109,20 @@ export function createFireMode(camera,head,beak,chick,{reducedMotion=false,scene
     mediaFx.playOn(state.element,thumb);
   };
   document.addEventListener('pointerover',onThumbHover,{passive:true});
+  // While transformed, the page's own buttons are locked: project cards (hover still opens the card
+  // and plays its thumbnail; only the click into the dialog is stopped), the hero reel's play
+  // button, the scroll arrow, the filter and collapse/expand buttons and the contact icons. The
+  // press still sends the chick (its pointerdown). The chick's switch, badges, the debug panels and
+  // an open dialog stay usable.
+  const LOCKED='.work-card,.hero-video-toggle,.hero-scroll-cue,.filter-chip,.card-details-option,.contact-icon-link';
+  const onLockedClick=e=>{
+    if(state.remaining<=0)return;
+    const t=e.target;
+    if(!t?.closest?.(LOCKED)||t.closest('[data-sumi-control],.sumi-game-debug,.sumi-growth-debug,.project-dialog'))return;
+    e.preventDefault();e.stopPropagation();
+  };
+  window.addEventListener('click',onLockedClick,true);
+  let lockShown=false;
   // The page reacts while the element lasts: plain fixed layers under the chick canvas tint and
   // scorch / frost / charge the screen edges, and a strike flash lights the page for lightning.
   // Per frame only their opacity changes; the hero video and section headings recolour from a
@@ -210,12 +234,6 @@ export function createFireMode(camera,head,beak,chick,{reducedMotion=false,scene
       // effects belong to the old surface and are cleared; a transformed chick then arrives on
       // the new one (a project dialog opening or closing) in its element's way
       if(switched&&state.remaining>0)fx.arrive(state.element,g.foot);
-      // opening a project while charged: its main stage takes the element's media burst first,
-      // once the stage has had a moment to paint
-      clearTimeout(stageTimer);
-      if(host!==document.body)stageTimer=setTimeout(()=>{
-        if(lastHost===host&&host.open&&charged())mediaFx.playOn(state.element,host.querySelector('.dialog-stage'));
-      },320);
     }
     let clip='';
     if(host!==document.body){const r=host.getBoundingClientRect();clip=`inset(${Math.max(0,r.top)}px ${Math.max(0,width-r.right)}px ${Math.max(0,height-r.bottom)}px ${Math.max(0,r.left)}px)`;}
@@ -234,6 +252,38 @@ export function createFireMode(camera,head,beak,chick,{reducedMotion=false,scene
     // which renders inside fx.update, so the boxes are read first and match this frame's scroll)
     if(fx.darkness>.001)darkGlow(host,width,height);
     fx.update(dt,g);
+    // the minigame: a round per charge; the clock runs once the transformation has played and
+    // keeps running in a project dialog (a dialog only opens while transformed when the chick
+    // transformed inside one, and then it teleports out)
+    // fire: the breath, from the mouth toward the butterfly, while it is on (never from a dialog)
+    let breath=null;
+    if(state.element==='fire'&&state.breath>0&&!fx.transforming&&!fx.blinking&&host===document.body&&aim){
+      project(_dash.copy(g.mouth));const fx0=(_dash.x+1)*width/2,fy0=(1-_dash.y)*height/2;
+      project(_dash.copy(aim));breath={from:{x:fx0,y:fy0},to:{x:(_dash.x+1)*width/2,y:(1-_dash.y)*height/2}};
+    }
+    // ice: the live walking pillars on screen; dark: where the chick is and its coat
+    const nowS=performance.now()/1000;
+    while(pillars.length&&pillars[0].until<nowS)pillars.shift();
+    const icePillars=state.element==='ice'&&host===document.body?pillars.filter(p=>p.until>nowS).map(p=>{project(_dash.set(p.x,.05,p.z));return {x:(_dash.x+1)*width/2,y:(1-_dash.y)*height/2};}):null;
+    project(_dash.copy(g.body));
+    const chick={x:(_dash.x+1)*width/2,y:(1-_dash.y)*height/2};
+    game.update(dt,{element:state.element,charged:state.remaining>0&&!state.ending,timeLeft:state.remaining,playing:!fx.transforming&&fx.wipe>.5,dialog:host!==document.body,breath,pillars:icePillars,chick,coat:fx.darkCoat});
+    if(state.remaining>0)gameDebug?.showElement(state.element);
+    // dark: the head orb shows the colour to break next
+    fx.setOrbCue(game.cue);
+    if((state.remaining>0)!==lockShown){lockShown=state.remaining>0;document.documentElement.classList.toggle('sumi-transform-lock',lockShown);}
+    // A quick attack on the page sweeps the mobs along the straight line of the move (start to
+    // landing, at body height where the bolt is drawn), stretch by stretch as the chick really
+    // advances: its progress is its position along that line, ignoring the bolt's zigzag. Moves
+    // inside a dialog never touch the page's mobs.
+    if(fx.blinking&&state.element==='lightning'&&host===document.body){
+      const ex=dashTo.x-dashFrom.x,ez=dashTo.z-dashFrom.z,len2=ex*ex+ez*ez||1;
+      const t=THREE.MathUtils.clamp(((fx.blinkPos.x-dashFrom.x)*ex+(fx.blinkPos.z-dashFrom.z)*ez)/len2,0,1);
+      project(_dash.set(dashFrom.x+ex*t,.3,dashFrom.z+ez*t));
+      const cur={x:(_dash.x+1)*width/2,y:(1-_dash.y)*height/2,id:dashId};
+      if(dashPrev&&dashPrev.id===dashId)game.sweep(dashPrev,cur,dashId);
+      dashPrev=cur;
+    } else dashPrev=null;
     // large text: from the burst (the coat starts to change) until the element starts to end;
     // dark's thin rims instead come and go with the darkness itself
     const dark=state.element==='dark'&&fx.darkness>.001;
@@ -251,17 +301,21 @@ export function createFireMode(camera,head,beak,chick,{reducedMotion=false,scene
     get breathing(){return state.breath>0&&!fx.transforming&&!fx.blinking;},
     // A click while charged sends the chick to `dest` (the spot under the butterfly) in the
     // element's own way; false while transforming, mid-move or on the short cooldown after one.
-    blink(dest){if(!active||state.remaining<=0)return false;sample();return fx.blink(state.element,g.foot,dest);},
+    blink(dest){if(!active||state.remaining<=0)return false;sample();dashFrom.copy(g.foot);const moved=fx.blink(state.element,g.foot,dest);if(moved){dashId++;dashTo.set(dest.x,0,dest.z);}return moved;},
+    get game(){return game;},
     get blinking(){return fx.blinking;},
     get darkness(){return fx.darkness;},
     // dark's coat, 'white' or 'black': it swaps at every move while the chick is hidden
     get darkCoat(){return fx.darkCoat;},
+    get orbCue(){return fx.orbCue;},
+    // the transformed chick's walking speed multiplier, per element (minigame panel); 1 otherwise
+    get walkScale(){return state.remaining>0?(GAME_CONFIG.elements[state.element]?.walk||1):1;},
     get darknessPass(){return fx.darknessPass;},
     pourIntoInk(emitters,cam){fx.pourIntoInk(emitters,cam);},
     get blinkPos(){return fx.blinkPos;},
-    setActive(value){active=value;layer.hidden=!value;fx.setVisible(value);if(!value){clearTimeout(stageTimer);state.clearBreath();fx.clear();mediaFx.stop();textFx.clear();setVeil('',0,0);lastHost=null;}},
+    setActive(value){active=value;layer.hidden=!value;fx.setVisible(value);gameDebug?.setVisible(value);if(!value){game.stop();state.clearBreath();fx.clear();mediaFx.stop();textFx.clear();setVeil('',0,0);lastHost=null;}},
     get mediaFx(){return mediaFx;},
     get textFx(){return textFx;},
-    dispose(){clearTimeout(stageTimer);document.removeEventListener('pointerover',onThumbHover);fx.dispose();mediaFx.dispose();textFx.dispose();layer.remove();setVeil('',0,0);for(const v of veil)v.remove();},
+    dispose(){game.dispose();gameDebug?.dispose();document.removeEventListener('pointerover',onThumbHover);window.removeEventListener('click',onLockedClick,true);document.documentElement.classList.remove('sumi-transform-lock');fx.dispose();mediaFx.dispose();textFx.dispose();layer.remove();setVeil('',0,0);for(const v of veil)v.remove();},
   };
 }

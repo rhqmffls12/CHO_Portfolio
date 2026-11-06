@@ -397,3 +397,185 @@ html[data-sumi-element='ice'] :is(#hero-title, #work-title, #capabilities-title,
 html[data-sumi-element='lightning'] :is(#hero-title, #work-title, #capabilities-title, #approach-title, #dialog-title) {
   text-shadow:0 0 .04em rgba(255,252,220,.95), 0 0 .22em rgba(255,205,45,.8), 0 0 .5em rgba(255,170,20,.35);
 }
+
+/* Element minigame, MVP (sumi-minigame.js): mobs above the chick canvas, a text HUD under the
+   badges, and a local tuning panel. No effects yet. */
+.sumi-game-layer { position:fixed; inset:0; z-index:16; pointer-events:none; overflow:hidden; }
+.sumi-mob { position:absolute; left:0; top:0; display:block; object-fit:contain; will-change:translate, rotate, scale; visibility:hidden; }
+.sumi-game-hud { position:fixed; top:calc(96px + 44px + 10px + 48px + 8px + env(safe-area-inset-top, 0px)); right:max(18px, env(safe-area-inset-right, 0px)); z-index:21;
+  padding:6px 12px; border-radius:999px; background:#1a1f19cc; color:#f4f6ef; font:600 12px/1.4 Pretendard, sans-serif; font-variant-numeric:tabular-nums; pointer-events:none; }
+.sumi-game-hud[hidden] { display:none; }
+.sumi-game-debug { position:fixed; left:max(18px, env(safe-area-inset-left, 0px)); bottom:max(18px, env(safe-area-inset-bottom, 0px)); z-index:22; width:250px; box-sizing:border-box;
+  border:1px solid #bac2a6; border-radius:12px; background:#f4f5f1; color:#252d23; box-shadow:0 6px 24px #11181320; font:12px/1.5 Pretendard, sans-serif; }
+.sumi-game-debug[hidden] { display:none; }
+.sumi-game-debug summary { padding:10px 14px; cursor:pointer; font-weight:700; }
+.sumi-game-debug summary span { color:#596444; font-weight:400; }
+.sumi-game-debug-body { display:grid; grid-template-columns:1fr 70px; gap:4px 8px; padding:0 14px 6px; align-items:center; }
+.sumi-game-debug input { width:100%; box-sizing:border-box; padding:2px 4px; font:inherit; }
+.sumi-game-debug-note { margin:4px 14px; font-size:11px; color:#636b5d; }
+.sumi-game-debug button { margin:4px 14px 12px; min-height:30px; padding:0 10px; border:1px solid #bac2a6; border-radius:6px; background:transparent; cursor:pointer; font:inherit; }
+.sumi-game-debug-check { display:flex; align-items:center; gap:6px; margin:2px 14px; font-size:11px; cursor:pointer; }
+.sumi-game-debug-check input { width:auto; }
+/* tuning-panel test aids (sumi-minigame.js) */
+html.sumi-game-noselect body, html.sumi-game-noselect body *:not(.sumi-game-debug *) { -webkit-user-select:none !important; user-select:none !important; -webkit-user-drag:none !important; }
+html.sumi-game-nodrag :is(.work-card, .work-card *, .project-dialog, .project-dialog *) { -webkit-user-select:none !important; user-select:none !important; -webkit-user-drag:none !important; }
+.sumi-game-hits { position:fixed; inset:0; z-index:17; width:100%; height:100%; pointer-events:none; }
+.sumi-game-hits[hidden] { display:none; }
+.sumi-game-debug-tabs { display:flex; gap:4px; padding:0 14px 8px; }
+.sumi-game-debug-tabs button { flex:1; min-height:28px; margin:0; border:1px solid #bac2a6; border-radius:6px; background:transparent; cursor:pointer; font:inherit; }
+.sumi-game-debug-tabs button[aria-pressed='true'] { border-color:#7d8c3b; background:#7d8c3b; color:#fff; }
+.sumi-game-debug { max-height:calc(100vh - 36px); overflow:auto; }
+/* dark minigame: mobs in black (white outline) or white (black outline) */
+.sumi-mob.is-black { filter:brightness(0) drop-shadow(0 0 1.5px #fff) drop-shadow(0 0 1px #fff); }
+.sumi-mob.is-white { filter:brightness(0) invert(1) drop-shadow(0 0 1.5px #000) drop-shadow(0 0 1px #000); }
+.sumi-game-debug-head { margin:6px 0 0; font-weight:700; font-size:11px; color:#55642c; }
+/* transformed: the page's own buttons are locked (clicks stopped in sumi-fire-mode.js); hover effects stay */
+html.sumi-transform-lock :is(.work-card-visual, .work-card h3 button, .hero-video-toggle, .hero-scroll-cue, .filter-chip, .card-details-option, .contact-icon-link) { cursor:default; }
+/* minigame: a mob off screen shows a pin at the top or bottom edge (arrow + its picture), bobbing gently */
+.sumi-mob-pin { position:absolute; left:0; top:0; display:flex; flex-direction:column; align-items:center; gap:2px; will-change:transform; pointer-events:none; }
+.sumi-mob-pin[hidden] { display:none; }
+.sumi-mob-pin[data-dir='down'] { flex-direction:column-reverse; }
+.sumi-mob-pin::before { content:''; width:0; height:0; border-left:7px solid transparent; border-right:7px solid transparent; border-bottom:10px solid #e8432e; filter:drop-shadow(0 0 2px #fff); animation:sumi-pin-bob .8s ease-in-out infinite alternate; }
+.sumi-mob-pin[data-dir='down']::before { border-bottom:0; border-top:10px solid #e8432e; }
+.sumi-mob-pin img { display:block; width:22px; height:22px; object-fit:contain; padding:3px; border-radius:50%; background:rgba(255,255,255,.85); box-shadow:0 0 0 1.5px #e8432e, 0 1px 4px rgba(0,0,0,.25); }
+.sumi-mob-pin-large img { width:28px; height:28px; }
+.sumi-mob-pin-small img { width:18px; height:18px; }
+.sumi-mob-pin.is-black img { filter:brightness(0); }
+.sumi-mob-pin.is-white img { filter:brightness(0) invert(1); background:rgba(20,20,22,.85); }
+/* anchored on its tip: the pin's own box is shifted so the arrow points at the edge */
+.sumi-mob-pin[data-dir='up'] { translate:-50% 0; }
+.sumi-mob-pin[data-dir='down'] { translate:-50% -100%; }
+@keyframes sumi-pin-bob { from { transform:translateY(0); } to { transform:translateY(-3px); } }
+.sumi-mob-pin[data-dir='down']::before { animation-direction:alternate-reverse; }
+@media (prefers-reduced-motion: reduce) { .sumi-mob-pin::before { animation:none; } }
+/* ---- minigame play UI (elements with `polish`; lightning first) ---- */
+.sumi-game-hud.is-quiet { display:none; }
+.sumi-play { position:fixed; inset:0; z-index:21; pointer-events:none; font-family:inherit; }
+/* HUD: a dark capsule at the top centre with the count, the clock and the time-left bar */
+.sumi-play-hud { position:absolute; left:50%; top:84px; translate:-50% 0; display:flex; align-items:center; gap:14px; padding:9px 20px 13px 16px; border-radius:999px; background:rgba(18,18,20,.9); color:#fff; box-shadow:0 6px 22px rgba(0,0,0,.28), 0 0 0 1.5px var(--acc); overflow:hidden; }
+.sumi-play-hud[hidden] { display:none; }
+.sumi-play-icon { font-size:20px; line-height:1; filter:drop-shadow(0 0 6px var(--acc)); }
+.sumi-play-count { display:flex; align-items:baseline; gap:2px; font-variant-numeric:tabular-nums; }
+.sumi-play-count b { font-size:26px; font-weight:800; line-height:1; color:var(--acc); }
+.sumi-play-count small { font-size:13px; opacity:.7; }
+.sumi-play-time { min-width:56px; font-size:15px; font-weight:600; font-variant-numeric:tabular-nums; text-align:right; opacity:.9; }
+.sumi-play-bar { position:absolute; left:16px; right:16px; bottom:5px; height:3px; border-radius:2px; background:rgba(255,255,255,.15); }
+.sumi-play-bar i { position:absolute; inset:0; border-radius:inherit; background:var(--acc); transform-origin:left center; }
+.sumi-play-hud.is-tick .sumi-play-count b { animation:sumi-play-tick .32s ease-out; }
+.sumi-play-hud.is-urgent { box-shadow:0 6px 22px rgba(0,0,0,.28), 0 0 0 2px #ff4a3d; animation:sumi-play-urgent .5s ease-in-out infinite alternate; }
+.sumi-play-hud.is-urgent .sumi-play-bar i { background:#ff4a3d; }
+.sumi-play-hud.is-urgent .sumi-play-time { color:#ff8a80; opacity:1; }
+@keyframes sumi-play-tick { 0% { scale:1.6; } 100% { scale:1; } }
+@keyframes sumi-play-urgent { to { scale:1.05; } }
+/* start banner */
+.sumi-play-banner { position:absolute; left:50%; top:38%; translate:-50% -50%; display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center; white-space:nowrap; }
+.sumi-play-banner[hidden] { display:none; }
+.sumi-play-banner strong { font-size:clamp(40px, 6vw, 76px); font-weight:900; letter-spacing:-.02em; color:var(--acc); -webkit-text-stroke:2px #141416; paint-order:stroke fill; text-shadow:0 4px 0 #141416, 0 0 26px var(--acc); }
+.sumi-play-banner span { padding:6px 14px; border-radius:999px; background:rgba(18,18,20,.88); color:#fff; font-size:15px; font-weight:600; }
+.sumi-play-banner.is-on { animation:sumi-play-banner 1.5s cubic-bezier(.2,.9,.3,1.2) both; }
+@keyframes sumi-play-banner { 0% { opacity:0; scale:.4; } 14% { opacity:1; scale:1.08; } 22% { scale:1; } 80% { opacity:1; scale:1; } 100% { opacity:0; scale:1.04; } }
+/* result card */
+.sumi-play-result { position:absolute; left:50%; top:42%; translate:-50% -50%; min-width:240px; padding:22px 30px 20px; border-radius:22px; background:#141416; color:#fff; text-align:center; box-shadow:0 14px 44px rgba(0,0,0,.35), 0 0 0 2px var(--acc); }
+.sumi-play-result[hidden] { display:none; }
+.sumi-play-result.is-fail { box-shadow:0 14px 44px rgba(0,0,0,.35), 0 0 0 2px #ff4a3d; }
+.sumi-play-result strong { display:block; font-size:34px; font-weight:900; color:var(--acc); }
+.sumi-play-result.is-fail strong { color:#ff6b5e; }
+.sumi-play-result p { margin:0; }
+.sumi-play-big { margin-top:4px !important; font-size:46px; font-weight:800; line-height:1.1; font-variant-numeric:tabular-nums; }
+.sumi-play-big small { margin-left:4px; font-size:16px; font-weight:600; opacity:.75; }
+.sumi-play-tag { margin-top:6px !important; display:inline-block; padding:3px 12px; border-radius:999px; background:var(--acc); color:#141416; font-size:13px; font-weight:800; }
+.sumi-play-result.is-fail .sumi-play-tag { background:rgba(255,255,255,.14); color:#fff; font-weight:600; }
+.sumi-play-result ol { list-style:none; margin:14px 0 0; padding:10px 0 0; border-top:1px solid rgba(255,255,255,.14); display:grid; gap:4px; font-size:14px; font-variant-numeric:tabular-nums; }
+.sumi-play-result li { display:flex; justify-content:space-between; gap:24px; opacity:.7; }
+.sumi-play-result li.is-now { opacity:1; color:var(--acc); font-weight:700; }
+.sumi-play-result.is-on { animation:sumi-play-pop .45s cubic-bezier(.2,.9,.3,1.3) both; }
+@keyframes sumi-play-pop { from { opacity:0; scale:.6; } to { opacity:1; scale:1; } }
+/* mobs alive: a wobble and an electric yellow rim (lightning) */
+.sumi-mob-live { animation:sumi-mob-wobble 1.6s ease-in-out infinite; }
+.sumi-mob-live.is-hit { animation:sumi-mob-hit .22s ease-out; filter:brightness(3) drop-shadow(0 0 8px #fff); }
+@keyframes sumi-mob-wobble { 0%, 100% { rotate:-7deg; scale:1; } 50% { rotate:7deg; scale:1.07; } }
+@keyframes sumi-mob-hit { 0% { scale:1.35; } 40% { rotate:-14deg; } 70% { rotate:12deg; } 100% { scale:1; rotate:0deg; } }
+/* a mob broken: a flash, rays and its picture popping; combo text */
+.sumi-burst { position:absolute; left:0; top:0; width:0; height:0; pointer-events:none; }
+.sumi-burst::before { content:''; position:absolute; left:-60px; top:-60px; width:120px; height:120px; border-radius:50%; background:radial-gradient(circle, #fff 0 30%, var(--acc) 45%, transparent 70%); animation:sumi-burst-flash .4s ease-out both; }
+.sumi-burst img { position:absolute; left:0; top:0; translate:-50% -50%; object-fit:contain; animation:sumi-burst-pic .45s ease-out both; }
+.sumi-burst i { position:absolute; left:0; top:-2.5px; width:64px; height:5px; border-radius:2px; transform-origin:0 50%; background:linear-gradient(90deg, #fff, var(--acc) 60%, transparent); animation:sumi-burst-ray .45s ease-out both; }
+@keyframes sumi-burst-flash { from { opacity:1; scale:.3; } to { opacity:0; scale:1.6; } }
+@keyframes sumi-burst-pic { 0% { opacity:1; scale:1; filter:brightness(4); } 100% { opacity:0; scale:1.8; filter:brightness(1); } }
+@keyframes sumi-burst-ray { 0% { opacity:1; translate:8px 0; scale:.2 1; } 60% { opacity:1; } 100% { opacity:0; translate:40px 0; scale:1 .4; } }
+.sumi-burst i { translate:0 0; }
+.sumi-combo { position:absolute; left:0; top:0; translate:-50% -100%; font-size:26px; font-weight:900; color:var(--acc); -webkit-text-stroke:1.5px #141416; paint-order:stroke fill; text-shadow:0 3px 0 #141416; white-space:nowrap; pointer-events:none; }
+.sumi-combo.is-on { animation:sumi-combo .9s ease-out both; }
+@keyframes sumi-combo { 0% { opacity:0; scale:.4; } 18% { opacity:1; scale:1.25; } 30% { scale:1; } 75% { opacity:1; } 100% { opacity:0; translate:-50% -160%; } }
+@media (prefers-reduced-motion: reduce) {
+  .sumi-mob-live, .sumi-play-hud.is-urgent, .sumi-play-hud.is-tick .sumi-play-count b { animation:none; }
+  .sumi-burst i { display:none; }
+}
+/* "N마리 남음!" in the middle on every break */
+.sumi-play-left { position:absolute; left:50%; top:46%; translate:-50% -50%; display:flex; align-items:baseline; gap:8px; white-space:nowrap; }
+.sumi-play-left[hidden] { display:none; }
+.sumi-play-left b { font-size:clamp(64px, 9vw, 120px); font-weight:900; line-height:1; color:#fff; -webkit-text-stroke:3px #0f2a4a; paint-order:stroke fill; text-shadow:0 5px 0 #0f2a4a, 0 0 30px rgba(64,160,255,.75); font-variant-numeric:tabular-nums; }
+.sumi-play-left span { font-size:clamp(20px, 2.4vw, 30px); font-weight:800; color:#fff; -webkit-text-stroke:2px #0f2a4a; paint-order:stroke fill; text-shadow:0 3px 0 #0f2a4a; }
+.sumi-play-left.is-few b { color:#ff5a4d; text-shadow:0 5px 0 #4a0f0f, 0 0 30px rgba(255,90,77,.75); -webkit-text-stroke-color:#4a0f0f; }
+.sumi-play-left.is-on { animation:sumi-play-left .9s cubic-bezier(.2,.9,.3,1.3) both; }
+@keyframes sumi-play-left { 0% { opacity:0; scale:.5; } 16% { opacity:1; scale:1.15; } 28% { scale:1; } 75% { opacity:1; } 100% { opacity:0; scale:.96; } }
+/* element accents for the play UI and its bursts */
+.sumi-play, .sumi-burst, .sumi-combo { --acc:#ffd600; }
+.sumi-play[data-element='fire'], .sumi-burst-fire { --acc:#ff8a1f; }
+.sumi-play[data-element='ice'], .sumi-burst-ice { --acc:#9fdcff; }
+.sumi-play[data-element='dark'], .sumi-burst-dark { --acc:#ffffff; }
+/* the target ring: a container, breathing; each band is one hit or freeze still needed (band 0
+   innermost, 6 px apart), its rim shining every 1.8 s; a used band cracks off */
+.sumi-mob-ring { position:absolute; left:0; top:0; pointer-events:none; --ring:#40a0ff; --glow:rgba(64,160,255,.6); animation:sumi-ring-breathe 1.1s ease-in-out infinite alternate; }
+.sumi-ring-band { position:absolute; inset:calc(var(--k, 0) * -6px); box-sizing:border-box; border-radius:50%; border:2.5px solid var(--ring); box-shadow:0 0 0 1.5px rgba(10,30,60,.55), 0 0 10px var(--glow), inset 0 0 8px var(--glow); transition:background .15s, opacity .15s; }
+.sumi-ring-band::after { content:''; position:absolute; inset:-2.5px; border-radius:50%; border:2.5px solid #e6f4ff; box-shadow:0 0 12px 2px rgba(150,210,255,.9), inset 0 0 8px rgba(150,210,255,.6); opacity:0; animation:sumi-ring-shine 1.8s ease-in-out infinite; animation-delay:calc(var(--k, 0) * .15s); }
+.sumi-ring-band.is-crack { border-style:dashed; border-color:#fff; animation:sumi-ring-crack .42s ease-out forwards; }
+.sumi-ring-band.is-crack::after { display:none; }
+@keyframes sumi-ring-breathe { from { scale:1; } to { scale:1.1; } }
+@keyframes sumi-ring-shine { 0%, 62%, 100% { opacity:0; } 74% { opacity:1; } 86% { opacity:.15; } }
+@keyframes sumi-ring-crack { 0% { opacity:1; scale:1; } 25% { scale:1.08; } 100% { opacity:0; scale:1.45; rotate:20deg; } }
+/* fire: the heat gauge, filling clockwise round the ring while the breath is on it */
+.sumi-ring-heat { position:absolute; inset:-6px; border-radius:50%; background:conic-gradient(#ff6a1a 0 calc(var(--p, 0) * 360deg), rgba(255,255,255,.18) 0); -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 6px), #000 calc(100% - 5px)); mask:radial-gradient(farthest-side, transparent calc(100% - 6px), #000 calc(100% - 5px)); opacity:0; transition:opacity .15s; }
+.sumi-mob-ring.is-hot .sumi-ring-heat { opacity:1; filter:drop-shadow(0 0 5px #ff7a1a); }
+.sumi-mob-ring.is-hot .sumi-ring-band { --ring:#ffb24a; --glow:rgba(255,140,40,.6); }
+/* ice: white-blue rings; frozen fills them and stills the icon; not freezable yet goes dashed and dim */
+.sumi-mob-ring-ice { --ring:#eaf8ff; --glow:rgba(120,200,255,.85); }
+.sumi-mob-ring[data-state~='frozen'] .sumi-ring-band { background:rgba(190,235,255,.35); border-color:#fff; }
+.sumi-mob-ring[data-state~='immune'] .sumi-ring-band { border-style:dashed; opacity:.45; }
+.sumi-mob-ring[data-state~='immune'] .sumi-ring-band::after { display:none; }
+.sumi-mob.is-frozen { animation-play-state:paused; filter:saturate(.35) brightness(1.2) drop-shadow(0 0 6px #cdefff); }
+/* dark: the ring in the mob's colour, thicker when it is the colour due next; the big one dashed with
+   a lock until it is the last */
+.sumi-mob-ring[data-state~='black'] .sumi-ring-band { border-color:#0c0c0e; box-shadow:0 0 0 1.5px rgba(255,255,255,.9), 0 0 10px rgba(255,255,255,.6); }
+.sumi-mob-ring[data-state~='white'] .sumi-ring-band { border-color:#fff; box-shadow:0 0 0 1.5px rgba(0,0,0,.85), 0 0 10px rgba(255,255,255,.5); }
+.sumi-mob-ring[data-state~='next'] .sumi-ring-band { border-width:4.5px; }
+.sumi-mob-ring[data-state~='locked'] .sumi-ring-band { border-style:dashed; border-color:#9a9aa2; box-shadow:none; opacity:.75; }
+.sumi-mob-ring[data-state~='locked'] .sumi-ring-band::after { display:none; }
+.sumi-ring-lock { position:absolute; right:-10px; top:-10px; display:none; font-size:18px; line-height:1; filter:drop-shadow(0 1px 2px rgba(0,0,0,.6)); }
+.sumi-mob-ring[data-state~='locked'] .sumi-ring-lock { display:block; }
+/* dark: the colour due next in the HUD */
+.sumi-play-next { display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700; opacity:.9; }
+.sumi-play-next[hidden] { display:none; }
+.sumi-play-next i { width:18px; height:18px; border-radius:50%; box-sizing:border-box; }
+.sumi-play-next i[data-color='black'] { background:#0c0c0e; border:2px solid #fff; }
+.sumi-play-next i[data-color='white'] { background:#fff; border:2px solid #0c0c0e; box-shadow:0 0 0 1.5px #fff; }
+@media (prefers-reduced-motion: reduce) { .sumi-mob-ring, .sumi-ring-band::after, .sumi-ring-band.is-crack { animation:none; } }
+/* ---- P1 (2026-11-06) ---- */
+/* the ready countdown under the banner */
+.sumi-play-banner em { min-height:1em; font-style:normal; font-size:clamp(48px, 7vw, 92px); font-weight:900; line-height:1; color:#fff; -webkit-text-stroke:2.5px #141416; paint-order:stroke fill; text-shadow:0 4px 0 #141416, 0 0 24px var(--acc); }
+.sumi-play-banner em.is-on { animation:sumi-play-count .6s cubic-bezier(.2,.9,.3,1.3) both; }
+@keyframes sumi-play-count { 0% { opacity:0; scale:1.8; } 30% { opacity:1; scale:1; } 100% { opacity:.9; scale:.92; } }
+/* quit: the one control in the HUD */
+.sumi-play-quit { pointer-events:auto; margin-left:2px; padding:4px 10px; border:1px solid rgba(255,255,255,.35); border-radius:999px; background:transparent; color:#fff; font:inherit; font-size:12px; font-weight:700; cursor:pointer; opacity:.8; }
+.sumi-play-quit:hover, .sumi-play-quit:focus-visible { opacity:1; border-color:var(--acc); color:var(--acc); }
+/* dark: the chick's colour beside the colour due next */
+.sumi-play-coat { display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700; opacity:.9; }
+.sumi-play-coat[hidden] { display:none; }
+.sumi-play-coat i { width:18px; height:18px; border-radius:50%; box-sizing:border-box; }
+.sumi-play-coat i[data-color='black'] { background:#0c0c0e; border:2px solid #fff; }
+.sumi-play-coat i[data-color='white'] { background:#fff; border:2px solid #0c0c0e; box-shadow:0 0 0 1.5px #fff; }
+/* a blocked touch: the ring flashes red, a cross pops */
+.sumi-mob-ring.is-nope .sumi-ring-band { animation:sumi-ring-nope .45s ease-out; }
+@keyframes sumi-ring-nope { 0%, 40% { border-color:#ff4a3d; box-shadow:0 0 0 1.5px rgba(60,0,0,.6), 0 0 14px rgba(255,74,61,.9); } 100% { } }
+.sumi-nope { position:absolute; translate:-50% -100%; font-size:22px; font-weight:900; color:#ff4a3d; -webkit-text-stroke:1.5px #fff; paint-order:stroke fill; pointer-events:none; animation:sumi-nope .6s ease-out both; }
+@keyframes sumi-nope { 0% { opacity:0; scale:.4; } 25% { opacity:1; scale:1.2; } 45% { scale:1; } 100% { opacity:0; translate:-50% -160%; } }
